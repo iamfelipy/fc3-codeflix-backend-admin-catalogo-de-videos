@@ -61,9 +61,19 @@
 
 - instalar o docker
 - extensoes vcode
+  - devcontainer
+  - eslint
+  - pretty
 
-#### comandos 
+#### comandos
 ```bash
+# recomendação
+executar o projeto com devcontainer
+instalar extensão dev container
+ctrl + shift + p 
+> dev container: reopen in container
+
+---
 # Executar docker compose na raiz do projeto, para os caminhos funcionarem
 docker compose -f docker/docker-compose.yml up
 docker compose -f docker/docker-compose.yml up --build

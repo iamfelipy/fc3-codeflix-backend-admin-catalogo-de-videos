@@ -1,0 +1,36 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/docker-outside-of-docker-compose
+{
+	"name": "backend: admin catalogo de videos",
+	"dockerComposeFile": "../docker/docker-compose.yml",
+	"service": "fc3-codeflix-backend-admin-catalogo-de-videos",
+	"workspaceFolder": "/home/node/app",
+
+	// Use this environment variable if you need to bind mount your local source code into a new container.
+	"remoteEnv": {
+		"LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}"
+	},
+
+	"features": {
+		// Sim, essa feature permite usar o Docker do host (via socket) e rodar comandos Docker dentro do container dev.
+		// desativei pois deu problema no build dev container, pq uso imagem slim
+		// se precisar no futuro vejo isso
+		// "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+		// 	"version": "20.10",
+		// 	"enableNonRootDocker": "true",
+		// 	"moby": "true"
+		// },
+		// "ghcr.io/devcontainers/features/common-utils:2": {},
+		// "ghcr.io/stuartleeks/dev-container-features/shell-history:0": {},
+		// "ghcr.io/devcontainers-extra/features/zsh-plugins:0": {}
+		"ghcr.io/devcontainers/features/git:1": {}
+	}
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "docker --version",
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}
