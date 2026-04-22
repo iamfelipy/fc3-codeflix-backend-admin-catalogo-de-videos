@@ -1,7 +1,7 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/docker-outside-of-docker-compose
 {
-	"name": "backend: admin catalogo de videos",
+	"name": "micro-videos-admin",
 	"dockerComposeFile": "../docker/docker-compose.yml",
 	"service": "fc3-codeflix-backend-admin-catalogo-de-videos",
 	"workspaceFolder": "/home/node/app",
