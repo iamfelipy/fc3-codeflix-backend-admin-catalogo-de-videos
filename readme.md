@@ -36,7 +36,7 @@
 
 ### etapas de construção da aplicação backend
 - Montagem do ambiente de desenvolvimento (Docker e IDE)
-- modelar o core antes de ir para o framework nestjs, usando ddd e clean archtecture
+- modelar o core(regras de negocio, ...) antes de ir para o framework nestjs, usando ddd e clean archtecture
 - Criar uma aplicação TypeScript (core)
     - Criar entidade de Categoria
     - Criar testes (pirâmide de testes)
@@ -54,3 +54,20 @@
     - docker file para produção
         - imagem menor, otimizada
         - vai ser usada no cd
+
+
+----
+#### rodar o projeto
+
+- instalar o docker
+- extensoes vcode
+
+#### comandos 
+```bash
+# Executar docker compose na raiz do projeto, para os caminhos funcionarem
+docker compose -f docker/docker-compose.yml up
+docker compose -f docker/docker-compose.yml up --build
+
+# acessar container
+docker exec -it fc3-codeflix-backend-admin-catalogo bash
+```
