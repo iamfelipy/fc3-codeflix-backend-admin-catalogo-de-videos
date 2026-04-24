@@ -9,7 +9,7 @@
 ### caracteristica do projeto
 - microserviço da parte administrativa do catalogo de video
 - typescript, javascript
-- clean architecture, domain driven design, solid, conceitos da arquitetura de microserviços
+- clean architecture, domain driven design, solid, conceitos da arquitetura de microserviços, piramide de testes, tdd
 - nestjs
 - spa: frontend conversa com o backend de administração de video
 - api rest
@@ -72,6 +72,11 @@ executar o projeto com devcontainer
 instalar extensão dev container
 ctrl + shift + p 
 > dev container: reopen in container
+
+---
+tests
+npm run test
+npm run test — — watch
 
 ---
 # Executar docker compose na raiz do projeto, para os caminhos funcionarem

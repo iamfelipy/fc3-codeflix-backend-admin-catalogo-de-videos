@@ -1,7 +1,7 @@
 {
   "name": "micro-videos-admin",
   "version": "1.0.0",
-  "description": "### c4 model ![Imagem 2](docs/c4-model-baixa-amplitude.png) ![Imagem 1](docs/c4-model-ampla.png)",
+  "description": "",
   "main": "index.js",
   "directories": {
     "doc": "docs"
