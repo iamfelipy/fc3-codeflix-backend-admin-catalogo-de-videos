@@ -63,7 +63,17 @@
 - extensoes vcode
   - devcontainer
   - eslint
+    - regra de codigo
   - pretty
+    - formatar
+  - jest
+    - botão no codigo
+    - icones de quimica - arvore de testes
+    - executa apenas o teste isolado
+    - jest
+      - orta.vscode-jest
+    - jest runner
+      - firsttris.vscode-jest-runner
 
 #### comandos
 ```bash
