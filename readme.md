@@ -57,7 +57,7 @@
 
 
 ----
-#### rodar o projeto
+### rodar o projeto
 
 - instalar o docker
 - extensoes vcode
@@ -75,7 +75,8 @@
     - jest runner
       - firsttris.vscode-jest-runner
 
-#### comandos
+----
+### comandos
 ```bash
 # recomendação
 executar o projeto com devcontainer
@@ -96,3 +97,7 @@ docker compose -f docker/docker-compose.yml up --build
 # acessar container
 docker exec -it fc3-codeflix-backend-admin-catalogo bash
 ```
+
+---
+projeto pai:
+[Link para o projeto pai](https://github.com/iamfelipy/fc3-codeflix-netflix)
