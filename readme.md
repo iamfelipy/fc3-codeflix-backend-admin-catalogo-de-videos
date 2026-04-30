@@ -22,6 +22,10 @@
     - consigo trocar os frameworks com essa estrategia, ex: nestjs, express, banco
     - uncle bob - framework é detalhe
 - utlizando conceitos de uma modelagem mais rica, facilita o entendimento da arquitetura em camadas do software de forma mais madura
+- ddd: domain driven design
+  - design tatico
+    - entidade, objeto de valor, repository
+- repository inmemory, mysql
 
 ---
 
