@@ -37,6 +37,10 @@
   - videos
 
 ---
+### tdd, triple aaa
+- quantidade de testes:
+  - teste de unidade: 30
+---
 
 ### etapas de construção da aplicação backend
 - Montagem do ambiente de desenvolvimento (Docker e IDE)
