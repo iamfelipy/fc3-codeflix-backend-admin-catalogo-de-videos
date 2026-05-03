@@ -37,7 +37,8 @@
   - videos
 
 ---
-### tdd, triple aaa
+### testes
+- caracteristicas: tdd, triple aaa, class-validator, fluent pattern
 - quantidade de testes:
   - teste de unidade: 30
 ---
