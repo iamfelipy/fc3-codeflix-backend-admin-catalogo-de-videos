@@ -91,6 +91,7 @@ export abstract class InMemorySearchableRepository<
   ) {
     const start = (page - 1) * per_page; // 0 * 15 = 0
     const limit = start + per_page; // 0 + 15 = 15
+    //se start for um indice maior que length, retorna um array vazio, sem erro.
     return items.slice(start, limit);
   }
 
