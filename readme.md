@@ -38,7 +38,7 @@
 
 ---
 ### testes
-- caracteristicas: tdd, triple aaa, class-validator, fluent pattern
+- tdd, triple aaa, class-validator, fluent pattern, Test Data Builder
 - quantidade de testes:
   - teste de unidade: 30
 ---
