@@ -16,6 +16,7 @@
     "@swc/cli": "^0.1.65",
     "@swc/core": "^1.15.30",
     "@swc/jest": "^0.2.39",
+    "@types/chance": "^1.1.4",
     "@types/jest": "^29.5.4",
     "@types/lodash": "^4.17.24",
     "@types/uuid": "^9.0.3",
@@ -24,6 +25,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "chance": "^1.1.11",
     "class-validator": "^0.14.0",
     "lodash": "^4.17.21",
     "uuid": "^9.0.0"

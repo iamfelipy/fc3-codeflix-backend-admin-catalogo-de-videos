@@ -37,8 +37,17 @@
   - videos
 
 ---
+### DDD
+  - category
+    - class-validator
+  
+
+---
 ### testes
-- tdd, triple aaa, class-validator, fluent pattern, Test Data Builder
+- tdd, triple aaa
+- fluent pattern, Test Data Builder(Gof - criacional)
+  - CategoryFakeBuilder
+  - ValidatorRules
 - quantidade de testes:
   - teste de unidade: 30
 ---

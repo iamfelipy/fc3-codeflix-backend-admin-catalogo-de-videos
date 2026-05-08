@@ -4,6 +4,7 @@ import { Uuid } from "../../shared/domain/value-objects/uuid.vo";
 
 type PropOrFactory<T> = T | ((index: number) => T);
 
+// fluent pattern, Test Data Builder
 export class CategoryFakeBuilder<TBuild = any> {
   // auto generated in entity
   private _category_id: PropOrFactory<Uuid> | undefined = undefined;
