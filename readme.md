@@ -25,9 +25,14 @@
 - ddd: domain driven design
   - design tatico
     - entidade, objeto de valor, repository
-- repository 
+
+----
+
+- database, persistence
+  - repository 
   - inmemory, mysql
   - orm: sequelize
+  - design pattern - active record
 
 ---
 
@@ -45,12 +50,13 @@
 
 ---
 ### testes
-- tdd, triple aaa
+- tdd(test driven development), triple aaa
 - fluent pattern, Test Data Builder(Gof - criacional)
   - CategoryFakeBuilder
   - ValidatorRules
 - quantidade de testes:
-  - teste de unidade: 30
+  - unidade: 76
+  - integração: 1
 ---
 
 ### etapas de construção da aplicação backend
