@@ -50,7 +50,7 @@
 
 ---
 ### testes
-- tdd(test driven development), triple aaa
+- tdd(test driven development), triple aaa(arrange, act, assert)
 - fluent pattern, Test Data Builder(Gof - criacional)
   - CategoryFakeBuilder
   - ValidatorRules
