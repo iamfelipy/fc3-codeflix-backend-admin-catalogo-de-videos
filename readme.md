@@ -25,7 +25,9 @@
 - ddd: domain driven design
   - design tatico
     - entidade, objeto de valor, repository
-- repository inmemory, mysql
+- repository 
+  - inmemory, mysql
+  - orm: sequelize
 
 ---
 
@@ -40,7 +42,6 @@
 ### DDD
   - category
     - class-validator
-  
 
 ---
 ### testes
