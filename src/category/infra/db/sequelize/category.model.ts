@@ -5,10 +5,19 @@ import {
     PrimaryKey,
     Table,
   } from "sequelize-typescript";
+
+
+  export type CategoryModelProps = {
+    category_id: string;
+    name: string;
+    description: string | null;
+    is_active: boolean;
+    created_at: Date;
+  };
   
   // Active Record é um padrão de projeto onde cada objeto de uma classe representa uma linha de uma tabela do banco de dados; os próprios objetos contêm métodos para salvar, atualizar, excluir e buscar dados, centralizando lógica de persistência na própria entidade. O Sequelize Model segue esse padrão.
   @Table({ tableName: "categories", timestamps: false })
-  export class CategoryModel extends Model {
+  export class CategoryModel extends Model<CategoryModelProps> {
     @PrimaryKey
     @Column({ type: DataType.UUID })
     declare category_id: string;
