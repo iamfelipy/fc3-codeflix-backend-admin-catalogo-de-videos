@@ -44,9 +44,21 @@
   - videos
 
 ---
+### solid
+- srp
+  - usecases
+- open extension / close change
+  - category entity
+    - class-validator: validação da entidade
+- l
+- interface segregation
+  - repository inmemory 
+    - crud comum e search separados
+- d: dependecy inversion
+  - inmemory repository
+---
 ### DDD
   - category
-    - class-validator
 
 ---
 ### testes
@@ -54,6 +66,7 @@
 - fluent pattern, Test Data Builder(Gof - criacional)
   - CategoryFakeBuilder
   - ValidatorRules
+- helpers/setup test sequelize
 - quantidade de testes:
   - unidade: 76
   - integração: 1
@@ -62,6 +75,7 @@
 ### etapas de construção da aplicação backend
 - Montagem do ambiente de desenvolvimento (Docker e IDE)
 - modelar o core(regras de negocio, ...) antes de ir para o framework nestjs, usando ddd e clean archtecture
+- criar uma pasta shared(logica compartilhavel)
 - Criar uma aplicação TypeScript (core)
     - Criar entidade de Categoria
     - Criar testes (pirâmide de testes)

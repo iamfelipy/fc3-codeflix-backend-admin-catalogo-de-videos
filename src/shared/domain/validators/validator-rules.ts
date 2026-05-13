@@ -1,5 +1,5 @@
 import { ValidationError } from './validation.error';
-
+// não usamos esse validatorrules baseado no fluent pattern ainda.
 export class ValidatorRules {
   private constructor(
     private value: any,

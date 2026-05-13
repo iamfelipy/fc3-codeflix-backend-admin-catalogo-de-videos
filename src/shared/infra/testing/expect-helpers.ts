@@ -38,9 +38,15 @@ function assertContainsErrorsMessages(
   received: FieldsErrors
 ) {
   /*
-    e- aqui expect.objectContaining(...).asymmetricMatch(...) é usado como utilitário interno para checar objetos parcialmente, não faz um "teste" com relatório ou falha como dentro de um it(). Dentro de um it(), expect(...).toBe(...) registra resultados dos testes; já asymmetricMatch apenas retorna true/false como uma função comum.
+    # diferença entre expect utilitario e dentro do it
+    e- aqui expect.objectContaining(...).asymmetricMatch(...) é usado como utilitário interno para checar objetos parcialmente, não faz um "teste" com relatório ou falha como dentro de um it(). 
+    Dentro de um it(), expect(...).toBe(...) registra resultados dos testes; já asymmetricMatch apenas retorna true/false como uma função comum.
     
+    # o que é asymmetric
     "Asymmetric" significa que a comparação é feita em apenas um sentido: verifica se um objeto contém as propriedades esperadas, sem exigir igualdade total.
+
+    # como funciona asymmetricMatch
+    expected deve conter pelo menos todas as propriedades e valores que existem em received. Ou seja, received é o “molde” e expected deve ter igual ou mais campos, mas os campos de received precisam estar presentes e iguais em expected.
   */
   const isMatch = expect.objectContaining(received).asymmetricMatch(expected);
 
