@@ -28,10 +28,13 @@
 
 ----
 
-- database, persistence
+### database, persistence
   - repository 
-  - inmemory, mysql
+    - search(filter, sort, paginate), crud
+  - inmemory
+  - mysql, sqlite
   - orm: sequelize
+  - mapper
   - design pattern - active record
 
 ---
@@ -77,13 +80,13 @@
 - modelar o core(regras de negocio, ...) antes de ir para o framework nestjs, usando ddd e clean archtecture
 - criar uma pasta shared(logica compartilhavel)
 - Criar uma aplicação TypeScript (core)
-    - Criar entidade de Categoria
-    - Criar testes (pirâmide de testes)
-        - unitario, integração
-    - Criar Casos de Uso e Repositório
-    - Nest.js - Criação de API Rest
-    - Criar testes e2e (end-to-end)
-- Repetir para as outras entidades, cast member, genre, video
+  - Criar entidade de Categoria
+  - Criar testes (pirâmide de testes)
+    - unitario, integração
+  - Criar Casos de Uso e Repositório
+  - Nest.js - Criação de API Rest
+  - Criar testes e2e (end-to-end)
+  - Repetir para as outras entidades, cast member, genre, video
 - Integração com RabbitMQ e Encoder de vídeo
 - keycloak
 - logs
