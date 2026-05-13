@@ -1,0 +1,25 @@
+import { Sequelize, SequelizeOptions } from "sequelize-typescript";
+import { Config } from "../config";
+
+export function setupSequelize(options: SequelizeOptions = {}) {
+  let _sequelize: Sequelize;
+
+  beforeAll(async () => {
+    _sequelize = new Sequelize({
+      ...Config.db(),
+      ...options,
+    });
+  });
+    
+  // recria o schema no banco novamente, force true destroi o que ja existe
+  // util para testes
+  beforeEach(async () => await _sequelize.sync({ force: true }));
+
+  afterAll(async () => await _sequelize.close());
+
+  return {
+    get sequelize() {
+      return _sequelize;
+    },
+  };
+}

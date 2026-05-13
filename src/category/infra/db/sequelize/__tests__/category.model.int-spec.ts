@@ -1,28 +1,14 @@
 import { DataType, Sequelize } from "sequelize-typescript";
 import { CategoryModel } from "../category.model";
 import { Config } from "../../../../../shared/infra/config";
+import { setupSequelize } from "../../../../../shared/infra/testing/helpers";
 
 describe("CategoryModel Integration Tests", () => {
-  let sequelize;
-
-  beforeEach(async () => {
-    console.log(Config.db())
-    // Sim, o teste vai passar automaticamente se não tiver nenhum expect e nenhuma exceção for lançada. O Jest considera o teste como aprovado se não houver erro. Mas, sem expect, não há verificação de resultado ou comportamento.
-    sequelize = new Sequelize({
-      dialect: "sqlite",
-      storage: ":memory:",
-      models: [CategoryModel],
-      logging: false
-    });
-    // recria o schema no banco novamente, force true destroi o que ja existe
-    // util para testes
-    await sequelize.sync({ force: true });
-  });
+  setupSequelize({ models: [CategoryModel] });
 
   test("mapping props", () => {
     const attributesMap = CategoryModel.getAttributes();
     const attributes = Object.keys(CategoryModel.getAttributes());
-    console.log(attributes, attributesMap);
     // Não, se attributes tiver um novo item, o teste vai falhar porque toStrictEqual exige que o array tenha exatamente os mesmos itens, na mesma ordem e quantidade.
     expect(attributes).toStrictEqual([
       "category_id",
