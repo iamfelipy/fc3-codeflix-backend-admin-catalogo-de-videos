@@ -136,7 +136,7 @@ describe("CategorySequelizeRepository Integration Test", () => {
       const searchOutput = await repository.search(new CategorySearchParams());
       const items = searchOutput.items;
       [...items].reverse().forEach((item, index) => {
-        expect(`Movie ${index + 1}`).toBe(`${categories[index + 1].name}`);
+        expect(item.name).toBe(`${categories[index + 1].name}`);
       });
     });
 
