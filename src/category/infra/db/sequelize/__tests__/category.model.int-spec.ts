@@ -1,10 +1,12 @@
 import { DataType, Sequelize } from "sequelize-typescript";
 import { CategoryModel } from "../category.model";
+import { Config } from "../../../../../shared/infra/config";
 
 describe("CategoryModel Integration Tests", () => {
   let sequelize;
 
   beforeEach(async () => {
+    console.log(Config.db())
     // Sim, o teste vai passar automaticamente se não tiver nenhum expect e nenhuma exceção for lançada. O Jest considera o teste como aprovado se não houver erro. Mas, sem expect, não há verificação de resultado ou comportamento.
     sequelize = new Sequelize({
       dialect: "sqlite",

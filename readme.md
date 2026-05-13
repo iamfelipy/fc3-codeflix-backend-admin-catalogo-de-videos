@@ -85,7 +85,7 @@
 ### rodar o projeto
 
 - instalar o docker
-- extensoes vcode
+- extensoes vscode
   - devcontainer
   - eslint
     - regra de codigo
@@ -99,6 +99,7 @@
       - orta.vscode-jest
     - jest runner
       - firsttris.vscode-jest-runner
+- definir variveis de ambiente no envs, usar *.example como base
 
 ----
 ### comandos
