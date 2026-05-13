@@ -75,10 +75,10 @@
 - logs
   - rastrear comportamento
 - CI
-    - esteira no github actions
-    - docker file para produção
-        - imagem menor, otimizada
-        - vai ser usada no cd
+  - esteira no github actions
+  - docker file para produção
+      - imagem menor, otimizada
+      - vai ser usada no cd
 
 
 ----
