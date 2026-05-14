@@ -9,7 +9,8 @@
 ### caracteristica do projeto
 - microserviço da parte administrativa do catalogo de video
 - typescript, javascript
-- clean architecture, domain driven design, solid, conceitos da arquitetura de microserviços, piramide de testes, tdd
+- clean architecture, domain driven design, solid, conceitos da arquitetura de microserviços, design patterns
+- piramide de testes, tdd
 - nestjs
 - spa: frontend conversa com o backend de administração de video
 - api rest
@@ -26,6 +27,28 @@
   - design tatico
     - entidade, objeto de valor, repository
 
+----
+### etapas de construção da aplicação backend
+- Montagem do ambiente de desenvolvimento (Docker e IDE)
+- modelar o core(regras de negocio, ...) antes de ir para o framework nestjs, usando ddd e clean archtecture
+- criar uma pasta shared(logica compartilhavel)
+- Criar uma aplicação TypeScript (core)
+  - Criar entidade de Categoria
+  - Criar testes (pirâmide de testes)
+    - unitario, integração
+  - Criar Casos de Uso e Repositório
+  - Nest.js - Criação de API Rest
+  - Criar testes e2e (end-to-end)
+  - Repetir para as outras entidades, cast member, genre, video
+- Integração com RabbitMQ e Encoder de vídeo
+- keycloak
+- logs
+  - rastrear comportamento
+- CI
+  - esteira no github actions
+  - docker file para produção
+      - imagem menor, otimizada
+      - vai ser usada no cd
 ----
 
 ### database, persistence
@@ -79,33 +102,10 @@
   - CategoryFakeBuilder
   - ValidatorRules
 - helpers/setup test sequelize
+- fixtures
 - quantidade de testes:
   - unidade: 76
   - integração: 1
----
-
-### etapas de construção da aplicação backend
-- Montagem do ambiente de desenvolvimento (Docker e IDE)
-- modelar o core(regras de negocio, ...) antes de ir para o framework nestjs, usando ddd e clean archtecture
-- criar uma pasta shared(logica compartilhavel)
-- Criar uma aplicação TypeScript (core)
-  - Criar entidade de Categoria
-  - Criar testes (pirâmide de testes)
-    - unitario, integração
-  - Criar Casos de Uso e Repositório
-  - Nest.js - Criação de API Rest
-  - Criar testes e2e (end-to-end)
-  - Repetir para as outras entidades, cast member, genre, video
-- Integração com RabbitMQ e Encoder de vídeo
-- keycloak
-- logs
-  - rastrear comportamento
-- CI
-  - esteira no github actions
-  - docker file para produção
-      - imagem menor, otimizada
-      - vai ser usada no cd
-
 
 ----
 ### rodar o projeto
