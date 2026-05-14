@@ -45,20 +45,29 @@
   - genres
   - cast members
   - videos
-
+---
+### hexagonal - ports and adapters
+- usecase
+  - port: ICategoryRepository
+  - adapter: CategoryRepository, CategoryInMemoryRepository
 ---
 ### solid
 - srp
-  - usecases
-- open extension / close change
+  - usecase: execute
+  - repository: mapper, helper
+- open/closed principle (OCP):
   - category entity
     - class-validator: validação da entidade
 - l
 - interface segregation
-  - repository inmemory 
-    - crud comum e search separados
+  - IRepository e ISearchableRepository separados
 - d: dependecy inversion
-  - inmemory repository
+  - usecase
+    - constructor
+      - repository
+  - repository
+    - constructor
+      - sequelize
 ---
 ### DDD
   - category
