@@ -1,7 +1,7 @@
 import { IUseCase } from "../../../shared/application/use-case.interface";
 import { Category } from "../../domain/category.entity";
 import { ICategoryRepository } from "../../domain/category.repository";
-import { CategoryOutputMapper } from "./common/category-output";
+import { CategoryOutput, CategoryOutputMapper } from "./common/category-output";
 
 export class CreateCategoryUseCase
   implements IUseCase<CreateCategoryInput, CreateCategoryOutput>
@@ -23,4 +23,4 @@ export type CreateCategoryInput = {
   is_active?: boolean;
 };
 
-export type CreateCategoryOutput = CategoryOutputMapper;
+export type CreateCategoryOutput = CategoryOutput;
