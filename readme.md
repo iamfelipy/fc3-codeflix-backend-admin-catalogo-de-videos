@@ -50,6 +50,14 @@
       - imagem menor, otimizada
       - vai ser usada no cd
 ----
+### usecases
+  - category
+    - Create: Criação de uma nova categoria.
+    - Update: Atualização de uma categoria existente.
+    - Delete: Remoção de uma categoria.
+    - Get: Recuperação de uma categoria específica.
+    - Search/List: Listagem e busca de categorias.
+----
 
 ### database, persistence
   - repository 
@@ -81,7 +89,8 @@
 - open/closed principle (OCP):
   - category entity
     - class-validator: validação da entidade
-- l
+- liskov substitution principle (LSP):
+  - garantir que subclasses de repositórios, use cases ou entidades possam substituir as superclasses sem alterar a corretude do comportamento do sistema
 - interface segregation
   - IRepository e ISearchableRepository separados
 - d: dependecy inversion
@@ -93,7 +102,12 @@
       - sequelize
 ---
 ### DDD
-  - category
+  - entities
+    - category
+  - object value
+    - uuid, search-params, search-result
+  - repository
+    - category
 
 ---
 ### testes
@@ -103,6 +117,14 @@
   - ValidatorRules
 - helpers/setup test sequelize
 - fixtures
+- Configuração de Qualidade (QA)
+  - ferramentas de qualidade para garantir a integridade do código, assegurando cobertura de testes e tipagem correta.
+    - jest, typescript
+    - eslint, prettier
+  - cobertura de testes
+    - Configurado o Jest para que a execução falhe caso a cobertura de código (code coverage) seja inferior a 80%.
+  - Verificação de Tipagem:
+    - Criado um script NPM chamado tsc:check que execute o compilador do TypeScript apenas para verificação (sem gerar build), garantindo que não existam erros de tipagem no projeto.
 - quantidade de testes:
   - unidade: 76
   - integração: 1
@@ -142,12 +164,18 @@ npm run test
 npm run test — — watch
 
 ---
-# Executar docker compose na raiz do projeto, para os caminhos funcionarem
+# executando o projeto sem devcontainer
+  # Executar docker compose na raiz do projeto, para os caminhos funcionarem
 docker compose -f docker/docker-compose.yml up
 docker compose -f docker/docker-compose.yml up --build
 
 # acessar container
 docker exec -it fc3-codeflix-backend-admin-catalogo bash
+
+---
+# --noEmit = verifica erros sem gerar arquivos .js
+ "tsc:check": "tsc --noEmit"
+
 ```
 
 ---
