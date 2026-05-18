@@ -84,7 +84,7 @@ export class CategoryFakeBuilder<TBuild extends Category | Category[]> {
             created_at: this.callFactory(this._created_at, index),
           }),
         });
-        //category.validate();
+        category.validate();
         return category;
       });
     
