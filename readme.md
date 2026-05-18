@@ -11,7 +11,7 @@
 - typescript, javascript
 - clean architecture, domain driven design, solid, conceitos da arquitetura de microserviços, design patterns
 - piramide de testes, tdd
-- nestjs
+- framework backend: nestjs
 - spa: frontend conversa com o backend de administração de video
 - api rest
 - storage - google cloude storage - assets(imagens, videos)
@@ -49,6 +49,11 @@
   - docker file para produção
       - imagem menor, otimizada
       - vai ser usada no cd
+
+---
+### generico
+- config: carregar variveis de ambiente com dotenv
+
 ----
 ### usecases
   - category
@@ -80,15 +85,14 @@
 ### hexagonal - ports and adapters
 - usecase
   - port: ICategoryRepository
-  - adapter: CategoryRepository, CategoryInMemoryRepository
+  - adapter: CategorySequelizeRepository, CategoryInMemoryRepository
 ---
 ### solid
 - srp
-  - usecase: execute
+  - usecase: execute, validação input
   - repository: mapper, helper
 - open/closed principle (OCP):
-  - category entity
-    - class-validator: validação da entidade
+  - class-validator: validação da entidade
 - liskov substitution principle (LSP):
   - garantir que subclasses de repositórios, use cases ou entidades possam substituir as superclasses sem alterar a corretude do comportamento do sistema
 - interface segregation
@@ -104,6 +108,7 @@
 ### DDD
   - entities
     - category
+      - é qualquer agrupamento de elementos com características em comum, usado para classificar, organizar ou estruturar informações, objetos ou conceitos.
   - object value
     - uuid, search-params, search-result
   - repository
@@ -111,9 +116,8 @@
 
 ---
 
-### validações e lanãmento de exceções
-  - validações de dominio vs validações de sintaxe
-    - regras de dominio
+### validações e lançamento de exceções
+  - separação das validações de dominio(regras de dominio) vs validações de sintaxe
   - class-validator
     - categoryRules
   - mudando de lançar exceções de cada erro para notification pattern(acumular erros e no final fazer algo no usecase), isso depende do caso
@@ -165,8 +169,7 @@
 ----
 ### comandos
 ```bash
-# recomendação
-executar o projeto com devcontainer
+# executar o projeto com devcontainer
 instalar extensão dev container
 ctrl + shift + p 
 > dev container: reopen in container
