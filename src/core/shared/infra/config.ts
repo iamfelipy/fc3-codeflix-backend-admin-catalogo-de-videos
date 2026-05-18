@@ -20,7 +20,7 @@ export class Config {
     }
 
     Config.env = readEnv({
-      path: join(__dirname, `../../../envs/.env.${process.env.NODE_ENV}`),
+      path: join(__dirname, `../../../../envs/.env.${process.env.NODE_ENV}`),
     }).parsed;
   }
 }

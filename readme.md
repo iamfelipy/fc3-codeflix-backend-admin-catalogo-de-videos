@@ -53,6 +53,8 @@
 ---
 ### generico
 - config: carregar variveis de ambiente com dotenv
+  - normalmente o dotenv é usado apenas em desenvolvimento para carregar variáveis de ambiente locais, não em produção, onde variáveis já devem estar definidas no ambiente do servidor/container.
+- /core: contem as principais operações do dominio, com poucas influencia do nestjs
 
 ----
 ### usecases
@@ -113,6 +115,7 @@
     - uuid, search-params, search-result
   - repository
     - category
+  - commit sem nestjs: 73137dbf9f8a561f3be342723fb982a4cdd73ec3
 
 ---
 
@@ -145,6 +148,16 @@
 - quantidade de testes:
   - unidade: 76
   - integração: 1
+----
+
+### nestjs
+
+- versão da cli: @nestjs/cli@10.1.17
+
+- inicializa um novo projeto
+  - nest new nest
+    - select: npm
+
 
 ----
 ### rodar o projeto
