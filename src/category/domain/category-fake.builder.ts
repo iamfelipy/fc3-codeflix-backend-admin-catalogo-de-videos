@@ -4,8 +4,7 @@ import { Uuid } from "../../shared/domain/value-objects/uuid.vo";
 
 type PropOrFactory<T> = T | ((index: number) => T);
 
-// fluent pattern, Test Data Builder
-export class CategoryFakeBuilder<TBuild = any> {
+export class CategoryFakeBuilder<TBuild extends Category | Category[]> {
   // auto generated in entity
   private _category_id: PropOrFactory<Uuid> | undefined = undefined;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -88,7 +87,15 @@ export class CategoryFakeBuilder<TBuild = any> {
         //category.validate();
         return category;
       });
-    return this.countObjs === 1 ? (categories[0] as any) : categories;
+    
+    /*
+      Quando um tipo genérico pode ser vários tipos (TBuild = Category | Category[]), o TypeScript não consegue automaticamente "afinar" (narrow) para o tipo certo com base em lógica (ex: countObjs === 1). Ele trata o tipo como podendo ser qualquer uma das opções do genérico, pois não tem garantia em tempo de compilação. Para resolver, forçamos (com as unknown as TBuild) ou usamos sobrecarga de métodos para retornos diferentes conforme o input.
+    */
+
+    // Força o retorno do tipo TBuild usando type assertion 
+    return (this.countObjs === 1
+      ? categories[0]
+      : categories) as unknown as TBuild;
   }
 
   get category_id() {

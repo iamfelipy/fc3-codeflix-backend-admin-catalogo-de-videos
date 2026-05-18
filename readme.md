@@ -110,13 +110,17 @@
     - category
 
 ---
-### testes
-- tdd(test driven development), triple aaa(arrange, act, assert)
-- fluent pattern, Test Data Builder(Gof - criacional)
-  - CategoryFakeBuilder
-  - ValidatorRules
-- helpers/setup test sequelize
-- fixtures
+
+### validações e lanãmento de exceções
+  - validações de dominio vs validações de sintaxe
+    - regras de dominio
+  - class-validator
+    - categoryRules
+  - mudando de lançar exceções de cada erro para notification pattern(acumular erros e no final fazer algo no usecase), isso depende do caso
+
+---
+
+### configurações de qualidade
 - Configuração de Qualidade (QA)
   - ferramentas de qualidade para garantir a integridade do código, assegurando cobertura de testes e tipagem correta.
     - jest, typescript
@@ -125,6 +129,15 @@
     - Configurado o Jest para que a execução falhe caso a cobertura de código (code coverage) seja inferior a 80%.
   - Verificação de Tipagem:
     - Criado um script NPM chamado tsc:check que execute o compilador do TypeScript apenas para verificação (sem gerar build), garantindo que não existam erros de tipagem no projeto.
+
+---
+### testes
+- tdd(test driven development), triple aaa(arrange, act, assert), piramidade de testes
+- fluent pattern, Test Data Builder(Gof - criacional)
+  - CategoryFakeBuilder
+  - ValidatorRules
+- helpers/setup test sequelize
+- fixtures
 - quantidade de testes:
   - unidade: 76
   - integração: 1
