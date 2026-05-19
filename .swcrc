@@ -1,0 +1,26 @@
+{
+    "$schema": "https://json.schemastore.org/swcrc",
+    "sourceMaps": true,
+    "jsc": {
+      "parser": {
+        "syntax": "typescript",
+        "decorators": true,
+        // habilitar lazy loading de modulos
+        "dynamicImport": true
+      },
+      "transform": {
+        "legacyDecorator": true,
+        "decoratorMetadata": true
+      },
+      "baseUrl": "./",
+      // impedi do swc mudar o nomes das classes depois do build
+      "keepClassNames": true,
+      // alias de path definidos no tsconfig.json
+      "paths": {
+        "@core/*": [
+          "./src/core/*"
+        ]
+      }
+    },
+    "minify": false
+  }
