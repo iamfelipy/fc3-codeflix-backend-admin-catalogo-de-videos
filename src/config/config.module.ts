@@ -16,6 +16,9 @@ type DB_SCHEMA_TYPE = {
   DB_LOGGING: boolean;
   DB_AUTO_LOAD_MODELS: boolean;
 };
+
+export type CONFIG_SCHEMA_TYPE = DB_SCHEMA_TYPE;
+
 export const CONFIG_DB_SCHEMA: Joi.StrictSchemaMap<DB_SCHEMA_TYPE> = {
   DB_VENDOR: Joi.string().required().valid('mysql', 'sqlite'),
   DB_HOST: Joi.string().required(),
