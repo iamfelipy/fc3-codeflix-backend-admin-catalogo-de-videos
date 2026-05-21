@@ -119,11 +119,13 @@
 
 ---
 
-### validações e lançamento de exceções
+### validações, lançamento de exceções
   - separação das validações de dominio(regras de dominio) vs validações de sintaxe
   - class-validator
     - categoryRules
   - mudando de lançar exceções de cada erro para notification pattern(acumular erros e no final fazer algo no usecase), isso depende do caso
+  - joy validator
+    - configModule - variaveis de ambiente
 
 ---
 
