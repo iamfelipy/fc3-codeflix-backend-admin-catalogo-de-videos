@@ -17,6 +17,7 @@ type DB_SCHEMA_TYPE = {
   DB_AUTO_LOAD_MODELS: boolean;
 };
 
+// usado no configService<>.get
 export type CONFIG_SCHEMA_TYPE = DB_SCHEMA_TYPE;
 
 export const CONFIG_DB_SCHEMA: Joi.StrictSchemaMap<DB_SCHEMA_TYPE> = {
@@ -51,6 +52,7 @@ export class ConfigModule extends NestConfigModule {
 
     return super.forRoot({
       isGlobal: true,
+      // O último arquivo na lista sobrescreve as variáveis dos anteriores.
       envFilePath: [
         ...(Array.isArray(envFilePath) ? envFilePath : [envFilePath]),
         join(process.cwd(), 'envs', `.env.${process.env.NODE_ENV}`),
