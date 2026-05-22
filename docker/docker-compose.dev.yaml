@@ -1,0 +1,20 @@
+
+services:
+  
+  fc3-codeflix-backend-admin-catalogo-de-videos:
+    build: .
+    command: ./docker/.docker/start.sh
+    ports:
+      - 3000:3000
+    volumes:
+      - ../:/home/node/app
+
+  db-fc3-codeflix-backend-admin-catalogo-de-videos:
+    image: mysql:8.0.30-debian
+    environment:
+      - MYSQL_DATABASE=micro_videos
+      - MYSQL_ROOT_PASSWORD=root
+    volumes:
+      - ./.docker/dbdata:/var/lib/mysql:delegated
+    security_opt:
+      - seccomp:unconfined

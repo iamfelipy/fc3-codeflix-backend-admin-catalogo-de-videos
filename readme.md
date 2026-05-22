@@ -160,12 +160,27 @@
   - nest new nest
     - select: npm
 
-
+----
+### docker
+- como está organizado a config do docker?
+- docker-compose.yml
+  - usa tmpfs
+  - tmpfs
+    - util para teste
+    - carrega pasta do mysql na memoria ram
+- docker-compose.dev.yml
+  - util para desenvolvimento
+  - usa volumes inves de tmpfs, quando reiniciar o container não perde a pasta
+  - foi usado pq devcontainer não esta reconhecendo !reset do tmpfs
+- docker-compose.overvire.yaml
+  - usuaria isso com docker-compose.yml se o devcontainer reconhece-se !reset
+- devcontainer.json.example
+  - por padrão está configurando para usar docker-compose.yml
 ----
 ### rodar o projeto
 
 - instalar o docker
-- extensoes vscode
+- instalar extensoes vscode
   - devcontainer
   - eslint
     - regra de codigo
@@ -181,12 +196,12 @@
       - firsttris.vscode-jest-runner
 - definir variveis de ambiente no envs, usar *.example como base
 
-----
 ### comandos
 ```bash
 # executar o projeto com devcontainer
-instalar extensão dev container
-ctrl + shift + p 
+- instalar extensão dev container
+- duplicar devcontainer.json.example, e renomear tirando .example
+- ctrl + shift + p 
 > dev container: reopen in container
 
 ---
@@ -198,6 +213,8 @@ npm run test — — watch
 # executando o projeto sem devcontainer
   # Executar docker compose na raiz do projeto, para os caminhos funcionarem
 docker compose -f docker/docker-compose.yml up
+
+# rebuild se alterar manifesto
 docker compose -f docker/docker-compose.yml up --build
 
 # acessar container

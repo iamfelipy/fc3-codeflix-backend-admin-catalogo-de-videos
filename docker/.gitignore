@@ -1,0 +1,3 @@
+# criei esse .gitignore aqui mas na aula foi criado na raiz
+# ele colocou todos os arquivos docker na raiz, eu fiz diferente
+docker-compose.override.yaml

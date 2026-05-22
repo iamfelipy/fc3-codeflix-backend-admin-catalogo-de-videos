@@ -1,0 +1,23 @@
+services:
+  fc3-codeflix-backend-admin-catalogo-de-videos:
+    # O . em build: . é relativo ao local onde está o arquivo docker-compose.yml, não ao terminal.
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    # esse arquivo precisa da permissão chmod a+x .docker/start.sh
+    command: ./docker/.docker/start.sh
+    ports:
+      - 3000:3000
+    # relativo ao docker compose
+    volumes:
+      - ../:/home/node/app
+  
+  db-fc3-codeflix-backend-admin-catalogo-de-videos:
+    image: mysql:8.0.30-debian
+    environment:
+      - MYSQL_DATABASE=micro_videos
+      - MYSQL_ROOT_PASSWORD=root
+    tmpfs:
+      - /var/lib/mysql
+    security_opt:
+      - seccomp:unconfined
