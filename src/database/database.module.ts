@@ -31,6 +31,14 @@ const models = [CategoryModel];
             password: configService.get('DB_PASSWORD'),
             models,
             logging: configService.get('DB_LOGGING'),
+            /*
+              Define se o Sequelize deve adicionar automaticamente os models do array models ao ORM ao iniciar (true), ou se você precisará registrá-los manualmente depois (false).
+              
+              Automático: DB_AUTO_LOAD_MODELS: true e models listados no array models.
+
+              Manual: DB_AUTO_LOAD_MODELS: false e registrar os models manualmente via sequelize.addModels([Model1, Model2]) no código após iniciar o Sequelize.
+
+            */
             autoLoadModels: configService.get('DB_AUTO_LOAD_MODELS'),
           };
         }
