@@ -173,7 +173,7 @@
   - usa volumes inves de tmpfs, quando reiniciar o container não perde a pasta
   - foi usado pq devcontainer não esta reconhecendo !reset do tmpfs
 - docker-compose.overvire.yaml
-  - usuaria isso com docker-compose.yml se o devcontainer reconhece-se !reset
+  - usaria isso com docker-compose.yml se o devcontainer reconhece-se !reset
 - devcontainer.json.example
   - por padrão está configurando para usar docker-compose.yml
 ----
@@ -198,6 +198,9 @@
 
 ### comandos
 ```bash
+# variaveis de ambiente
+- dentro da pasta /envs tem exemplos, criei .env.test com os dados de .env.test.example para funcionar
+
 # executar o projeto com devcontainer
 - instalar extensão dev container
 - duplicar devcontainer.json.example, e renomear tirando .example
