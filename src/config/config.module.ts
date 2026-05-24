@@ -49,10 +49,10 @@ export const CONFIG_DB_SCHEMA: Joi.StrictSchemaMap<DB_SCHEMA_TYPE> = {
 export class ConfigModule extends NestConfigModule {
   static forRoot(options: ConfigModuleOptions = {}) {
     const { envFilePath, ...otherOptions } = options;
-
+    
     return super.forRoot({
       isGlobal: true,
-      // O último arquivo na lista sobrescreve as variáveis dos anteriores.
+      // quem vem antes na lista envFilePath é quem prevalece em chaves duplicadas.
       envFilePath: [
         ...(Array.isArray(envFilePath) ? envFilePath : [envFilePath]),
         join(process.cwd(), 'envs', `.env.${process.env.NODE_ENV}`),

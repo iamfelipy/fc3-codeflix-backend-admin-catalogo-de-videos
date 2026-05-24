@@ -214,16 +214,20 @@ describe('Schema Unit Tests', () => {
 });
 
 describe('ConfigModule Unit Tests', () => {
-  it('should throw an error when env vars are invalid', () => {
+  it('should throw an error when env vars are invalid', async() => {
+    // fail não tem no jest, so a tipagem do jasmine
+    // solução temporaria
+    function fail(message: string): never {
+      throw new Error(message);
+    }
     try {
-      // sem .compile retorna um build sincrono
-      Test.createTestingModule({
+      await Test.createTestingModule({
         imports: [
           ConfigModule.forRoot({
             envFilePath: join(__dirname, '.env.fake'),
           }),
         ],
-      });
+      }).compile()
       fail('ConfigModule should throw an error when env vars are invalid');
     } catch (e) {
       expect(e.message).toContain('"DB_VENDOR" must be one of [mysql, sqlite]');
