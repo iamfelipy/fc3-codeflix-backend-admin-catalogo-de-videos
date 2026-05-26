@@ -26,7 +26,7 @@ export class CategoriesController {
 
   @Post()
   create(@Body() createCategoryDto: CreateCategoryDto) {
-    
+    return this.createUseCase.execute(createCategoryDto);
   }
 
   @Get()

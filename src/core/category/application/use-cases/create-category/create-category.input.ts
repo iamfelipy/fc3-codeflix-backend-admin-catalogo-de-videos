@@ -26,6 +26,7 @@ export class CreateCategoryInput {
   is_active?: boolean;
 
   constructor(props: CreateCategoryInputConstructorProps) {
+    // class-validator foi usado no dominio e no nest
     // esse if é pq o nestjs inializa a dependencia vazia, isso é por causa da injeção de dependencia
     if (!props) return;
     this.name = props.name;
