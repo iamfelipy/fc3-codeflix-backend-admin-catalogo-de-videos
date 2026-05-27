@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Inject } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Inject, ParseUUIDPipe } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { CreateCategoryUseCase } from '@core/category/application/use-cases/create-category/create-category.use-case';
@@ -44,8 +44,15 @@ export class CategoriesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
-    
+  async update( @Param('id', new ParseUUIDPipe({ errorHttpStatusCode: 422 })) id: string,
+  // O NestJS identifica o DTO pelo tipo usado na assinatura do parâmetro (updateCategoryDto: UpdateCategoryDto), não pelo nome da variável. O nome não importa, só o tipo.
+  @Body() updateCategoryDto: UpdateCategoryDto,) 
+  {
+    const output = await this.updateUseCase.execute({
+      ...updateCategoryDto,
+      id,
+    });
+    return CategoriesController.serialize(output);
   }
 
   @Delete(':id')
