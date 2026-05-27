@@ -3,7 +3,7 @@ import { NotFoundError } from "../../../../shared/domain/errors/not-found.error"
 import { Uuid } from "../../../../shared/domain/value-objects/uuid.vo";
 import { Category } from "../../../domain/category.entity";
 import { ICategoryRepository } from "../../../domain/category.repository";
-import { CategoryOutputMapper } from "../common/category-output";
+import { CategoryOutput, CategoryOutputMapper } from "../common/category-output";
 
 export class GetCategoryUseCase
   implements IUseCase<GetCategoryInput, GetCategoryOutput>
@@ -25,4 +25,4 @@ export type GetCategoryInput = {
   id: string;
 };
 
-export type GetCategoryOutput = CategoryOutputMapper;
+export type GetCategoryOutput = CategoryOutput;
