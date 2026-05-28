@@ -13,7 +13,7 @@ export const REPOSITORIES = {
   // alias que pode ser usado por outros providers
   CATEGORY_REPOSITORY: {
     provide: 'CategoryRepository',
-    // posso trocar por in_memory_repository facilmente
+    // posso trocar por in_memory_repository facilmente, nos testes usando override
     useExisting: CategorySequelizeRepository,
   },
   CATEGORY_IN_MEMORY_REPOSITORY: {
