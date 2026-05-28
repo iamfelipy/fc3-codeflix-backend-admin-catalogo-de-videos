@@ -11,6 +11,7 @@ async function bootstrap() {
     }),
   );
 
+  // O ClassSerializerInterceptor precisa do Reflector para acessar metadados definidos via decorators (como @Exclude, @Expose) nas classes. O Reflector permite que o interceptor saiba quais regras de serialização aplicar em cada rota ou classe, conforme as anotações feitas com decorators do class-transformer.
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   await app.listen(process.env.PORT ?? 3000);
