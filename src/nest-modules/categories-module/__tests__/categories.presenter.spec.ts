@@ -1,5 +1,5 @@
 import { instanceToPlain } from "class-transformer";
-import { CategoryPresenter } from "./categories.presenter";
+import { CategoryPresenter } from "../categories.presenter";
 
 describe("Category Presenter Unit Tests", () => {
   describe('constructor', () => {
