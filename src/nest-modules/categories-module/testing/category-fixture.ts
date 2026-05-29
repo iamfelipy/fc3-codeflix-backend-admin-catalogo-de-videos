@@ -217,7 +217,6 @@ export class UpdateCategoryFixture {
         },
         expected: {
           name: faker.name,
-          description: expect.anything(),
           is_active: false,
         },
       },

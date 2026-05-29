@@ -22,7 +22,7 @@ export class UpdateCategoryUseCase
 
     input.name && category.changeName(input.name);
 
-    if ("description" in input) {
+    if (input.description !== undefined) {
       category.changeDescription(input.description);
     }
 

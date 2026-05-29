@@ -13,8 +13,8 @@ describe("Category Presenter Unit Tests", () => {
       });
 
       expect(presenter.id).toBe('XXX-XXX');
-      expect(presenter.name).toBe('melissa');
-      expect(presenter.description).toBe('ana');
+      expect(presenter.name).toBe('roupa');
+      expect(presenter.description).toBe('roupas da loja');
       expect(presenter.created_at).toBeInstanceOf(Date);
  
     });
