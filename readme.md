@@ -53,6 +53,7 @@
 ---
 ### generico
 - config: carregar variveis de ambiente com dotenv
+  - criei suportando configurações alem do .env, assim respeitando twelve-factory - chapter 3
   - normalmente o dotenv é usado apenas em desenvolvimento para carregar variáveis de ambiente locais, não em produção, onde variáveis já devem estar definidas no ambiente do servidor/container.
 - /core: contem as principais operações do dominio, com poucas influencia do nestjs
 - class-transformer
@@ -177,61 +178,77 @@
 - docker-compose.dev.yml
   - util para desenvolvimento
   - usa volumes inves de tmpfs, quando reiniciar o container não perde a pasta
-  - foi usado pq devcontainer não esta reconhecendo !reset do tmpfs
+  - foi usado pq devcontainer não esta reconhecendo !reset do tmpfs do docker-compose.override.yaml, se reconhece-se era só descomentar .example do override para poder mudar de ambiente.
 - docker-compose.overvire.yaml
   - usaria isso com docker-compose.yml se o devcontainer reconhece-se !reset
 - devcontainer.json.example
   - por padrão está configurando para usar docker-compose.yml
 ----
-### rodar o projeto
+### como rodar o projeto
 
 - instalar o docker
-- instalar extensoes vscode
-  - devcontainer
-  - eslint
-    - regra de codigo
-  - pretty
-    - formatar
-  - jest
-    - botão no codigo
-    - icones de quimica - arvore de testes
-    - executa apenas o teste isolado
+- escolhendo entre modo test ou desenvolvimento
+  - executar em modo test
+    - criar /envs/.env.test com base no .env.test.example
+      - sqlite inmemory
+    - usar docker-compose.yaml
+      - mysql em memoria
+  - executar em modo dev
+    - criar /envs/.env com base no .env.example
+      - sqlite inmemory
+    - usar docker-compose.dev.yaml
+      - mysql com volume mapeado
+  - eu posso mudar o banco via .env* ou nos tests via config-module
+- como executar como dev container?
+  - criar devcontainer.json baseado no ./devcontainer/devcontainer.json.example
+    - mudar a opção dockercomposefile dentro do arquivo devcontainer.json para apontar para o modo test ou modo dev
+      - por padrão está em modo test
+  - instalar extensão dev container
+    - abrir command pallete: ctrl + shift + p 
+    - digitar > dev container
+    - escolher: reopen in container
+- como executar o projeto sem dev container?
+  - instalar extensoes vscode
+    - devcontainer
+    - eslint
+      - regra de codigo
+    - pretty
+      - formatar
     - jest
-      - orta.vscode-jest
-    - jest runner
-      - firsttris.vscode-jest-runner
-- definir variveis de ambiente no envs, usar *.example como base
+      - botão no codigo
+      - icones de quimica - arvore de testes
+      - executa apenas o teste isolado
+      - jest
+        - orta.vscode-jest
+      - jest runner
+        - firsttris.vscode-jest-runner
+    - rest client
+      - testar api com o arquivo api.http e com npm run start:dev
+  - comandos
+    - iniciar ambiente
+      - docker compose -f docker/docker-compose.yml up
+    - acessar container
+      - docker exec -it fc3-codeflix-backend-admin-catalogo bash
+- executando nest
+  - executar em modo test
+    - npm run test ou npm run start:dev
+  - executar em modo dev
+    - npm run start:dev
+- testando a api com rest client extension + /api.http
+  - npm run start:dev
+  - executar chamadas do /api.http
 
 ### comandos
 ```bash
-# variaveis de ambiente
-- dentro da pasta /envs tem exemplos, criei .env.test com os dados de .env.test.example para funcionar
-
-# executar o projeto com devcontainer
-- instalar extensão dev container
-- duplicar devcontainer.json.example, e renomear tirando .example
-- ctrl + shift + p 
-> dev container: reopen in container
-
----
-tests
+# tests
 npm run test
 npm run test — — watch
-
----
-# executando o projeto sem devcontainer
-  # Executar docker compose na raiz do projeto, para os caminhos funcionarem
-docker compose -f docker/docker-compose.yml up
 
 # rebuild se alterar manifesto
 docker compose -f docker/docker-compose.yml up --build
 
-# acessar container
-docker exec -it fc3-codeflix-backend-admin-catalogo bash
-
----
-# --noEmit = verifica erros sem gerar arquivos .js
- "tsc:check": "tsc --noEmit"
+# analise estatica do typescript sem gerar build
+ npm run tsc:check
 
 ```
 
