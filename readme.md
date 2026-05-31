@@ -166,6 +166,15 @@
     - select: npm
 - novo modulo
   - npx nest g module shared
+- pipe
+  - validação com class-transform
+- interceptor
+  - class-transform para transformar a data para toIsoString
+  - envolver saida do category get com a propriedade data
+- filter
+  - tratar execeções do dominio
+    - o campo name não pode ter mais de 255 caracters, criar entidade e notification
+    - not found id no usecase
 
 ----
 ### docker
