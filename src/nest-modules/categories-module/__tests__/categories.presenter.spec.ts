@@ -33,6 +33,7 @@ describe("Category Presenter Unit Tests", () => {
       id: 'XXX-XXX',
       name: 'roupa',
       description: 'roupas da loja',
+      is_active: true,
       created_at: presenter.created_at.toISOString(),
     });
   });
