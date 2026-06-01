@@ -198,10 +198,13 @@
 - instalar o docker
 - escolhendo entre modo test ou desenvolvimento
   - executar em modo test
-    - criar /envs/.env.test com base no .env.test.example
-      - sqlite inmemory
-    - usar docker-compose.yaml
-      - mysql em memoria
+    - teste de unidade, integração
+      - criar /envs/.env.test com base no .env.test.example
+        - sqlite inmemory
+      - usar docker-compose.yaml
+        - mysql em memoria
+    - teste end-to-end(e2e)
+      - criar /envs/.env.e2e com base no .env.e2e.example
   - executar em modo dev
     - criar /envs/.env com base no .env.example
       - sqlite inmemory
@@ -240,7 +243,10 @@
       - docker exec -it fc3-codeflix-backend-admin-catalogo bash
 - executando nest
   - executar em modo test
-    - npm run test ou npm run start:dev
+    - teste de unidade, integração
+      - npm run test
+    - teste end-to-end(e2e)
+      - npm run test:e2e
   - executar em modo dev
     - npm run start:dev
 - testando a api com rest client extension + /api.http
