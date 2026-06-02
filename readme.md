@@ -246,7 +246,7 @@
     - teste de unidade, integração
       - npm run test
     - teste end-to-end(e2e)
-      - npm run test:e2e -- --runInBand
+      - npm run test:e2e:runInBand
         - os testes foram projetos para funcionar só de forma sequencial para não dar conflito ao mudar o mesmo schema
   - executar em modo dev
     - npm run start:dev
