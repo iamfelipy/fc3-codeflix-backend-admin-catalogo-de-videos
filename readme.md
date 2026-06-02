@@ -75,10 +75,10 @@
   - repository 
     - search(filter, sort, paginate), crud
   - inmemory
-  - mysql, sqlite
   - orm: sequelize
+    - mysql, sqlite
+    - design pattern - active record
   - mapper
-  - design pattern - active record
 
 ---
 
@@ -90,9 +90,11 @@
   - videos
 ---
 ### hexagonal - ports and adapters
-- usecase
+- gateway no usecase
   - port: ICategoryRepository
   - adapter: CategorySequelizeRepository, CategoryInMemoryRepository
+- controller
+  - api rest
 ---
 ### solid
 - srp
@@ -131,27 +133,30 @@
   - mudando de lançar exceções de cada erro para notification pattern(acumular erros e no final fazer algo no usecase), isso depende do caso
   - joy validator
     - configModule - variaveis de ambiente
-
+  - nest - pipe
 ---
 
 ### configurações de qualidade
 - Configuração de Qualidade (QA)
   - ferramentas de qualidade para garantir a integridade do código, assegurando cobertura de testes e tipagem correta.
-    - jest, typescript
-    - eslint, prettier
+- typescript (tipagem)
+  - Criado um script NPM chamado tsc:check que execute o compilador do TypeScript apenas para verificação (sem gerar build), garantindo que não existam erros de tipagem no projeto.
+- jest (teste)
   - cobertura de testes
     - Configurado o Jest para que a execução falhe caso a cobertura de código (code coverage) seja inferior a 80%.
-  - Verificação de Tipagem:
-    - Criado um script NPM chamado tsc:check que execute o compilador do TypeScript apenas para verificação (sem gerar build), garantindo que não existam erros de tipagem no projeto.
+- eslint (regras de código)
+- prettier (formatação automatica baseada nas regras)
 
 ---
 ### testes
 - tdd(test driven development), triple aaa(arrange, act, assert), piramidade de testes
-- fluent pattern, Test Data Builder(Gof - criacional)
+- Test Data Builder(Gof - criacional)
   - CategoryFakeBuilder
+- fluent pattern
   - ValidatorRules
 - helpers/setup test sequelize
-- fixtures
+- fixtures (configuração para teste, arranges)
+  - teste de integração, e2e
 - quantidade de testes:
   - unidade: 76
   - integração: 1
@@ -167,14 +172,14 @@
 - novo modulo
   - npx nest g module shared
 - pipe
-  - validação com class-transform
+  - validação com class-validator
 - interceptor
   - class-transform para transformar a data para toIsoString
   - envolver saida do category get com a propriedade data
 - filter
   - tratar execeções do dominio
     - o campo name não pode ter mais de 255 caracters, criar entidade e notification
-    - not found id no usecase
+    - not found id no usecase, repository update
 
 ----
 ### docker
