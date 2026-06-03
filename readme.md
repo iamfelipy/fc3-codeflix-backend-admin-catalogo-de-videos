@@ -82,6 +82,12 @@
   - migration
     - umzug
       - src/core/shared/infra/db/sequelize/migrator.ts
+      - comando
+        - mostra as funcionalidades disponiveis do umzug
+        - dev
+          - npm run migrate:ts
+        - produção
+          - npm run migrate:js
 ---
 
 ### api rest
@@ -269,11 +275,24 @@
 npm run test
 npm run test — — watch
 
+# coverage html - teste de unitade e integração
+npm run test:cov
+
 # rebuild se alterar manifesto
 docker compose -f docker/docker-compose.yml up --build
 
 # analise estatica do typescript sem gerar build
  npm run tsc:check
+
+# migration umzug
+- mostra as funcionalidades disponiveis do umzug
+- dev
+  - npm run migrate:ts
+- produção
+  - npm run migrate:js
+
+# typescript: analise estatica
+npm run tsc:check
 
 ```
 
