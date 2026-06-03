@@ -144,6 +144,8 @@
 - jest (teste)
   - cobertura de testes
     - Configurado o Jest para que a execução falhe caso a cobertura de código (code coverage) seja inferior a 80%.
+    - foi usado apenas para o teste de integração e unidade
+    - npm run test:cov
 - eslint (regras de código)
 - prettier (formatação automatica baseada nas regras)
 
