@@ -285,14 +285,39 @@ docker compose -f docker/docker-compose.yml up --build
  npm run tsc:check
 
 # migration umzug
+- observaçao
+  - usou .env com mysql e DB_AUTO_LOAD_MODELS=false, false evita conflito com o array de models carregados na inicialização nest
+  - provavelmente as migrations vão ter um utilidade maior em produção
 - mostra as funcionalidades disponiveis do umzug
-- dev
-  - npm run migrate:ts
-- produção
-  - npm run migrate:js
+  - dev
+    - npm run migrate:ts
+  - produção
+    - npm run migrate:js
+- ver funcionalidades disponiveis do create
+  npm run migrate:ts create -- --help
+
+- cria migration
+  - dar um nome sugestivo, do que está sendo feito
+  - mover para a pasta do modulo correspondente
+  npm run migrate:ts create -- --name create-categories-table.ts --folder ./src
+
+- mostra migrations pendentes
+  - npm run migrate:ts pending
+- aplica migrations pendentes
+  - npm run migrate:ts up
+- desfaz; suporta steps
+  - npm run migrate:ts down
 
 # typescript: analise estatica
 npm run tsc:check
+
+# container mysql, comandos uteis
+mysql -uroot -proot
+use micro_videos;
+show tables;
+drop table categories;
+describe categories;
+select * from SequelizeMeta;
 
 ```
 
