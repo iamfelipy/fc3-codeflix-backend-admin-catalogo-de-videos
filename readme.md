@@ -79,7 +79,9 @@
     - mysql, sqlite
     - design pattern - active record
   - mapper
-
+  - migration
+    - umzug
+      - src/core/shared/infra/db/sequelize/migrator.ts
 ---
 
 ### api rest
