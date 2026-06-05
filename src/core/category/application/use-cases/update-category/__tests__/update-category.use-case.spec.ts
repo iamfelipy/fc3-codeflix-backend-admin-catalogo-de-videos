@@ -3,7 +3,7 @@ import {
   InvalidUuidError,
   Uuid,
 } from "../../../../../shared/domain/value-objects/uuid.vo";
-import { Category } from "../../../../domain/category.entity";
+import { Category, CategoryId } from "../../../../domain/category.aggregate";
 import { CategoryInMemoryRepository } from "../../../../infra/db/in-memory/category-in-memory.repository";
 import { UpdateCategoryUseCase } from "../update-category.use-case";
 
@@ -21,11 +21,11 @@ describe("UpdateCategoryUseCase Unit Tests", () => {
       useCase.execute({ id: "fake id", name: "fake" })
     ).rejects.toThrow(new InvalidUuidError());
 
-    const uuid = new Uuid();
+    const categoryId = new CategoryId();
 
     await expect(() =>
-      useCase.execute({ id: uuid.id, name: "fake" })
-    ).rejects.toThrow(new NotFoundError(uuid.id, Category));
+      useCase.execute({ id: categoryId.id, name: "fake" })
+    ).rejects.toThrow(new NotFoundError(categoryId.id, Category));
   });
 
   it('should throw an error when aggregate is not valid', async () => {

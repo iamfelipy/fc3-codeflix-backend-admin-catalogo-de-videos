@@ -1,5 +1,5 @@
 import { Uuid } from "../../../shared/domain/value-objects/uuid.vo";
-import { Category } from "../category.entity";
+import { Category, CategoryId } from "../category.aggregate";
 
 describe("Category Without Validator Unit Tests", () => {
   beforeEach(() => {
@@ -9,7 +9,7 @@ describe("Category Without Validator Unit Tests", () => {
   });
   test("constructor of category", () => {
     let category = new Category({ name: "Movie" });
-    expect(category.category_id).toBeInstanceOf(Uuid);
+    expect(category.category_id).toBeInstanceOf(CategoryId);
     expect(category.name).toBe("Movie");
     expect(category.description).toBeNull();
     expect(category.is_active).toBe(true);
@@ -22,7 +22,7 @@ describe("Category Without Validator Unit Tests", () => {
       is_active: false,
       created_at,
     });
-    expect(category.category_id).toBeInstanceOf(Uuid);
+    expect(category.category_id).toBeInstanceOf(CategoryId);
     expect(category.name).toBe("Movie");
     expect(category.description).toBe("some description");
     expect(category.is_active).toBe(false);
@@ -32,7 +32,7 @@ describe("Category Without Validator Unit Tests", () => {
       name: "Movie",
       description: "other description",
     });
-    expect(category.category_id).toBeInstanceOf(Uuid);
+    expect(category.category_id).toBeInstanceOf(CategoryId);
     expect(category.name).toBe("Movie");
     expect(category.description).toBe("other description");
     expect(category.is_active).toBe(true);
@@ -42,7 +42,7 @@ describe("Category Without Validator Unit Tests", () => {
       name: "Movie",
       is_active: true,
     });
-    expect(category.category_id).toBeInstanceOf(Uuid);
+    expect(category.category_id).toBeInstanceOf(CategoryId);
     expect(category.name).toBe("Movie");
     expect(category.description).toBeNull();
     expect(category.is_active).toBe(true);
@@ -53,7 +53,7 @@ describe("Category Without Validator Unit Tests", () => {
       name: "Movie",
       created_at,
     });
-    expect(category.category_id).toBeInstanceOf(Uuid);
+    expect(category.category_id).toBeInstanceOf(CategoryId);
     expect(category.name).toBe("Movie");
     expect(category.description).toBeNull();
     expect(category.is_active).toBe(true);
@@ -65,7 +65,7 @@ describe("Category Without Validator Unit Tests", () => {
       const category = Category.create({
         name: "Movie",
       });
-      expect(category.category_id).toBeInstanceOf(Uuid);
+      expect(category.category_id).toBeInstanceOf(CategoryId);
       expect(category.name).toBe("Movie");
       expect(category.description).toBeNull();
       expect(category.is_active).toBe(true);
@@ -84,7 +84,7 @@ Resposta: Porque o mock está em Category.prototype.validate; ao acessar direto 
         name: "Movie",
         description: "some description",
       });
-      expect(category.category_id).toBeInstanceOf(Uuid);
+      expect(category.category_id).toBeInstanceOf(CategoryId);
       expect(category.name).toBe("Movie");
       expect(category.description).toBe("some description");
       expect(category.is_active).toBe(true);
@@ -98,7 +98,7 @@ Resposta: Porque o mock está em Category.prototype.validate; ao acessar direto 
         name: "Movie",
         is_active: false,
       });
-      expect(category.category_id).toBeInstanceOf(Uuid);
+      expect(category.category_id).toBeInstanceOf(CategoryId);
       expect(category.name).toBe("Movie");
       expect(category.description).toBeNull();
       expect(category.is_active).toBe(false);
@@ -109,7 +109,7 @@ Resposta: Porque o mock está em Category.prototype.validate; ao acessar direto 
   });
 
   describe("category_id field", () => {
-    const arrange = [{ id: null }, { id: undefined }, { id: new Uuid() }];
+    const arrange = [{ id: null }, { id: undefined }, { id: new CategoryId() }];
 
     test.each(arrange)("should be is %j", (props) => {
       const category = new Category(props as any);

@@ -21,7 +21,7 @@ import {
 } from '../categories.presenter';
 import { CategoryOutputMapper } from '../../../core/category/application/use-cases/common/category-output';
 import { Uuid } from '../../../core/shared/domain/value-objects/uuid.vo';
-import { Category } from '../../../core/category/domain/category.entity';
+import { Category, CategoryId } from '../../../core/category/domain/category.aggregate';
 
 describe('CategoriesController Integration Tests', () => {
   let controller: CategoriesController;
@@ -52,7 +52,7 @@ describe('CategoriesController Integration Tests', () => {
       'when body is $send_data',
       async ({ send_data, expected }) => {
         const presenter = await controller.create(send_data);
-        const entity = await repository.findById(new Uuid(presenter.id));
+        const entity = await repository.findById(new CategoryId(presenter.id));
         expect(entity.toJSON()).toStrictEqual({
           category_id: presenter.id,
           created_at: presenter.created_at,
@@ -80,7 +80,7 @@ describe('CategoriesController Integration Tests', () => {
           category.category_id.id,
           send_data,
         );
-        const entity = await repository.findById(new Uuid(presenter.id));
+        const entity = await repository.findById(new CategoryId(presenter.id));
         expect(entity.toJSON()).toStrictEqual({
           category_id: presenter.id,
           created_at: presenter.created_at,

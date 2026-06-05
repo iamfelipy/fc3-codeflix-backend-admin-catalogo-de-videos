@@ -1,4 +1,4 @@
-import { Category } from '../../../core/category/domain/category.entity';
+import { Category } from '../../../core/category/domain/category.aggregate';
 
 // campos que vai vir na maioria das respostas
 const _keysInResponse = [
