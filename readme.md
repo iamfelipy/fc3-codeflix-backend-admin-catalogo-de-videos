@@ -57,18 +57,22 @@
   - normalmente o dotenv é usado apenas em desenvolvimento para carregar variáveis de ambiente locais, não em produção, onde variáveis já devem estar definidas no ambiente do servidor/container.
 - /core: contem as principais operações do dominio, com poucas influencia do nestjs
 - class-transformer
-  - usado na serialização
+  - usado na serialização do output do controller
 - class-validator
   - usado no core e no controller para validar entradas
 
 ----
-### usecases
-  - category
-    - Create: Criação de uma nova categoria.
-    - Update: Atualização de uma categoria existente.
-    - Delete: Remoção de uma categoria.
-    - Get: Recuperação de uma categoria específica.
-    - Search/List: Listagem e busca de categorias.
+### clean architecture
+  - presenter
+    - categoryOuput, collection, pagination
+  - controller, gateway
+  - usecases
+    - category
+      - Create: Criação de uma nova categoria.
+      - Update: Atualização de uma categoria existente.
+      - Delete: Remoção de uma categoria.
+      - Get: Recuperação de uma categoria específica.
+      - Search/List: Listagem e busca de categorias.
 ----
 
 ### database, persistence
@@ -103,6 +107,9 @@
   - adapter: CategorySequelizeRepository, CategoryInMemoryRepository
 - controller
   - api rest
+- validator-fields-interface.ts
+  - validate domain
+- repository-interface.ts
 ---
 ### solid
 - srp
@@ -110,8 +117,9 @@
   - repository: mapper, helper
 - open/closed principle (OCP):
   - class-validator: validação da entidade
+  - IRepository, ISearchableRepository
 - liskov substitution principle (LSP):
-  - garantir que subclasses de repositórios, use cases ou entidades possam substituir as superclasses sem alterar a corretude do comportamento do sistema
+  - garantir que subclasses possam substituir as superclasses sem alterar a corretude do comportamento do sistema
 - interface segregation
   - IRepository e ISearchableRepository separados
 - d: dependecy inversion
@@ -126,22 +134,33 @@
   - entities
     - category
       - é qualquer agrupamento de elementos com características em comum, usado para classificar, organizar ou estruturar informações, objetos ou conceitos.
+    - cast-members
+      - "membro do elenco", uma pessoa (ator, atriz, diretor, etc.) que faz parte da produção de um filme, série ou peça.
   - object value
-    - uuid, search-params, search-result
+    - uuid, search-params, search-result, cast-member-type
   - repository
     - category
+    - cast-member
+  - aggregate
   - commit sem nestjs: 73137dbf9f8a561f3be342723fb982a4cdd73ec3
 
 ---
 
-### validações, lançamento de exceções
-  - separação das validações de dominio(regras de dominio) vs validações de sintaxe
-  - class-validator
-    - categoryRules
-  - mudando de lançar exceções de cada erro para notification pattern(acumular erros e no final fazer algo no usecase), isso depende do caso
-  - joy validator
-    - configModule - variaveis de ambiente
-  - nest - pipe
+### validações, tratamento de erros
+  - validações
+    - separação das validações de dominio(regras de dominio) vs validações de sintaxe
+    - class-validator
+      - categoryRules
+      - CastMemberRules
+    - joy validator
+      - configModule - variaveis de ambiente
+    - nest - pipe
+  - tratamento de erros, lançamento de exceções
+    - either
+    - erros na entidade com notification pattern(acumular erros e no final fazer algo no usecase)
+    - nest - filters
+    - exceptions especificas inves de new Error generic
+  
 ---
 
 ### configurações de qualidade
@@ -190,6 +209,9 @@
   - tratar execeções do dominio
     - o campo name não pode ter mais de 255 caracters, criar entidade e notification
     - not found id no usecase, repository update
+- helper
+  - test
+    - startApp - inicia modulo, banco para o teste e2e
 
 ----
 ### docker

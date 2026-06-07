@@ -1,5 +1,7 @@
 import { ValidationError } from './validation.error';
-// não usamos esse validatorrules baseado no fluent pattern ainda.
+
+// O código demonstra o padrão Fluent Interface (Interface Fluente), pois permite encadear chamadas de métodos para configurar e validar valores de forma legível e sequencial.
+// não foi usado no projeto, foi usado class-validator como alternativa
 export class ValidatorRules {
   private constructor(
     private value: any,
