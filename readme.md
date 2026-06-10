@@ -63,16 +63,24 @@
 
 ----
 ### clean architecture
-  - presenter
-    - categoryOuput, collection, pagination
-  - controller, gateway
-  - usecases
-    - category
-      - Create: Criação de uma nova categoria.
-      - Update: Atualização de uma categoria existente.
-      - Delete: Remoção de uma categoria.
-      - Get: Recuperação de uma categoria específica.
-      - Search/List: Listagem e busca de categorias.
+  - interface adapters
+    - presenters
+      - categoryOuput, collection, pagination
+    - controllers
+      - category, cast-member
+    - gateways
+      - repository
+  - application business rules
+    - usecases
+      - category
+        - Create: Criação de uma nova categoria.
+        - Update: Atualização de uma categoria existente.
+        - Delete: Remoção de uma categoria.
+        - Get: Recuperação de uma categoria específica.
+        - Search/List: Listagem e busca de categorias.
+  - enterprise business rules
+    - category, castmembers
+  - dependencias apontam para o centro
 ----
 
 ### database, persistence
