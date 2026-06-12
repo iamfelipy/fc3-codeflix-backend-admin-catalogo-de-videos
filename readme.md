@@ -126,6 +126,7 @@
 - open/closed principle (OCP):
   - class-validator: validação da entidade
   - IRepository, ISearchableRepository
+  - SearchParams
 - liskov substitution principle (LSP):
   - garantir que subclasses possam substituir as superclasses sem alterar a corretude do comportamento do sistema
 - interface segregation
