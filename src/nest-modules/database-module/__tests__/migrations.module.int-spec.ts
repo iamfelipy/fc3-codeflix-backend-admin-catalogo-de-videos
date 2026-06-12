@@ -101,7 +101,7 @@ describe('Migration Integration Tests', () => {
       expect(resultsUp.length).toBeGreaterThan(0);
 
       // Run migrations down (undo all)
-      const downResult = await migratorInstance.down();
+      const downResult = await migratorInstance.down({step: upResult.length});
       expect(Array.isArray(downResult)).toBe(true);
 
       // Check SequelizeMeta table is empty
