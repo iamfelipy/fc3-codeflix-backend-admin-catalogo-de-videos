@@ -12,7 +12,7 @@ implements ICategoryRepository
 
   protected async applyFilter(
     items: Category[],
-    filter: CategoryFilter
+    filter: CategoryFilter | null
   ): Promise<Category[]> {
     if (!filter) {
       return items;

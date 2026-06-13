@@ -54,7 +54,7 @@ export class ConfigModule extends NestConfigModule {
       isGlobal: true,
       // quem vem antes na lista envFilePath é quem prevalece em chaves duplicadas.
       envFilePath: [
-        ...(Array.isArray(envFilePath) ? envFilePath : [envFilePath]),
+        ...(Array.isArray(envFilePath) ? envFilePath! : [envFilePath!]),
         join(process.cwd(), 'envs', `.env.${process.env.NODE_ENV}`),
         join(process.cwd(), 'envs', `.env`),
       ],
