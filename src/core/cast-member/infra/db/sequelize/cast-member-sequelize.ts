@@ -60,6 +60,15 @@ export class CastMemberSequelizeRepository implements ICastMemberRepository {
       name: (sort_dir: SortDirection) => literal(`binary name ${sort_dir}`),
     },
   };
+  /*
+    CastMemberModel: a instância em si ou referência à classe.
+    typeof CastMemberModel: o tipo do construtor (a própria classe).
+    new (...args) => CastMemberModel: o tipo de função que pode ser chamada com new para criar um CastMemberModel.
+    Resumindo:
+
+    Use typeof CastMemberModel para aceitar a classe.
+    Use CastMemberModel para aceitar uma instância.
+  */
   constructor(private castMemberModel: typeof CastMemberModel) {}
 
   async insert(entity: CastMember): Promise<void> {

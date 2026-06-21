@@ -53,6 +53,7 @@ export class ConfigModule extends NestConfigModule {
     return super.forRoot({
       isGlobal: true,
       // quem vem antes na lista envFilePath é quem prevalece em chaves duplicadas.
+      // "As variáveis de ambiente definidas nos arquivos mais à esquerda do array sobrescrevem as à direita."
       envFilePath: [
         ...(Array.isArray(envFilePath) ? envFilePath! : [envFilePath!]),
         join(process.cwd(), 'envs', `.env.${process.env.NODE_ENV}`),

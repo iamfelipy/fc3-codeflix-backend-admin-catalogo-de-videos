@@ -78,6 +78,7 @@
         - Delete: Remoção de uma categoria.
         - Get: Recuperação de uma categoria específica.
         - Search/List: Listagem e busca de categorias.
+      - castmembers
   - enterprise business rules
     - category, castmembers
   - dependencias apontam para o centro
@@ -114,10 +115,10 @@
   - port: ICategoryRepository
   - adapter: CategorySequelizeRepository, CategoryInMemoryRepository
 - controller
-  - api rest
-- validator-fields-interface.ts
+  - port/adapter: api rest
+- port: validator-fields-interface.ts
   - validate domain
-- repository-interface.ts
+- port: repository-interface.ts
 ---
 ### solid
 - srp
@@ -165,7 +166,7 @@
       - configModule - variaveis de ambiente
     - nest - pipe
   - tratamento de erros, lançamento de exceções
-    - either
+    - either - tratar de forma explicita, alternativa ao throw
     - erros na entidade com notification pattern(acumular erros e no final fazer algo no usecase)
     - nest - filters
     - exceptions especificas inves de new Error generic
@@ -221,6 +222,7 @@
 - helper
   - test
     - startApp - inicia modulo, banco para o teste e2e
+- nest-modules/shared-module
 
 ----
 ### docker
@@ -242,21 +244,6 @@
 ### como rodar o projeto
 
 - instalar o docker
-- escolhendo entre modo test ou desenvolvimento
-  - executar em modo test
-    - teste de unidade, integração
-      - criar /envs/.env.test com base no .env.test.example
-        - sqlite inmemory
-      - usar docker-compose.yaml
-        - mysql em memoria
-    - teste end-to-end(e2e)
-      - criar /envs/.env.e2e com base no .env.e2e.example
-  - executar em modo dev
-    - criar /envs/.env com base no .env.example
-      - sqlite inmemory
-    - usar docker-compose.dev.yaml
-      - mysql com volume mapeado
-  - eu posso mudar o banco via .env* ou nos tests via config-module
 - como executar como dev container?
   - criar devcontainer.json baseado no ./devcontainer/devcontainer.json.example
     - mudar a opção dockercomposefile dentro do arquivo devcontainer.json para apontar para o modo test ou modo dev
@@ -287,15 +274,26 @@
       - docker compose -f docker/docker-compose.yml up
     - acessar container
       - docker exec -it fc3-codeflix-backend-admin-catalogo bash
-- executando nest
+- escolhendo entre modo test ou desenvolvimento
   - executar em modo test
     - teste de unidade, integração
+      - criar /envs/.env.test com base no .env.test.example
+        - sqlite inmemory
       - npm run test
     - teste end-to-end(e2e)
+      - criar /envs/.env.e2e com base no .env.e2e.example
+      - usar docker-compose.yaml
+        - mysql em memoria
       - npm run test:e2e:runInBand
         - os testes foram projetos para funcionar só de forma sequencial para não dar conflito ao mudar o mesmo schema
   - executar em modo dev
-    - npm run start:dev
+    - criar /envs/.env com base no .env.example
+      - sqlite inmemory
+    - usar docker-compose.dev.yaml
+      - mysql com volume mapeado
+    - executar em modo dev
+      - npm run start:dev
+  - eu posso mudar o banco via .env* ou nos tests via config-module
 - testando a api com rest client extension + /api.http
   - npm run start:dev
   - executar chamadas do /api.http
@@ -338,9 +336,6 @@ docker compose -f docker/docker-compose.yml up --build
   - npm run migrate:ts up
 - desfaz; suporta steps
   - npm run migrate:ts down
-
-# typescript: analise estatica
-npm run tsc:check
 
 # container mysql, comandos uteis
 mysql -uroot -proot

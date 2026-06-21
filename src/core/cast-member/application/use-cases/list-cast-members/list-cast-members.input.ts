@@ -5,6 +5,13 @@ import { IsInt, ValidateNested, validateSync } from 'class-validator';
 
 export class ListCastMembersFilter {
   name?: string | null;
+  /*
+    * `?` → TypeScript: permite a propriedade não existir (`undefined`)
+    * `@IsOptional()` → class-validator: ignora validações se for `undefined` ou `null`
+    * `@IsInt()` sozinho → valida números inteiros, mas normalmente ignora `undefined` e `null`
+    * `@IsDefined()` → obriga existir (não aceita `undefined`/`null`)
+
+  */
   @IsInt()
   type?: CastMemberTypes | null;
 }

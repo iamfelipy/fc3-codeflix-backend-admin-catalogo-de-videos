@@ -15,6 +15,8 @@ export class CreateCastMemberInput {
   @IsNotEmpty()
   type: CastMemberTypes;
 
+  //Quando o Global Validation Pipe do NestJS recebe uma requisição, ele instancia o DTO sem argumentos para validar os dados recebidos. O !props return; evita que, nessa instanciação sem parâmetros, o acesso a props.name e props.type cause erro, garantindo que as propriedades sejam setadas só quando props existir. Isso permite que a validação funcione sem exceptions desnecessárias.
+  // Sim, props?. resolve, pois props?.name e props?.type serão undefined se props for undefined, e não causará exceção. O efeito é equivalente ao if (!props) return;, mas as propriedades ficarão undefined, o que pode afetar validações caso esperem valores obrigatórios.
   constructor(props?: CreateCastMemberInputConstructorProps) {
     if (!props) return;
     this.name = props.name;

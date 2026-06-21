@@ -11,8 +11,10 @@ import { NotFoundErrorFilter } from './shared-module/filters/not-found-error.fil
 export function applyGlobalConfig(app: INestApplication) {
   // O oposto de errorHttpStatusCode: 422 (Unprocessable Entity — válido, mas rejeitado por regra de negócio) seria errorHttpStatusCode: 400 (Bad Request — dados inválidos, erro de validação). Use 400 para erros de validação básica.
   app.useGlobalPipes(
+    // ativa o class-validator no dto do controller, ativa class-transform, defini o statuscode se der erro de validação
     new ValidationPipe({
       errorHttpStatusCode: 422,
+      // foi ativado pq dentro de CastMemberSearchParams o CastmemberType.create precisa receber numero e não string, e o param no search-controler do cast-member vem o type como string
       transform: true,
     }),
   );
