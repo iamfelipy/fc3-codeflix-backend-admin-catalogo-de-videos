@@ -246,8 +246,10 @@
 - instalar o docker
 - como executar como dev container?
   - criar devcontainer.json baseado no ./devcontainer/devcontainer.json.example
-    - mudar a opção dockercomposefile dentro do arquivo devcontainer.json para apontar para o modo test ou modo dev
-      - por padrão está em modo test
+    - posso escolher a opção dockercomposefile dentro do arquivo devcontainer.json para apontar para:
+      - docker-compose.yaml: tmpfs mysql - modo test
+        - por padrão está em modo test
+      - docker-compose.dev.yaml: volume mysql -> modo dev
   - instalar extensão dev container
     - abrir command pallete: ctrl + shift + p 
     - digitar > dev container
