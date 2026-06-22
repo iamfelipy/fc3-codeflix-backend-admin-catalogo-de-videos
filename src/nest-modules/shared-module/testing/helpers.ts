@@ -15,7 +15,7 @@ export function startApp() {
 
     const sequelize = moduleFixture.get<Sequelize>(getConnectionToken());
 
-    // resolve o problema: Os testes usarem dados ou tabelas antigos, gerando inconsistência.
+    // dropa e recria as tabelas.
     // banco fica igual os models
     await sequelize.sync({ force: true });
 

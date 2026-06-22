@@ -7,6 +7,7 @@ import { Reflector } from '@nestjs/core';
 import { WrapperDataInterceptor } from './shared-module/interceptors/wrapper-data/wrapper-data.interceptor';
 import { EntityValidationErrorFilter } from './shared-module/filters/entity-validation-error.filter';
 import { NotFoundErrorFilter } from './shared-module/filters/not-found-error.filter';
+import { SearchValidationErrorFilter } from './shared-module/filters/search-validation-error.filter';
 
 export function applyGlobalConfig(app: INestApplication) {
   // O oposto de errorHttpStatusCode: 422 (Unprocessable Entity — válido, mas rejeitado por regra de negócio) seria errorHttpStatusCode: 400 (Bad Request — dados inválidos, erro de validação). Use 400 para erros de validação básica.
@@ -27,5 +28,6 @@ export function applyGlobalConfig(app: INestApplication) {
   app.useGlobalFilters(
     new EntityValidationErrorFilter(),
     new NotFoundErrorFilter(),
+    new SearchValidationErrorFilter()
   );
 }

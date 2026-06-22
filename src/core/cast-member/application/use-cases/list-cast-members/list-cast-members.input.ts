@@ -1,18 +1,14 @@
+import { Type } from 'class-transformer';
 import { SearchInput } from '../../../../shared/application/search-input';
 import { SortDirection } from '../../../../shared/domain/repository/search-params';
 import { CastMemberTypes } from '../../../domain/cast-member-type.vo';
-import { IsInt, ValidateNested, validateSync } from 'class-validator';
+import { IsInt, IsOptional, ValidateNested, validateSync } from 'class-validator';
 
 export class ListCastMembersFilter {
   name?: string | null;
-  /*
-    * `?` → TypeScript: permite a propriedade não existir (`undefined`)
-    * `@IsOptional()` → class-validator: ignora validações se for `undefined` ou `null`
-    * `@IsInt()` sozinho → valida números inteiros, mas normalmente ignora `undefined` e `null`
-    * `@IsDefined()` → obriga existir (não aceita `undefined`/`null`)
-
-  */
   @IsInt()
+  @IsOptional()
+  @Type(() => Number)
   type?: CastMemberTypes | null;
 }
 
@@ -24,6 +20,7 @@ export class ListCastMembersInput
   sort?: string;
   sort_dir?: SortDirection;
   @ValidateNested()
+  @Type(() => ListCastMembersFilter)
   filter?: ListCastMembersFilter;
 }
 

@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { validateSync } from 'class-validator';
 import { CastMemberTypes } from '../../../../domain/cast-member-type.vo';
 import {

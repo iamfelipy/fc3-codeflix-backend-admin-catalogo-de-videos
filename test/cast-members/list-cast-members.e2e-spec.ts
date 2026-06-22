@@ -46,6 +46,7 @@ describe('CastMembersController (e2e)', () => {
 
     describe('should return cast members using paginate, filter and sort', () => {
       let castMemberRepo: ICastMemberRepository;
+      // esse teste passa pq dentro de startApp tem um BeforeEach
       const nestApp = startApp();
       const { entitiesMap, arrange } = ListCastMembersFixture.arrangeUnsorted();
 
@@ -56,7 +57,7 @@ describe('CastMembersController (e2e)', () => {
         await castMemberRepo.bulkInsert(Object.values(entitiesMap));
       });
 
-      test.each([arrange[0]])(
+      test.each(arrange)(
         'when query params is $send_data',
         async ({ send_data, expected }) => {
           // foi usado "qs" pq urlsearch params não funcione com parametros aninhados
