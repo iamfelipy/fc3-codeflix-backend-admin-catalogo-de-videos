@@ -143,9 +143,18 @@
 ### DDD
   - entities
     - category
-      - é qualquer agrupamento de elementos com características em comum, usado para classificar, organizar ou estruturar informações, objetos ou conceitos.
+      - Categoria: um conjunto de coisas agrupadas porque compartilham uma característica geral em comum.
+      - Categoria = onde algo se encaixa pelo tipo geral.
+      - Categoria olha para a classe/espécie da coisa.
+      - Categoria agrupa pela natureza/tipo.
+      - filme, documentário, infantil
     - cast-members
       - "membro do elenco", uma pessoa (ator, atriz, diretor, etc.) que faz parte da produção de um filme, série ou peça.
+    - genre
+      - Gênero: uma categoria mais específica usada para agrupar coisas que compartilham características de estilo, estrutura ou padrão.
+      - Gênero = o estilo/padrão que algo segue dentro de uma categoria.
+      - Gênero agrupa pela forma/estilo/padrão.
+      - Filme → gênero: terror, comédia, ação, drama
   - object value
     - uuid, search-params, search-result, cast-member-type
   - repository
