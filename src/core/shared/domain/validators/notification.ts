@@ -53,6 +53,7 @@ export class Notification {
   // isso é usado tambem por class-validator
   // exemplo do que ele gera
   /*
+  antes
   [
   {
     "property": "name",
@@ -60,13 +61,8 @@ export class Notification {
       "isNotEmpty": "name should not be empty",
       "minLength": "name must be at least 3 characters"
     }
-  },
-  {
-    "property": "age",
-    "constraints": {
-      "min": "age must not be less than 0",
-      "isInt": "age must be an integer number"
-    }
   }
-]
+  ]
+  depois Map
+    "name": ["name should not be empty","name must be at least 3 characters"]
   */
