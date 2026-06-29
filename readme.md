@@ -87,6 +87,8 @@
 ### database, persistence
   - repository 
     - search(filter, sort, paginate), crud
+  - manyToMany
+    - gender with categories
   - inmemory
   - orm: sequelize
     - mysql, sqlite
