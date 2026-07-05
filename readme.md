@@ -92,8 +92,12 @@
   - inmemory
   - orm: sequelize
     - mysql, sqlite
-    - design pattern - active record
+    - sequelize: design pattern - active record
   - mapper
+  - unit of work
+    - genre
+  - transaction
+    - genre
   - migration
     - umzug
       - src/core/shared/infra/db/sequelize/migrator.ts

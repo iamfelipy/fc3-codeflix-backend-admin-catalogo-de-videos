@@ -7,6 +7,7 @@ declare global {
       notificationContainsErrorMessages: (
         expected: Array<FieldsErrors>,
       ) => R;
+      toBeValueObject: (expected: ValueObject) => R;
     }
   }
 }
