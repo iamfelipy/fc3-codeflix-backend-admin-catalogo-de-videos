@@ -26,6 +26,7 @@
 - ddd: domain driven design
   - design tatico
     - entidade, objeto de valor, repository
+- backend para a gestão de conteúdos para a CodeFlix,
 
 ----
 ### etapas de construção da aplicação backend
@@ -161,6 +162,7 @@
       - Gênero = o estilo/padrão que algo segue dentro de uma categoria.
       - Gênero agrupa pela forma/estilo/padrão.
       - Filme → gênero: terror, comédia, ação, drama
+      - Estilo é o modo particular de fazer, expressar ou apresentar algo, caracterizado por traços distintivos que diferenciam um autor, obra, período ou grupo.
   - object value
     - uuid, search-params, search-result, cast-member-type
   - repository

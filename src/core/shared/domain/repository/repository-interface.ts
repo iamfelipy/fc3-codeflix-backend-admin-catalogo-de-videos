@@ -11,6 +11,11 @@ export interface IRepository<E extends Entity, EntityId extends ValueObject> {
 
   findById(entity_id: EntityId): Promise<E | null>;
   findAll(): Promise<E[]>;
+  findByIds(ids: EntityId[]): Promise<E[]>;
+  existsById(ids: EntityId[]): Promise<{
+    exists: EntityId[];
+    not_exists: EntityId[];
+  }>;
 
   /*
     O tipo new (...args: any[]) => E descreve um construtor de classe em TypeScript: é uma função que pode ser chamada com new e aceita quaisquer argumentos (...args), retornando uma instância de E. Assim, getEntity() retorna o construtor da entidade, não a instância.
