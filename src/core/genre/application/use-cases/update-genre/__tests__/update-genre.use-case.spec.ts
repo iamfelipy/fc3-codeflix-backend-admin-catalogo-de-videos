@@ -1,4 +1,4 @@
-import { CategoriesIdExistsInStorageValidator } from '../../../../../category/application/validations/categories-ids-exists-in-storage.validator';
+import { CategoriesIdExistsInDatabaseValidator } from '../../../../../category/application/validations/categories-ids-exists-in-database.validator';
 import {
   Category,
   CategoryId,
@@ -15,20 +15,20 @@ describe('UpdateGenreUseCase Unit Tests', () => {
   let useCase: UpdateGenreUseCase;
   let genreRepo: GenreInMemoryRepository;
   let categoryRepo: CategoryInMemoryRepository;
-  let categoriesIdsExistsInStorageValidator: CategoriesIdExistsInStorageValidator;
+  let categoriesIdsExistsInDatabaseValidator: CategoriesIdExistsInDatabaseValidator;
   let uow: UnitOfWorkFakeInMemory;
 
   beforeEach(() => {
     uow = new UnitOfWorkFakeInMemory();
     genreRepo = new GenreInMemoryRepository();
     categoryRepo = new CategoryInMemoryRepository();
-    categoriesIdsExistsInStorageValidator =
-      new CategoriesIdExistsInStorageValidator(categoryRepo);
+    categoriesIdsExistsInDatabaseValidator =
+      new CategoriesIdExistsInDatabaseValidator(categoryRepo);
     useCase = new UpdateGenreUseCase(
       uow,
       genreRepo,
       categoryRepo,
-      categoriesIdsExistsInStorageValidator,
+      categoriesIdsExistsInDatabaseValidator,
     );
   });
 
@@ -38,7 +38,7 @@ describe('UpdateGenreUseCase Unit Tests', () => {
       const genre = Genre.fake().aGenre().build();
       await genreRepo.insert(genre);
       const spyValidateCategoriesId = jest.spyOn(
-        categoriesIdsExistsInStorageValidator,
+        categoriesIdsExistsInDatabaseValidator,
         'validate',
       );
       try {

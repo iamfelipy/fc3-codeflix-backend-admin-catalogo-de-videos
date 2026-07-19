@@ -8,6 +8,7 @@ import { DeleteCategoryUseCase } from '../../core/category/application/use-cases
 import { CategorySequelizeRepository } from '../../core/category/infra/db/sequelize/category-sequelize.repository';
 import { CategoryModel } from '../../core/category/infra/db/sequelize/category.model';
 import { ICategoryRepository } from '../../core/category/domain/category.repository';
+import { CategoriesIdExistsInDatabaseValidator } from '@core/category/application/validations/categories-ids-exists-in-database.validator';
 
 export const REPOSITORIES = {
   // alias que pode ser usado por outros providers

@@ -1,4 +1,4 @@
-import { CategoriesIdExistsInStorageValidator } from '../../../../../category/application/validations/categories-ids-exists-in-storage.validator';
+import { CategoriesIdExistsInDatabaseValidator } from '../../../../../category/application/validations/categories-ids-exists-in-database.validator';
 import {
   Category,
   CategoryId,
@@ -13,20 +13,20 @@ describe('CreateGenreUseCase Unit Tests', () => {
   let useCase: CreateGenreUseCase;
   let genreRepo: GenreInMemoryRepository;
   let categoryRepo: CategoryInMemoryRepository;
-  let categoriesIdsExistsInStorageValidator: CategoriesIdExistsInStorageValidator;
+  let categoriesIdsExistsInDatabaseValidator: CategoriesIdExistsInDatabaseValidator;
   let uow: UnitOfWorkFakeInMemory;
 
   beforeEach(() => {
     uow = new UnitOfWorkFakeInMemory();
     genreRepo = new GenreInMemoryRepository();
     categoryRepo = new CategoryInMemoryRepository();
-    categoriesIdsExistsInStorageValidator =
-      new CategoriesIdExistsInStorageValidator(categoryRepo);
+    categoriesIdsExistsInDatabaseValidator =
+      new CategoriesIdExistsInDatabaseValidator(categoryRepo);
     useCase = new CreateGenreUseCase(
       uow,
       genreRepo,
       categoryRepo,
-      categoriesIdsExistsInStorageValidator,
+      categoriesIdsExistsInDatabaseValidator,
     );
   });
 
@@ -34,7 +34,7 @@ describe('CreateGenreUseCase Unit Tests', () => {
     it('should throw an entity validation error when categories id not exists', async () => {
       expect.assertions(3);
       const spyValidateCategoriesId = jest.spyOn(
-        categoriesIdsExistsInStorageValidator,
+        categoriesIdsExistsInDatabaseValidator,
         'validate',
       );
       try {
