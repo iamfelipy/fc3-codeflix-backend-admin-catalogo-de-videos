@@ -212,7 +212,11 @@
   - CategoryFakeBuilder
 - fluent pattern
   - ValidatorRules
-- helpers/setup test sequelize
+- helpers
+  - src/core/shared/infra/testing/helpers.ts
+    - teste de unidade e integração
+  - src/nest-modules/shared-module/testing/helpers.ts
+   - teste de integração e e2e
 - fixtures (configuração para teste, arranges)
   - teste de integração, e2e
 - quantidade de testes:
