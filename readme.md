@@ -165,6 +165,8 @@
       - Gênero agrupa pela forma/estilo/padrão.
       - Filme → gênero: terror, comédia, ação, drama
       - Estilo é o modo particular de fazer, expressar ou apresentar algo, caracterizado por traços distintivos que diferenciam um autor, obra, período ou grupo.
+    - video
+      - Vídeo significa registro ou exibição de imagens em movimento, geralmente acompanhado de som.
   - object value
     - uuid, search-params, search-result, cast-member-type
   - repository
