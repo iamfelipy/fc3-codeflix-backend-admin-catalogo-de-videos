@@ -8,6 +8,8 @@ export class ListCastMembersFilter {
   name?: string | null;
   @IsInt()
   @IsOptional()
+  // isso é ativado pelo pipe global transform true, dto do controller é convertido de string para numero
+  // a classe é extendida para o dto de controller
   @Type(() => Number)
   type?: CastMemberTypes | null;
 }

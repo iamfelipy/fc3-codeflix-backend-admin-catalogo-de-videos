@@ -1,11 +1,14 @@
-import { Module } from '@nestjs/common';
-import { SequelizeModule } from '@nestjs/sequelize';
+import { Global, Module, Scope } from '@nestjs/common';
+import { getConnectionToken, SequelizeModule } from '@nestjs/sequelize';
 import { CategoryModel } from '../../core/category/infra/db/sequelize/category.model';
 import { ConfigService } from '@nestjs/config';
 import { CONFIG_SCHEMA_TYPE } from 'src/nest-modules/config-module/config.module';
+import { UnitOfWorkSequelize } from '@core/shared/infra/db/sequelize/unit-of-work-sequelize';
+import { Sequelize } from 'sequelize';
 
 const models = [CategoryModel];
 
+@Global()
 @Module({
   imports: [
     SequelizeModule.forRootAsync({
@@ -17,6 +20,7 @@ const models = [CategoryModel];
             host: configService.get('DB_HOST'),
             models,
             logging: configService.get('DB_LOGGING'),
+            // Em produção, o recomendado é autoLoadModels: false, para evitar que alterações nos models sejam aplicadas automaticamente sem controle de migrações. Isso garante maior segurança e previsibilidade no schema do banco.
             autoLoadModels: configService.get('DB_AUTO_LOAD_MODELS'),
           };
         }
@@ -48,5 +52,21 @@ const models = [CategoryModel];
       inject: [ConfigService],
     }),
   ],
+  providers: [
+    {
+      provide: UnitOfWorkSequelize,
+      useFactory: (sequelize: Sequelize) => {
+        return new UnitOfWorkSequelize(sequelize);
+      },
+      inject: [getConnectionToken()],
+      scope: Scope.REQUEST,
+    },
+    {
+      provide: 'UnitOfWork',
+      useExisting: UnitOfWorkSequelize,
+      scope: Scope.REQUEST,
+    },
+  ],
+  exports: ['UnitOfWork'],
 })
 export class DatabaseModule {}

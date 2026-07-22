@@ -66,9 +66,11 @@
 ### clean architecture
   - interface adapters
     - presenters
-      - categoryOuput, collection, pagination
+      - categoryOuput, collection, pagination, data, metadata
+      - class-transform
     - controllers
       - category, cast-member
+      - class-validator
     - gateways
       - repository
   - application business rules

@@ -18,6 +18,8 @@ export class WrapperDataInterceptor implements NestInterceptor {
   */
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next
+      // interceptors do NestJS usam programação reativa (RxJS) para permitir manipulação assíncrona da resposta; o handle fornece um Observable para compor transformações ou efeitos antes de enviar a resposta final.
+      // next.handle() retorna um Observable da resposta do controller. O pipe(map(...)) permite transformar essa resposta depois que o controller executou, antes de enviar ao cliente.
       .handle()
       // !body é para não interferir em outros controllers que retornam vazio
       // para os outros casos forçamos data: body
