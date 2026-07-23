@@ -150,7 +150,7 @@
       - sequelize
 ---
 ### DDD
-  - entities
+  - entities, aggregates
     - category
       - Categoria: um conjunto de coisas agrupadas porque compartilham uma característica geral em comum.
       - Categoria = onde algo se encaixa pelo tipo geral.
@@ -166,13 +166,14 @@
       - Filme → gênero: terror, comédia, ação, drama
       - Estilo é o modo particular de fazer, expressar ou apresentar algo, caracterizado por traços distintivos que diferenciam um autor, obra, período ou grupo.
     - video
-      - Vídeo significa registro ou exibição de imagens em movimento, geralmente acompanhado de som.
+      - video: significa registro ou exibição de imagens em movimento, geralmente acompanhado de som.
   - object value
-    - uuid, search-params, search-result, cast-member-type
+    - uuid, search-params, search-result, cast-member-type, 
+    - rating
+        - classificação" é a categoria atribuída ao conteúdo, enquanto "faixa etária" é o intervalo ou limite de idades ao qual essa categoria se aplica.
   - repository
     - category
     - cast-member
-  - aggregate
   - commit sem nestjs: 73137dbf9f8a561f3be342723fb982a4cdd73ec3
 
 ---
