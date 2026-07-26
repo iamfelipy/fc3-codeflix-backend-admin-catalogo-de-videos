@@ -171,6 +171,8 @@
     - uuid, search-params, search-result, cast-member-type, 
     - rating
         - classificação" é a categoria atribuída ao conteúdo, enquanto "faixa etária" é o intervalo ou limite de idades ao qual essa categoria se aplica.
+    - imageMedia
+    - banner, thumbnail-half, thumbnail
   - repository
     - category
     - cast-member
