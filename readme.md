@@ -133,10 +133,13 @@
 - srp
   - usecase: execute, validação input
   - repository: mapper, helper
+  - .validate dominio
 - open/closed principle (OCP):
   - class-validator: validação da entidade
   - IRepository, ISearchableRepository
   - SearchParams
+  - objeto de valor imageMedia abstract
+    - banner, thumbnail
 - liskov substitution principle (LSP):
   - garantir que subclasses possam substituir as superclasses sem alterar a corretude do comportamento do sistema
 - interface segregation
@@ -172,7 +175,9 @@
     - rating
         - classificação" é a categoria atribuída ao conteúdo, enquanto "faixa etária" é o intervalo ou limite de idades ao qual essa categoria se aplica.
     - imageMedia
-    - banner, thumbnail-half, thumbnail
+      - banner, thumbnail-half, thumbnail
+    - audiovideomedia
+      - video principal, trailer
   - repository
     - category
     - cast-member

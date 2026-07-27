@@ -6,6 +6,8 @@ import { CastMemberId } from '../../cast-member/domain/cast-member.aggregate';
 import { Rating } from './rating.vo';
 import { Banner } from './banner.vo';
 import { Thumbnail } from './thumbnail.vo';
+import { Trailer } from './trailer.vo';
+import { VideoMedia } from './video-media.vo';
 
 export type VideoConstructorProps = {
   video_id?: VideoId;
@@ -21,6 +23,8 @@ export type VideoConstructorProps = {
   banner?: Banner;
   thumbnail?: Thumbnail;
   thumbnail_half?: Thumbnail;
+  trailer?: Trailer;
+  video?: VideoMedia;
 
   categories_id: Map<string, CategoryId>;
   genres_id: Map<string, GenreId>;
@@ -39,6 +43,8 @@ export type VideoCreateCommand = {
   banner?: Banner;
   thumbnail?: Thumbnail;
   thumbnail_half?: Thumbnail;
+  trailer?: Trailer;
+  video?: VideoMedia;
 
   categories_id: CategoryId[];
   genres_id: GenreId[];
@@ -64,6 +70,8 @@ export class Video extends AggregateRoot {
   banner: Banner | null;
   thumbnail: Thumbnail | null;
   thumbnail_half: Thumbnail | null;
+  trailer: Trailer | null;
+  video: VideoMedia | null;
 
   // ex: documentario, filme, infantil
   categories_id: Map<string, CategoryId>;
@@ -88,6 +96,8 @@ export class Video extends AggregateRoot {
     this.banner = props.banner ?? null;
     this.thumbnail = props.thumbnail ?? null;
     this.thumbnail_half = props.thumbnail_half ?? null;
+    this.trailer = props.trailer ?? null;
+    this.video = props.video ?? null;
 
     this.categories_id = props.categories_id;
     this.genres_id = props.genres_id;
@@ -211,6 +221,8 @@ export class Video extends AggregateRoot {
       banner: this.banner ? this.banner.toJSON() : null,
       thumbnail: this.thumbnail ? this.thumbnail.toJSON() : null,
       thumbnail_half: this.thumbnail_half ? this.thumbnail_half.toJSON() : null,
+      trailer: this.trailer ? this.trailer.toJSON() : null,
+      video: this.video ? this.video.toJSON() : null,
       categories_id: Array.from(this.categories_id.values()).map((id) => id.id),
       genres_id: Array.from(this.genres_id.values()).map((id) => id.id),
       cast_members_id: Array.from(this.cast_members_id.values()).map(
