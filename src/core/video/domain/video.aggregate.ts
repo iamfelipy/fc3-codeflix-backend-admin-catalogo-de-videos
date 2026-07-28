@@ -11,6 +11,7 @@ import { VideoMedia } from './video-media.vo';
 import VideoValidatorFactory from './video.validator';
 import { ThumbnailHalf } from './thumbnail-half.vo';
 import { AudioVideoMediaStatus } from '@core/shared/domain/value-objects/audio-video-media.vo';
+import { VideoFakeBuilder } from './video-fake.builder';
 
 export type VideoConstructorProps = {
   video_id?: VideoId;
@@ -237,9 +238,9 @@ export class Video extends AggregateRoot {
     return validator.validate(this.notification, this, fields);
   }
 
-  //   static fake() {
-  //     return VideoFakeBuilder;
-  //   }
+  static fake() {
+    return VideoFakeBuilder;
+  }
 
   get entity_id() {
     return this.video_id;
