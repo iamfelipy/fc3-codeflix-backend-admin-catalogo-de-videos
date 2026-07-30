@@ -184,6 +184,17 @@
   - commit sem nestjs: 73137dbf9f8a561f3be342723fb982a4cdd73ec3
 
 ---
+### events
+  - evenEmitter2
+    - mediator
+    - observer
+    - src/core/shared/domain/events/domain-event.interface.ts
+  - ddd
+    - agregado video
+      - trailer e video principal
+      - VideoCreatedEvent
+      - VideoAudioMediaReplaced
+---
 
 ### validações, tratamento de erros
   - validações
