@@ -17,6 +17,16 @@ expect.extend({
     expected: Notification,
     received: Array<string | { [key: string]: string[] }>,
   ) {
+    // received
+    /*
+    [
+      "error 1",
+      {
+        title: ['title must be shorter than or equal to 255 characters'],
+        name: ['name must be shorter than or equal to 255 characters'],
+      },
+    ]
+    */
     const every = received.every((error) => {
       if (typeof error === 'string') {
         return expected.errors.has(error);
