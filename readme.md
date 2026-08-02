@@ -137,6 +137,7 @@
 - open/closed principle (OCP):
   - class-validator: validação da entidade
   - IRepository, ISearchableRepository
+    - filter
   - SearchParams
   - objeto de valor imageMedia abstract
     - banner, thumbnail
