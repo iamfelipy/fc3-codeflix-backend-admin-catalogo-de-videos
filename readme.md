@@ -1,7 +1,7 @@
 Olá, o objetivo deste repositório é ser utilizado em entrevistas.
 
 Sobre o sistema:  
-Vou comentar decisões de arquitetura, design e requisitos sobre uma aplicação backend para gestão de conteúdo. Ela faz parte de um sistema maior de streaming de vídeo (como a Netflix) e ainda não está completa.
+Vou comentar decisões de arquitetura, design e requisitos sobre uma aplicação backend para gestão de conteúdo construída no curso Full Cycle. Ela faz parte de um sistema maior de streaming de vídeo (como a Netflix) e ainda não está completa.
 
 ---
 - c4 model
@@ -106,6 +106,11 @@ Vou comentar decisões de arquitetura, design e requisitos sobre uma aplicação
       - quantidade de associações nessas relações
       - hasMany, many-to-many
         - src/core/genre/infra/db/sequelize/genre-model.ts
+    - mysql
+      - banco de dados relacional
+      - index
+      - integridade referencial
+      - constrains
    
 ---
 - communication
