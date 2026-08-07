@@ -143,6 +143,7 @@ Vou comentar decisões de arquitetura, design e requisitos sobre uma aplicação
     - handlers
     - filters
     - test
+    - injeção de dependência
 ---
 - outros
   - shared kernel
