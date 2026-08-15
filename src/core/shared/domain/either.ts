@@ -108,6 +108,24 @@ export class Either<Ok = unknown, ErrorType = Error>
     return [this.ok, this.error];
   }
 
+  /*
+    essa implementação foi feita justamente para permitir essa sintaxe conveniente:
+
+    const [value, error] = either;
+
+    sem precisar escrever:
+
+    const result = await validator.validate(...);
+
+    const value = result.ok;
+    const error = result.error;
+
+    src/core/cast-member/application/validations/cast-members-ids-exists-in-database.validator.spec.ts
+    let [castMembersId, errorsCastMembersId] = await validator.validate([
+      castMemberId1.id,
+      castMemberId2.id,
+    ]);
+  */
   [Symbol.iterator](): Iterator<Value<Ok, ErrorType>, any, undefined> {
     return new EitherIterator<Ok, ErrorType>({
       ok: this.ok,

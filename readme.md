@@ -52,6 +52,15 @@
       - vai ser usada no cd
 
 ---
+### principios de design de software
+  - cqs: um método deve ou alterar o estado (Command) ou retornar uma informação (Query), mas não fazer os dois ao mesmo tempo.
+    - levar em conta consequencias que podem acontecer dado a complexidade do que estou construindo
+    - src/core/video/infra/db/sequelize/video-sequelize.repository.ts (.insert)
+    - cqrs
+      -  leva essa separação para uma arquitetura, podendo ter modelos, handlers/use cases, bancos ou fluxos separados.
+      - src/core/video/application/create-video/create-video.use-case.ts
+      - src/core/video/application/get-video/get-video.use-case.ts
+---
 ### generico
 - config: carregar variveis de ambiente com dotenv
   - criei suportando configurações alem do .env, assim respeitando twelve-factory - chapter 3
