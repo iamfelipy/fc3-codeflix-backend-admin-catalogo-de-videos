@@ -53,13 +53,27 @@
 
 ---
 ### principios de design de software
-  - cqs: um método deve ou alterar o estado (Command) ou retornar uma informação (Query), mas não fazer os dois ao mesmo tempo.
-    - levar em conta consequencias que podem acontecer dado a complexidade do que estou construindo
-    - src/core/video/infra/db/sequelize/video-sequelize.repository.ts (.insert)
-    - cqrs
-      -  leva essa separação para uma arquitetura, podendo ter modelos, handlers/use cases, bancos ou fluxos separados.
-      - src/core/video/application/create-video/create-video.use-case.ts
-      - src/core/video/application/get-video/get-video.use-case.ts
+- cqs: Command Query Separation
+  - um método deve ou alterar o estado (Command) ou retornar uma informação (Query), mas não fazer os dois ao mesmo tempo.
+  - levar em conta consequencias que podem acontecer dado a complexidade do que estou construindo
+  - src/core/video/infra/db/sequelize/video-sequelize.repository.ts (.insert)
+  - cqrs
+    -  leva essa separação para uma arquitetura, podendo ter modelos, handlers/use cases, bancos ou fluxos separados.
+    - src/core/video/application/create-video/create-video.use-case.ts
+    - src/core/video/application/get-video/get-video.use-case.ts
+- ocp: Open Closed Principle (Princípio Aberto-Fechado)
+  - adicionar novos comportamentos sem alterar o código existente.
+  - src/core/shared/domain/validators/validation.error.ts
+    - herança
+    - permite criar novos tipos de erros estendendo a base, sem modificar a classe base.
+  - src/core/video/domain/banner.vo.ts
+---
+### gateway
+  - repository
+    - mysql
+  - storage
+    - google cloud plataform
+
 ---
 ### generico
 - config: carregar variveis de ambiente com dotenv
