@@ -67,12 +67,6 @@
     - herança
     - permite criar novos tipos de erros estendendo a base, sem modificar a classe base.
   - src/core/video/domain/banner.vo.ts
----
-### gateway
-  - repository
-    - mysql
-  - storage
-    - google cloud plataform
 
 ---
 ### generico
@@ -143,14 +137,18 @@
   - videos
 ---
 ### hexagonal - ports and adapters
-- gateway no usecase
-  - port: ICategoryRepository
-  - adapter: CategorySequelizeRepository, CategoryInMemoryRepository
-- controller
-  - port/adapter: api rest
-- port: validator-fields-interface.ts
-  - validate domain
-- port: repository-interface.ts
+- port
+  - repository
+    - port: ICategoryRepository, repository-interface.ts
+    - adapter: CategorySequelizeRepository, CategoryInMemoryRepository
+    - usado no usecase
+  - controller
+    - port/adapter: api rest
+  - validação
+    - port: validator-fields-interface.ts
+    - validate domain
+  - storage
+    - port: src/core/shared/application/storage.interface.ts
 ---
 ### solid
 - srp
@@ -264,6 +262,7 @@
    - teste de integração e e2e
 - fixtures (configuração para teste, arranges)
   - teste de integração, e2e
+- inmemory
 - quantidade de testes:
   - unidade: 76
   - integração: 1
