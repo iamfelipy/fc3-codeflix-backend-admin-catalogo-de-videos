@@ -67,6 +67,29 @@
     - herança
     - permite criar novos tipos de erros estendendo a base, sem modificar a classe base.
   - src/core/video/domain/banner.vo.ts
+- solid, poo
+  - srp
+    - usecase: execute, validação input
+    - repository: mapper, helper
+    - .validate dominio
+  - open/closed principle (OCP):
+    - class-validator: validação da entidade
+    - IRepository, ISearchableRepository
+      - filter
+    - SearchParams
+    - objeto de valor imageMedia abstract
+      - banner, thumbnail
+  - liskov substitution principle (LSP):
+    - garantir que subclasses possam substituir as superclasses sem alterar a corretude do comportamento do sistema
+  - interface segregation
+    - IRepository e ISearchableRepository separados
+  - d: dependecy inversion
+    - usecase
+      - constructor
+        - repository
+    - repository
+      - constructor
+        - sequelize
 
 ---
 ### generico
@@ -137,42 +160,19 @@
   - videos
 ---
 ### hexagonal - ports and adapters
-- port
-  - repository
-    - port: ICategoryRepository, repository-interface.ts
-    - adapter: CategorySequelizeRepository, CategoryInMemoryRepository
-    - usado no usecase
-  - controller
-    - port/adapter: api rest
-  - validação
-    - port: validator-fields-interface.ts
-    - validate domain
-  - storage
-    - port: src/core/shared/application/storage.interface.ts
----
-### solid
-- srp
-  - usecase: execute, validação input
-  - repository: mapper, helper
-  - .validate dominio
-- open/closed principle (OCP):
-  - class-validator: validação da entidade
-  - IRepository, ISearchableRepository
-    - filter
-  - SearchParams
-  - objeto de valor imageMedia abstract
-    - banner, thumbnail
-- liskov substitution principle (LSP):
-  - garantir que subclasses possam substituir as superclasses sem alterar a corretude do comportamento do sistema
-- interface segregation
-  - IRepository e ISearchableRepository separados
-- d: dependecy inversion
-  - usecase
-    - constructor
-      - repository
-  - repository
-    - constructor
-      - sequelize
+- repository
+  - port: ICategoryRepository, repository-interface.ts
+  - adapter: CategorySequelizeRepository, CategoryInMemoryRepository
+  - usado no usecase
+- controller
+  - port/adapter: api rest, controller, nest
+- validação
+  - port: validator-fields-interface.ts
+  - validate domain
+- storage
+  - port: src/core/shared/application/storage.interface.ts
+  - adapter: src/core/shared/infra/storage/google-cloud.storage.ts
+
 ---
 ### DDD
   - entities, aggregates
@@ -366,6 +366,7 @@
 - testando a api com rest client extension + /api.http
   - npm run start:dev
   - executar chamadas do /api.http
+- credenciais estão no githubgist
 
 ### comandos
 ```bash
