@@ -92,6 +92,22 @@
       - constructor
         - sequelize
 
+--- 
+### upload, storage, gcp
+- o caso de uso de video cria sem upload
+- src/core/video/application/upload-audio-video-medias
+- src/core/video/application/upload-image-medias
+- src/core/video/application/process-audio-video-medias/process-audio-video-medias.use-case.ts
+  - caso de uso usado pelo microserviço de encoded, ele usa para informar o resultado do encoded
+  - Processo de Upload e Publicação de Vídeos
+    1. Um funcionário ou administrador faz o upload do arquivo de áudio ou vídeo no microserviço de gestão de conteúdo.
+    2. O arquivo é armazenado em um bucket (armazenamento na nuvem).
+    3. O sistema dispara um evento indicando que o arquivo de áudio/vídeo foi modificado e publica esse evento no RabbitMQ.
+    4. O microserviço em Go responsável pelo encoding consome esse evento, faz o download do arquivo no GCP, realiza o processo de encoding e, ao finalizar, publica um novo evento no RabbitMQ.
+    5. O microserviço administrativo possui um consumidor do RabbitMQ que lê esse evento, e então atualiza o vídeo correspondente:
+        - Atualiza o status e o caminho do arquivo já encodado no value-object: vídeo ou trailer no agregado vídeo.
+    6. Se o vídeo atender a todos os critérios necessários (ex: ter os arquivos de vídeo/trailer processados), ele é atualizado para o status de "published" (publicado).
+
 ---
 ### generico
 - config: carregar variveis de ambiente com dotenv
