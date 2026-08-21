@@ -62,11 +62,12 @@
     - src/core/video/application/create-video/create-video.use-case.ts
     - src/core/video/application/get-video/get-video.use-case.ts
 - ocp: Open Closed Principle (Princípio Aberto-Fechado)
-  - adicionar novos comportamentos sem alterar o código existente.
+  - aberto para extensão, mas fechado para modificação.
   - src/core/shared/domain/validators/validation.error.ts
     - herança
     - permite criar novos tipos de erros estendendo a base, sem modificar a classe base.
   - src/core/video/domain/banner.vo.ts
+  - src/core/shared/domain/validators/validation.error.ts
 - solid, poo
   - srp
     - usecase: execute, validação input
@@ -125,6 +126,9 @@
   - enterprise business rules
     - category, castmembers
   - dependencias apontam para o centro
+  - tipos de duplicação
+    - essencial, acidental
+    - src/core/video/application/upload-audio-video-medias/upload-audio-video-medias.use-case.ts
 ----
 
 ### database, persistence

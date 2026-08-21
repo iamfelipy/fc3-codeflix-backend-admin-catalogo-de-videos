@@ -15,7 +15,7 @@ describe('GoogleCloudStorage Integration Tests', () => {
     );
   });
 
-  it.only('should store a file', async () => {
+  it('should store a file', async () => {
     await googleCloudStorage.store({
       data: Buffer.from('data'),
       id: 'location/1.txt',
