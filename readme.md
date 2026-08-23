@@ -92,6 +92,12 @@
       - constructor
         - sequelize
 
+### design patterns
+- unit of work (design pattern)
+  - Unit of Work coordena tudo que precisa acontecer junto para uma operação de domínio ser concluída de forma consistente. 
+  - video aggregate
+  - trasanction sequelize
+  - events 
 --- 
 ### upload, storage, gcp
 - o caso de uso de video cria sem upload
@@ -107,6 +113,17 @@
     5. O microserviço administrativo possui um consumidor do RabbitMQ que lê esse evento, e então atualiza o vídeo correspondente:
         - Atualiza o status e o caminho do arquivo já encodado no value-object: vídeo ou trailer no agregado vídeo.
     6. Se o vídeo atender a todos os critérios necessários (ex: ter os arquivos de vídeo/trailer processados), ele é atualizado para o status de "published" (publicado).
+
+---
+### eventos
+  - lidando com eventos de dominio de forma local, propagando dentro do agregado
+    - src/core/video/domain/video.aggregate.ts
+      - tryPublished()
+    - src/core/shared/domain/aggregate-root.ts
+  - lidando com eventos de dominio na camada de aplicação, propagando para outras partes ou outras aplicações
+    - src/core/shared/domain/repository/unit-of-work.interface.ts
+      - recebe o agregado quando uma operação do repository acontece
+      - src/core/video/infra/db/sequelize/video-sequelize.repository.ts
 
 ---
 ### generico
@@ -158,9 +175,8 @@
     - sequelize: design pattern - active record
   - mapper
   - unit of work
-    - genre
   - transaction
-    - genre
+    - video
   - migration
     - umzug
       - src/core/shared/infra/db/sequelize/migrator.ts
@@ -223,7 +239,8 @@
   - repository
     - category
     - cast-member
-  - commit sem nestjs: 73137dbf9f8a561f3be342723fb982a4cdd73ec3
+  - shared kernel
+    - src/core
 
 ---
 ### events
