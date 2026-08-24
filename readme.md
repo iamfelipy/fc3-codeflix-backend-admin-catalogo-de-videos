@@ -125,6 +125,8 @@
     - src/core/video/domain/video.aggregate.ts
       - tryPublished()
     - src/core/shared/domain/aggregate-root.ts
+      - events
+      - applyEvents()
   - lidando com eventos de dominio na camada de aplicação, propagando para outras partes ou outras aplicações
     - um insert do repository adiciona o agregado ao unit of work
       - unit of work
@@ -134,6 +136,11 @@
       - registra handler para um evento
       - publica os eventos do agregado 
       - src/core/shared/domain/events/domain-event-mediator.ts
+    - o usecase recebe o appService e o appService recebe o unit of work e o mediator
+      - serviço para coordenar regras de negócio de aplicação
+      - start, run, finish, fail
+      - src/core/shared/application/application.service.ts
+      - src/core/video/application/upload-audio-video-medias/upload-audio-video-medias.use-case.ts
     
 
 ---
