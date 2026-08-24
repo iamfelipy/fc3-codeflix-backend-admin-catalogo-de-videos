@@ -92,12 +92,17 @@
       - constructor
         - sequelize
 
+--- 
 ### design patterns
 - unit of work (design pattern)
   - Unit of Work coordena tudo que precisa acontecer junto para uma operação de domínio ser concluída de forma consistente. 
   - video aggregate
   - trasanction sequelize
   - events 
+  - src/core/shared/infra/db/sequelize/unit-of-work-sequelize.ts
+- mediator
+  - src/core/shared/domain/events/domain-event-mediator.ts
+
 --- 
 ### upload, storage, gcp
 - o caso de uso de video cria sem upload
@@ -121,9 +126,16 @@
       - tryPublished()
     - src/core/shared/domain/aggregate-root.ts
   - lidando com eventos de dominio na camada de aplicação, propagando para outras partes ou outras aplicações
-    - src/core/shared/domain/repository/unit-of-work.interface.ts
-      - recebe o agregado quando uma operação do repository acontece
-      - src/core/video/infra/db/sequelize/video-sequelize.repository.ts
+    - um insert do repository adiciona o agregado ao unit of work
+      - unit of work
+        - src/core/shared/domain/repository/unit-of-work.interface.ts
+        - src/core/video/infra/db/sequelize/video-sequelize.repository.ts
+          - uow recebe o agregado quando uma operação do repository acontece
+    - mediator
+      - registra handler para um evento
+      - publica os eventos do agregado 
+      - src/core/shared/domain/events/domain-event-mediator.ts
+    
 
 ---
 ### generico
