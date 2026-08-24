@@ -130,7 +130,6 @@
       - unit of work
         - src/core/shared/domain/repository/unit-of-work.interface.ts
         - src/core/video/infra/db/sequelize/video-sequelize.repository.ts
-          - uow recebe o agregado quando uma operação do repository acontece
     - mediator
       - registra handler para um evento
       - publica os eventos do agregado 
