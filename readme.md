@@ -121,27 +121,41 @@
 
 ---
 ### eventos
-  - lidando com eventos de dominio de forma local, propagando dentro do agregado
-    - src/core/video/domain/video.aggregate.ts
-      - tryPublished()
-    - src/core/shared/domain/aggregate-root.ts
-      - events
-      - applyEvents()
-  - lidando com eventos de dominio na camada de aplicação, propagando para outras partes ou outras aplicações
+- lidando com eventos de dominio de forma local, propagando dentro do agregado
+  1. para tornar o video visivel no catalogo(frontend), trailer e video precisam ter o status completed
+  2. os handlers locais são registrados ao instanciar o agregado video
+  3. criar o video ou mudar o anexo(video, trailer) dispacha eventos locais ouvidos apenas dentro do agregado pelos handlers locais
+    - handlers locais do agregado
+      - onVideoCreated
+      - onAudioVideoMediaReplaced
+    - eventos
+      - VideoCreatedEvent
+      - VideoAudioMediaReplaced
+      - ps: esses eventos são ouvidos tambem camada de aplicação
+  4. quando os eventos são disparados os handlers tentam executar .tryPublished()
+  - src/core/video/domain/video.aggregate.ts
+  - src/core/shared/domain/events/domain-event.interface.ts
+  - src/core/shared/domain/aggregate-root.ts
+    - mediator local
+      - eventEmitter2
+    - events
+    - applyEvents()
+- lidando com eventos de dominio na camada de aplicação, propagando para outras partes ou outras aplicações
+  - src/core/video/application/upload-audio-video-medias/upload-audio-video-medias.use-case.ts
+  1. o usecase manipula o agregado, o agregado gera eventos
+  2. o repository é executado dentro do appService, que está dentro do usecase
     - um insert do repository adiciona o agregado ao unit of work
-      - unit of work
-        - src/core/shared/domain/repository/unit-of-work.interface.ts
-        - src/core/video/infra/db/sequelize/video-sequelize.repository.ts
+      - src/core/video/infra/db/sequelize/video-sequelize.repository.ts
+  3. o usecase recebe o appService e o appService recebe o unit of work e o domain-eventmediator
+  4. o appService abre a transação, executa o repository, dispara os eventos dos agregados e faz o commit 
     - mediator
       - registra handler para um evento
       - publica os eventos do agregado 
       - src/core/shared/domain/events/domain-event-mediator.ts
-    - o usecase recebe o appService e o appService recebe o unit of work e o mediator
-      - serviço para coordenar regras de negócio de aplicação
+    - appService
+      - é um auxiliar para consolidação das regras de negocio na camada de aplicação
       - start, run, finish, fail
       - src/core/shared/application/application.service.ts
-      - src/core/video/application/upload-audio-video-medias/upload-audio-video-medias.use-case.ts
-    
 
 ---
 ### generico
@@ -260,17 +274,6 @@
   - shared kernel
     - src/core
 
----
-### events
-  - evenEmitter2
-    - mediator
-    - observer
-    - src/core/shared/domain/events/domain-event.interface.ts
-  - ddd
-    - agregado video
-      - trailer e video principal
-      - VideoCreatedEvent
-      - VideoAudioMediaReplaced
 ---
 
 ### validações, tratamento de erros
