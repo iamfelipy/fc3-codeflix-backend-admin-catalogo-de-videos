@@ -50,7 +50,48 @@
   - docker file para produção
       - imagem menor, otimizada
       - vai ser usada no cd
-
+---
+### DDD
+  - entities, aggregates
+    - category
+      - Categoria: um conjunto de coisas agrupadas porque compartilham uma característica geral em comum.
+      - Categoria = onde algo se encaixa pelo tipo geral.
+      - Categoria olha para a classe/espécie da coisa.
+      - Categoria agrupa pela natureza/tipo.
+      - filme, documentário, infantil
+    - cast-members
+      - "membro do elenco", uma pessoa (ator, atriz, diretor, etc.) que faz parte da produção de um filme, série ou peça.
+    - genre
+      - Gênero: uma categoria mais específica usada para agrupar coisas que compartilham características de estilo, estrutura ou padrão.
+      - Gênero = o estilo/padrão que algo segue dentro de uma categoria.
+      - Gênero agrupa pela forma/estilo/padrão.
+      - Filme → gênero: terror, comédia, ação, drama
+      - Estilo é o modo particular de fazer, expressar ou apresentar algo, caracterizado por traços distintivos que diferenciam um autor, obra, período ou grupo.
+    - video
+      - video: significa registro ou exibição de imagens em movimento, geralmente acompanhado de som.
+  - object value
+    - uuid, search-params, search-result, cast-member-type, 
+    - rating
+        - classificação" é a categoria atribuída ao conteúdo, enquanto "faixa etária" é o intervalo ou limite de idades ao qual essa categoria se aplica.
+    - imageMedia
+      - banner, thumbnail-half, thumbnail
+    - audiovideomedia
+      - video principal, trailer
+  - repository
+    - category
+    - cast-member
+  - shared kernel
+    - src/core
+---
+### generico
+- config: carregar variveis de ambiente com dotenv
+  - criei suportando configurações alem do .env, assim respeitando twelve-factory - chapter 3
+  - normalmente o dotenv é usado apenas em desenvolvimento para carregar variáveis de ambiente locais, não em produção, onde variáveis já devem estar definidas no ambiente do servidor/container.
+- /core: contem as principais operações do dominio, com poucas influencia do nestjs
+- class-transformer
+  - usado na serialização do output do controller
+- class-validator
+  - usado no core e no controller para validar entradas
 ---
 ### principios de design de software
 - cqs: Command Query Separation
@@ -61,6 +102,7 @@
     -  leva essa separação para uma arquitetura, podendo ter modelos, handlers/use cases, bancos ou fluxos separados.
     - src/core/video/application/create-video/create-video.use-case.ts
     - src/core/video/application/get-video/get-video.use-case.ts
+    - src/nest-modules/videos-module/videos.controller.ts
 - ocp: Open Closed Principle (Princípio Aberto-Fechado)
   - aberto para extensão, mas fechado para modificação.
   - src/core/shared/domain/validators/validation.error.ts
@@ -143,11 +185,11 @@
 - lidando com eventos de dominio na camada de aplicação, propagando para outras partes ou outras aplicações
   - src/core/video/application/upload-audio-video-medias/upload-audio-video-medias.use-case.ts
   1. o usecase manipula o agregado, o agregado gera eventos
-  2. o repository é executado dentro do appService, que está dentro do usecase
+  2. o repository é executado como closure dentro do appService, que está dentro do usecase
     - um insert do repository adiciona o agregado ao unit of work
       - src/core/video/infra/db/sequelize/video-sequelize.repository.ts
   3. o usecase recebe o appService e o appService recebe o unit of work e o domain-eventmediator
-  4. o appService abre a transação, executa o repository, dispara os eventos dos agregados e faz o commit 
+  4. o appService abre a transação, executa a closure com repository, dispara os eventos dos agregados e faz o commit 
     - mediator
       - registra handler para um evento
       - publica os eventos do agregado 
@@ -157,16 +199,55 @@
       - start, run, finish, fail
       - src/core/shared/application/application.service.ts
 
+----
+### persistence layer
+- camada de infraestrutura de persistência.
+  - É responsável por armazenar, recuperar e gerenciar dados persistentes da aplicação, independentemente do tipo de tecnologia utilizada (bancos, arquivos, filas, caches, buscadores).
+  - Database: Armazena dados estruturados ou semi-estruturados para consulta e manipulação (ex: MySQL, PostgreSQL, MongoDB).
+  - Storage: Guarda arquivos binários como imagens, vídeos e documentos (ex: Amazon S3, Google Cloud Storage).
+  - Cache: Memória temporária para acelerar leituras rápidas (ex: Redis, Memcached).
+  - Fila/Mensageria: Gerencia comunicação assíncrona entre sistemas (ex: RabbitMQ, Kafka).
+  - Buscador (Search Engine): Permite busca e indexação eficiente de grandes volumes de texto (ex: Elasticsearch).
+- repository 
+  - search(filter, sort, paginate), crud
+  - testes
+  - inmemoryRepository
+- cardinalidade
+  - oneToMany
+    - video 
+      - video, trailer
+      - banner
+  - manyToMany
+    - genres with categories
+    - video
+      - castmember
+      - genres
+      - categories
+- orm
+  - sequelize: design pattern - active record
+    - mysql, sqlite
+- mapper
+  - toDomain
+  - toModel
+- unit of work
+  - start, rollback, commit
+- transaction
+  - acid
+  - src/nest-modules/videos-module/videos.providers.ts
+  - src/nest-modules/genres-module/genres.providers.ts
+- migration
+  - umzug
+    - src/core/shared/infra/db/sequelize/migrator.ts
+    - comando
+      - mostra as funcionalidades disponiveis do umzug
+      - dev
+        - npm run migrate:ts
+      - produção
+        - npm run migrate:js
 ---
-### generico
-- config: carregar variveis de ambiente com dotenv
-  - criei suportando configurações alem do .env, assim respeitando twelve-factory - chapter 3
-  - normalmente o dotenv é usado apenas em desenvolvimento para carregar variáveis de ambiente locais, não em produção, onde variáveis já devem estar definidas no ambiente do servidor/container.
-- /core: contem as principais operações do dominio, com poucas influencia do nestjs
-- class-transformer
-  - usado na serialização do output do controller
-- class-validator
-  - usado no core e no controller para validar entradas
+
+### api rest
+
 
 ----
 ### clean architecture
@@ -176,9 +257,10 @@
       - class-transform
     - controllers
       - category, cast-member
-      - class-validator
+      - class-validator dto
     - gateways
       - repository
+      - storage gcp
   - application business rules
     - usecases
       - category
@@ -191,41 +273,12 @@
   - enterprise business rules
     - category, castmembers
   - dependencias apontam para o centro
+    - camada interna não conhece a camada mais externa
+    - a camada interage com a camada diretamente ao lado
   - tipos de duplicação
     - essencial, acidental
     - src/core/video/application/upload-audio-video-medias/upload-audio-video-medias.use-case.ts
-----
 
-### database, persistence
-  - repository 
-    - search(filter, sort, paginate), crud
-  - manyToMany
-    - gender with categories
-  - inmemory
-  - orm: sequelize
-    - mysql, sqlite
-    - sequelize: design pattern - active record
-  - mapper
-  - unit of work
-  - transaction
-    - video
-  - migration
-    - umzug
-      - src/core/shared/infra/db/sequelize/migrator.ts
-      - comando
-        - mostra as funcionalidades disponiveis do umzug
-        - dev
-          - npm run migrate:ts
-        - produção
-          - npm run migrate:js
----
-
-### api rest
-- recursos
-  - categories
-  - genres
-  - cast members
-  - videos
 ---
 ### hexagonal - ports and adapters
 - repository
@@ -240,39 +293,6 @@
 - storage
   - port: src/core/shared/application/storage.interface.ts
   - adapter: src/core/shared/infra/storage/google-cloud.storage.ts
-
----
-### DDD
-  - entities, aggregates
-    - category
-      - Categoria: um conjunto de coisas agrupadas porque compartilham uma característica geral em comum.
-      - Categoria = onde algo se encaixa pelo tipo geral.
-      - Categoria olha para a classe/espécie da coisa.
-      - Categoria agrupa pela natureza/tipo.
-      - filme, documentário, infantil
-    - cast-members
-      - "membro do elenco", uma pessoa (ator, atriz, diretor, etc.) que faz parte da produção de um filme, série ou peça.
-    - genre
-      - Gênero: uma categoria mais específica usada para agrupar coisas que compartilham características de estilo, estrutura ou padrão.
-      - Gênero = o estilo/padrão que algo segue dentro de uma categoria.
-      - Gênero agrupa pela forma/estilo/padrão.
-      - Filme → gênero: terror, comédia, ação, drama
-      - Estilo é o modo particular de fazer, expressar ou apresentar algo, caracterizado por traços distintivos que diferenciam um autor, obra, período ou grupo.
-    - video
-      - video: significa registro ou exibição de imagens em movimento, geralmente acompanhado de som.
-  - object value
-    - uuid, search-params, search-result, cast-member-type, 
-    - rating
-        - classificação" é a categoria atribuída ao conteúdo, enquanto "faixa etária" é o intervalo ou limite de idades ao qual essa categoria se aplica.
-    - imageMedia
-      - banner, thumbnail-half, thumbnail
-    - audiovideomedia
-      - video principal, trailer
-  - repository
-    - category
-    - cast-member
-  - shared kernel
-    - src/core
 
 ---
 
@@ -335,6 +355,14 @@
     - select: npm
 - novo modulo
   - npx nest g module shared
+- controllers
+  - api rest
+    - recursos
+    - categories
+    - genres
+    - cast members
+    - videos
+    - src/nest-modules
 - pipe
   - validação com class-validator
 - interceptor
