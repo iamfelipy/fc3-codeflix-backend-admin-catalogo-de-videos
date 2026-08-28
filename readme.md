@@ -84,14 +84,21 @@
     - src/core
 ---
 ### generico
-- config: carregar variveis de ambiente com dotenv
-  - criei suportando configurações alem do .env, assim respeitando twelve-factory - chapter 3
-  - normalmente o dotenv é usado apenas em desenvolvimento para carregar variáveis de ambiente locais, não em produção, onde variáveis já devem estar definidas no ambiente do servidor/container.
+- config, variaveis de ambiente
+  - local
+    - usado pelos testes
+    - src/core/shared/infra/config.ts
+    - dotenv
+      - carregar variveis de ambiente
+      - normalmente o dotenv é usado apenas em desenvolvimento para carregar variáveis de ambiente locais, não em produção, onde variáveis já devem estar definidas no ambiente do servidor/container.
+  - nest, framework, infraestrutura
+    - usado pelas serviços do container de injeção de dependencia e tambem pelos testes e2e
+    - src/nest-modules/config-module/config.module.ts
+    - criei suportando configurações alem do .env, assim respeitando twelve-factory - chapter 3
+    - validação
+      - lib typescript joi
 - /core: contem as principais operações do dominio, com poucas influencia do nestjs
-- class-transformer
-  - usado na serialização do output do controller
-- class-validator
-  - usado no core e no controller para validar entradas
+
 ---
 ### principios de design de software
 - cqs: Command Query Separation
@@ -144,6 +151,11 @@
   - src/core/shared/infra/db/sequelize/unit-of-work-sequelize.ts
 - mediator
   - src/core/shared/domain/events/domain-event-mediator.ts
+- adapter
+  - Ele serve para integrar interfaces incompatíveis, permitindo que classes com APIs diferentes trabalhem juntas.
+  - storage
+    - src/core/shared/infra/storage/google-cloud.storage.ts
+       - Ele implementa a interface IStorage e adapta o SDK do Google Cloud Storage para o formato esperado pela aplicação.
 
 --- 
 ### upload, storage, gcp
@@ -244,10 +256,6 @@
         - npm run migrate:ts
       - produção
         - npm run migrate:js
----
-
-### api rest
-
 
 ----
 ### clean architecture
@@ -363,6 +371,10 @@
     - cast members
     - videos
     - src/nest-modules
+  - class-transformer
+    - usado na serialização do output do controller
+  - class-validator
+    - usado no core e no controller para validar entradas
 - pipe
   - validação com class-validator
 - interceptor
@@ -375,7 +387,15 @@
 - helper
   - test
     - startApp - inicia modulo, banco para o teste e2e
+- variaveis de ambiente
+  - src/nest-modules/config-module/config.module.ts
 - nest-modules/shared-module
+  - storage
+    - global
+- injeção de dependencia
+  - inversão de controle
+  - inversão de dependencia
+  - container de serviço
 
 ----
 ### docker

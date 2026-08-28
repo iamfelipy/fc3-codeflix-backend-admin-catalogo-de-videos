@@ -20,7 +20,6 @@ const models = [CategoryModel];
             host: configService.get('DB_HOST'),
             models,
             logging: configService.get('DB_LOGGING'),
-            // Em produção, o recomendado é autoLoadModels: false, para evitar que alterações nos models sejam aplicadas automaticamente sem controle de migrações. Isso garante maior segurança e previsibilidade no schema do banco.
             autoLoadModels: configService.get('DB_AUTO_LOAD_MODELS'),
           };
         }
@@ -36,12 +35,7 @@ const models = [CategoryModel];
             models,
             logging: configService.get('DB_LOGGING'),
             /*
-              Define se o Sequelize deve adicionar automaticamente os models do array models ao ORM ao iniciar (true), ou se você precisará registrá-los manualmente depois (false).
-              
-              Automático: DB_AUTO_LOAD_MODELS: true e models listados no array models.
-
-              Manual: DB_AUTO_LOAD_MODELS: false e registrar os models manualmente via sequelize.addModels([Model1, Model2]) no código após iniciar o Sequelize.
-
+              autoLoadModels: true faz o Sequelize usar automaticamente os Models que foram registrados em outros módulos da aplicação. Assim, você não precisa informar esses Models novamente na configuração principal do Sequelize.
             */
             autoLoadModels: configService.get('DB_AUTO_LOAD_MODELS'),
           };
