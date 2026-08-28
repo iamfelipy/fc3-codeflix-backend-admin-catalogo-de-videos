@@ -81,7 +81,7 @@
     - category
     - cast-member
   - shared kernel
-    - src/core
+    - src/core/shared
 ---
 ### generico
 - config, variaveis de ambiente
@@ -203,6 +203,7 @@
   3. o usecase recebe o appService e o appService recebe o unit of work e o domain-eventmediator
   4. o appService abre a transação, executa a closure com repository, dispara os eventos dos agregados e faz o commit 
     - mediator
+      - serviço de orquestração de eventos
       - registra handler para um evento
       - publica os eventos do agregado 
       - src/core/shared/domain/events/domain-event-mediator.ts

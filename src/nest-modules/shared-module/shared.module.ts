@@ -2,6 +2,8 @@ import { Global, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { GoogleCloudStorage } from '../../core/shared/infra/storage/google-cloud.storage';
 import { Storage as GoogleCloudStorageSdk } from '@google-cloud/storage';
+import { DomainEventMediator } from '../../core/shared/domain/events/domain-event-mediator';
+import EventEmitter2 from 'eventemitter2';
 
 @Global()
 @Module({
@@ -17,6 +19,10 @@ import { Storage as GoogleCloudStorageSdk } from '@google-cloud/storage';
         return new GoogleCloudStorage(storage, bucket);
       },
       inject: [ConfigService],
+    },
+    {
+      provide: DomainEventMediator,
+      useValue: new DomainEventMediator(new EventEmitter2()),
     },
   ],
 })
