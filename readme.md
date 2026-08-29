@@ -394,9 +394,10 @@
   - storage
     - global
 - injeção de dependencia
-  - inversão de controle
-  - inversão de dependencia
-  - container de serviço
+  - scope.request
+    - appService
+    - unit of work
+    - src/nest-modules/shared-module/shared.module.ts
 
 ----
 ### docker
