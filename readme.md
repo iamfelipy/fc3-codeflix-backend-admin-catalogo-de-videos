@@ -250,13 +250,26 @@
   - src/nest-modules/genres-module/genres.providers.ts
 - migration
   - umzug
-    - src/core/shared/infra/db/sequelize/migrator.ts
+    - configuração
+      - src/core/shared/infra/db/sequelize/migrator.ts
+        - cli no core
+      - src/migrate.ts
+        - no nestjs usando a cli
+    - migrations
+      - src/core/*/infra/db/sequelize/migrations
+    - model vs migration
+      - model:  o ORM cria/altera o banco com base nos Models.
+        - usado pelos testes
+      - migration: você cria arquivos que descrevem cada alteração no 
+      banco.
+        - usadas em produção e desenvolvimento
     - comando
       - mostra as funcionalidades disponiveis do umzug
-      - dev
-        - npm run migrate:ts
-      - produção
-        - npm run migrate:js
+        - dev
+          - npm run migrate:ts:with-paths
+        - produção
+          - npm run migrate:js
+      - comandos de exemplo na seção mais abaixo
 
 ----
 ### clean architecture
@@ -350,9 +363,13 @@
 - fixtures (configuração para teste, arranges)
   - teste de integração, e2e
 - inmemory
+- tecnologia
+  - jest
+    - arquivo de configuracao diferente para unit, integration e e2e
 - quantidade de testes:
-  - unidade: 76
-  - integração: 1
+  - unidade: 500
+  - integração: 50
+  - e2e: 97
 ----
 
 ### nestjs
@@ -411,58 +428,68 @@
   - util para desenvolvimento
   - usa volumes inves de tmpfs, quando reiniciar o container não perde a pasta
   - foi usado pq devcontainer não esta reconhecendo !reset do tmpfs do docker-compose.override.yaml, se reconhece-se era só descomentar .example do override para poder mudar de ambiente.
+  - O padrão é usar o docker-compose.yml. O docker-compose.dev.yml só é usado se você especificar explicitamente com a flag -f ou configurar no devcontainer.json.
 - docker-compose.overvire.yaml
   - usaria isso com docker-compose.yml se o devcontainer reconhece-se !reset
-- devcontainer.json.example
-  - por padrão está configurando para usar docker-compose.yml
+- devcontainer
+  - devcontainer.json.example
+    - por padrão está configurando para usar docker-compose.yml
 ----
 ### como rodar o projeto
 
 - instalar o docker
-- como executar como dev container?
-  - criar devcontainer.json baseado no ./devcontainer/devcontainer.json.example
-    - posso escolher a opção dockercomposefile dentro do arquivo devcontainer.json para apontar para:
-      - docker-compose.yaml: tmpfs mysql - modo test
-        - por padrão está em modo test
-      - docker-compose.dev.yaml: volume mysql -> modo dev
-  - instalar extensão dev container
-    - abrir command pallete: ctrl + shift + p 
-    - digitar > dev container
-    - escolher: reopen in container
-- como executar o projeto sem dev container?
-  - instalar extensoes vscode
-    - devcontainer
-    - eslint
-      - regra de codigo
-    - pretty
-      - formatar
-    - jest
-      - botão no codigo
-      - icones de quimica - arvore de testes
-      - executa apenas o teste isolado
+- executando o projeto
+  - como executar como dev container?
+    - criar devcontainer.json baseado no ./devcontainer/devcontainer.json.example
+      - posso escolher a opção dockercomposefile dentro do arquivo devcontainer.json para apontar para:
+        - docker-compose.yaml: tmpfs mysql - modo test
+          - por padrão está em modo test
+        - docker-compose.dev.yaml: volume mysql -> modo dev
+    - instalar extensão dev container
+      - abrir command pallete: ctrl + shift + p 
+      - digitar > dev container
+      - escolher: reopen in container
+  - como executar o projeto sem dev container?
+    - instalar extensoes vscode
+      - devcontainer
+      - eslint
+        - regra de codigo
+      - pretty
+        - formatar
       - jest
-        - orta.vscode-jest
-      - jest runner
-        - firsttris.vscode-jest-runner
-    - rest client
-      - testar api com o arquivo api.http e com npm run start:dev
-  - comandos
-    - iniciar ambiente
-      - docker compose -f docker/docker-compose.yml up
-    - acessar container
-      - docker exec -it fc3-codeflix-backend-admin-catalogo bash
+        - botão no codigo
+        - icones de quimica - arvore de testes
+        - executa apenas o teste isolado
+        - jest
+          - orta.vscode-jest
+        - jest runner
+          - firsttris.vscode-jest-runner
+      - rest client
+        - testar api com o arquivo api.http e com npm run start:dev
+    - comandos
+      - iniciar ambiente
+        - docker compose -f docker/docker-compose.yml up
+      - acessar container
+        - docker exec -it fc3-codeflix-backend-admin-catalogo bash
 - escolhendo entre modo test ou desenvolvimento
   - executar em modo test
+    - tecnologia: jest
     - teste de unidade, integração
+      - jest, arquivo de configuracao
+        - jest.config.ts
       - criar /envs/.env.test com base no .env.test.example
         - sqlite inmemory
       - npm run test
+        - se NODE_ENV estiver undefined ou null, o Jest define como 'test'.
     - teste end-to-end(e2e)
+      - jest, arquivo de configuracao
+        - test/jest-e2e.config.ts
       - criar /envs/.env.e2e com base no .env.e2e.example
       - usar docker-compose.yaml
         - mysql em memoria
       - npm run test:e2e:runInBand
         - os testes foram projetos para funcionar só de forma sequencial para não dar conflito ao mudar o mesmo schema
+        - Para npm run test:e2e:runInBand, o test/jest-setup.ts sobrescreve o valor de NODE_ENV para e2e
   - executar em modo dev
     - criar /envs/.env com base no .env.example
       - sqlite inmemory
@@ -470,11 +497,20 @@
       - mysql com volume mapeado
     - executar em modo dev
       - npm run start:dev
+    - banco de dados
+      - migrations
+        - executar as migrations 
+          - migrate:ts:with-paths up
+        - comandos de exemplo na seção mais abaixo
+- extra
+  - env
+    - usou .env com mysql e DB_AUTO_LOAD_MODELS=false e sem sequelize.sync, evita conflito entre migrations e com o array de models carregados na inicialização nest
   - eu posso mudar o banco via .env* ou nos tests via config-module
-- testando a api com rest client extension + /api.http
-  - npm run start:dev
-  - executar chamadas do /api.http
-- credenciais estão no githubgist
+    - alguns testes usam a configuração do banco direto, sem env
+  - testando a api com rest client extension + ./api.http
+    - npm run start:dev
+    - executar chamadas do ./api.http
+  - exemplo de credenciais estão no githubgist
 
 ### comandos
 ```bash
@@ -482,41 +518,43 @@
 npm run test
 npm run test — — watch
 
-# coverage html - teste de unitade e integração
+# coverage html - resultado do teste de unitade e integração
 npm run test:cov
 
-# rebuild se alterar manifesto
+# rebuild se alterar manifesto/dockerfile/docker-compose
 docker compose -f docker/docker-compose.yml up --build
 
 # analise estatica do typescript sem gerar build
  npm run tsc:check
 
 # migration umzug
-- observaçao
-  - usou .env com mysql e DB_AUTO_LOAD_MODELS=false, false evita conflito com o array de models carregados na inicialização nest
-  - provavelmente as migrations vão ter um utilidade maior em produção
 - mostra as funcionalidades disponiveis do umzug
   - dev
-    - npm run migrate:ts
+    - npm run migrate:ts:with-paths
   - produção
     - npm run migrate:js
 - ver funcionalidades disponiveis do create
-  npm run migrate:ts create -- --help
+  npm run migrate:ts:with-paths create -- --help
 
 - cria migration
   - dar um nome sugestivo, do que está sendo feito
   - mover para a pasta do modulo correspondente
-  npm run migrate:ts create -- --name create-categories-table.ts --folder ./src
+  npm run migrate:ts:with-paths create -- --name create-categories-table.ts --folder ./src
 
 - mostra migrations pendentes
-  - npm run migrate:ts pending
+  - npm run migrate:ts:with-paths pending
 - aplica migrations pendentes
-  - npm run migrate:ts up
-- desfaz; suporta steps
-  - npm run migrate:ts down
+  - npm run migrate:ts:with-paths up
+- desfaz migrations
+  - npm run migrate:ts:with-paths down               # desfaz apenas a última migration
+  - npm run migrate:ts:with-paths down -- --step 2   # desfaz as 2 últimas migrations
+  - npm run migrate:ts:with-paths down -- --to 0   # desfaz todas as migrations, volta ao estado inicial
 
 # container mysql, comandos uteis
 mysql -uroot -proot
+show databases;
+drop database micro_videos;
+create database micro_videos;
 use micro_videos;
 show tables;
 drop table categories;

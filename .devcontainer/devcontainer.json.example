@@ -4,7 +4,7 @@
 	"name": "micro-videos-admin",
 	"dockerComposeFile": [
 		"../docker/docker-compose.yaml",
-		"docker-compose.yaml"
+		"./docker-compose.yaml"
 	],
 	"service": "fc3-codeflix-backend-admin-catalogo-de-videos",
 	"workspaceFolder": "/home/node/app",
