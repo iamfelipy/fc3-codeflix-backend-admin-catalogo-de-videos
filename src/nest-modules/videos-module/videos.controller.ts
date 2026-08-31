@@ -40,6 +40,8 @@ export class VideosController {
   async findOne(
     @Param('id', new ParseUUIDPipe({ errorHttpStatusCode: 422 })) id: string,
   ) {
+    //VideoPresenter
+    // ainda nao retorna url das medias, que pode ser util no frontend
     return await this.getUseCase.execute({ id });
   }
 
