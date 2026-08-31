@@ -384,11 +384,13 @@
 - controllers
   - api rest
     - recursos
-    - categories
-    - genres
-    - cast members
-    - videos
-    - src/nest-modules
+      - categories
+      - genres
+      - cast members
+      - videos
+      - src/nest-modules
+    - teste manual com client rest
+      - api.http
   - class-transformer
     - usado na serialização do output do controller
   - class-validator
@@ -408,8 +410,16 @@
 - variaveis de ambiente
   - src/nest-modules/config-module/config.module.ts
 - nest-modules/shared-module
-  - storage
-    - global
+  - agrupar logica e serviços reutilizaveis
+  - global
+  - serviços
+    - storage
+    - domainEventMediator
+    - appService
+  - presenter
+    - paginacao
+    - collection
+  - filters, interceptors, testing
 - injeção de dependencia
   - scope.request
     - appService
