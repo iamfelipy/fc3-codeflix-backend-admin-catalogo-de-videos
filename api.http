@@ -106,3 +106,97 @@ Content-Type: application/json
 }
 
 ###
+
+# upload de vídeo (envia apenas arquivo de vídeo, não aceita campos extras)
+# @name uploadVideo
+PATCH http://localhost:3000/videos/{{videoId}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary1234
+
+------WebKitFormBoundary1234
+Content-Disposition: form-data; name="video"; filename="video.mp4"
+Content-Type: video/mp4
+
+< ./package.json
+------WebKitFormBoundary1234--
+
+###
+
+# upload de imagem (envia apenas arquivo de imagem, não aceita campos extras)
+# @name uploadBanner
+PATCH http://localhost:3000/videos/{{videoId}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary1234
+
+------WebKitFormBoundary1234
+Content-Disposition: form-data; name="banner"; filename="banner.png"
+Content-Type: image/png
+
+< ./package.json
+------WebKitFormBoundary1234--
+
+###
+
+# Testando envio de dados comuns E arquivos (deve gerar erro 400)
+# Files and data cannot be sent together
+PATCH http://localhost:3000/videos/{{videoId}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary1234
+
+------WebKitFormBoundary1234
+Content-Disposition: form-data; name="video"; filename="video.mp4"
+Content-Type: video/mp4
+
+< ./package.json
+------WebKitFormBoundary1234
+Content-Disposition: form-data; name="description"
+Content-Type: text/plain
+
+descricao teste
+------WebKitFormBoundary1234--
+
+###
+
+# Testando envio de mais de um arquivo (deve gerar erro 400)
+# Only one file can be sent
+PATCH http://localhost:3000/videos/{{videoId}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary1234
+
+------WebKitFormBoundary1234
+Content-Disposition: form-data; name="video"; filename="video.mp4"
+Content-Type: video/mp4
+
+< ./package.json
+------WebKitFormBoundary1234
+Content-Disposition: form-data; name="banner"; filename="banner.png"
+Content-Type: image/png
+
+< ./package.json
+
+------WebKitFormBoundary1234--
+
+
+###
+
+# rota focada em upload (video)
+PATCH http://localhost:3000/videos/{{videoId}}/upload
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary1234
+
+------WebKitFormBoundary1234
+Content-Disposition: form-data; name="video"; filename="video.mp4"
+Content-Type: video/mp4
+
+< ./package.json
+
+------WebKitFormBoundary1234--
+
+###
+
+# rota focada em upload (imagem)
+PATCH http://localhost:3000/videos/{{videoId}}/upload
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary1234
+
+------WebKitFormBoundary1234
+Content-Disposition: form-data; name="banner"; filename="banner.png"
+Content-Type: image/png
+
+< ./package.json
+
+------WebKitFormBoundary1234--

@@ -21,6 +21,7 @@ import { UpdateVideoUseCase } from '../../core/video/application/update-video/up
 import { UploadAudioVideoMediasUseCase } from '../../core/video/application/upload-audio-video-medias/upload-audio-video-medias.use-case';
 import { GetVideoUseCase } from '../../core/video/application/get-video/get-video.use-case';
 import { ProcessAudioVideoMediasUseCase } from '../../core/video/application/process-audio-video-medias/process-audio-video-medias.use-case';
+import { UploadImageMediasUseCase } from '@core/video/application/upload-image-medias/upload-image-medias.use-case';
 
 export const REPOSITORIES = {
   VIDEO_REPOSITORY: {
@@ -112,6 +113,13 @@ export const USE_CASES = {
       REPOSITORIES.VIDEO_REPOSITORY.provide,
       'IStorage',
     ],
+  },
+  UPLOAD_IMAGE_MEDIA_USE_CASE: {
+    provide: UploadImageMediasUseCase,
+    useFactory: (uow: IUnitOfWork, videoRepo: IVideoRepository, storage: IStorage) => {
+      return new UploadImageMediasUseCase(uow, videoRepo, storage);
+    },
+    inject: ['UnitOfWork', REPOSITORIES.VIDEO_REPOSITORY.provide, 'IStorage'],
   },
   GET_VIDEO_USE_CASE: {
     provide: GetVideoUseCase,

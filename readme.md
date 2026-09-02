@@ -425,6 +425,8 @@
     - appService
     - unit of work
     - src/nest-modules/shared-module/shared.module.ts
+- upload de arquivos com multer, express, interceptor, multipart/data-form
+  - src/nest-modules/videos-module/videos.controller.ts
 
 ----
 ### docker
