@@ -214,6 +214,10 @@
       - é um auxiliar para consolidação das regras de negocio na camada de aplicação
       - start, run, finish, fail
       - src/core/shared/application/application.service.ts
+- framework, nest, observable, eventEmitter2
+  - gerencia os eventos, listeners, eventEmitter2
+  - src/nest-modules/event-module/event.module.ts
+  - src/nest-modules/use-case-module/use-case.module.ts
 
 ----
 ### persistence layer
