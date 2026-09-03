@@ -156,6 +156,9 @@
   - storage
     - src/core/shared/infra/storage/google-cloud.storage.ts
        - Ele implementa a interface IStorage e adapta o SDK do Google Cloud Storage para o formato esperado pela aplicação.
+- observable
+  - permite que um objeto observe um fluxo de valores ao longo do tempo e reaja quando novos valores acontecem.
+  - src/nest-modules/event-module/event.module.ts
 
 --- 
 ### upload, storage, gcp
@@ -427,6 +430,11 @@
     - src/nest-modules/shared-module/shared.module.ts
 - upload de arquivos com multer, express, interceptor, multipart/data-form
   - src/nest-modules/videos-module/videos.controller.ts
+- eventos
+  - integrar os eventos do dominio com nest
+  - nest tem decorator pra registrar evento e handler
+  - nest implementa o pattern observer com eventEmitter2
+  - ao carregar o eventEmitter2 do pacote nest, ele registra o servico de forma global no container de servicos
 
 ----
 ### docker
