@@ -24,6 +24,7 @@ export abstract class AggregateRoot extends Entity {
   }
 
   getUncommittedEvents(): IDomainEvent[] {
+    // Sim, mesmo que dois eventos tenham o mesmo conteúdo, se forem instâncias diferentes, o endereço de memória será diferente — e Sets/comparações usarão a identidade do objeto, não o valor. Portanto, só serão considerados "iguais" se forem exatamente a mesma instância.
     return Array.from(this.events).filter(
       (event) => !this.dispatchedEvents.has(event),
     );

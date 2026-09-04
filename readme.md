@@ -216,6 +216,8 @@
       - src/core/shared/application/application.service.ts
 - framework, nest, observable, eventEmitter2
   - gerencia os eventos, listeners, eventEmitter2
+  - src/core/shared/application/domain-event-handler.interface.ts
+  - src/core/video/application/handlers/publish-video-media-replaced-in-queue.handler.ts
   - src/nest-modules/event-module/event.module.ts
   - src/nest-modules/use-case-module/use-case.module.ts
 
