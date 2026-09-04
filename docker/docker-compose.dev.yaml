@@ -8,6 +8,8 @@ services:
       - 3000:3000
     volumes:
       - ../:/home/node/app
+      - '/etc/timezone:/etc/timezone:ro'
+      - '/etc/localtime:/etc/localtime:ro'
 
   db-fc3-codeflix-backend-admin-catalogo-de-videos:
     image: mysql:8.0.30-debian
@@ -18,3 +20,14 @@ services:
       - ./.docker/dbdata:/var/lib/mysql:delegated
     security_opt:
       - seccomp:unconfined
+  fc3-codeflix-rabbitmq:
+    image: rabbitmq:3.8-management-alpine
+    ports:
+      - 15672:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    #volumes:
+      # consigo salvar os dados das filas
+      #- ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      #- ./rabbitmq_data:/var/lib/rabbitmq

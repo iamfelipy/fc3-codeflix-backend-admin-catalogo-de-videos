@@ -175,6 +175,23 @@
     5. O microserviço administrativo possui um consumidor do RabbitMQ que lê esse evento, e então atualiza o vídeo correspondente:
         - Atualiza o status e o caminho do arquivo já encodado no value-object: vídeo ou trailer no agregado vídeo.
     6. Se o vídeo atender a todos os critérios necessários (ex: ter os arquivos de vídeo/trailer processados), ele é atualizado para o status de "published" (publicado).
+- para o sdk do gcs funcionar o precisei atualizar a data do container, alterando o volume no docker compose
+
+---
+### mensageria
+- rabbitmq
+  - @golevelup/nestjs-rabbitmq
+    -  mais recursos que a implementacao nativa do nest
+  - exchange, fila, routing key, produtor, consumidor
+  - gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener -> producer -> mensagem -> rabbitmq -> consumer -> microservico-go -> mp4 -> codificar -> mpeg -> bucket -> producer -> rabbitmq -> consumer -> gestao de conteudo -> encoded_location
+  - VideoAudioMediaReplaced
+  - PublishVideoMediaReplacedQueueHandler
+  - src/core/video/application/use-cases/process-audio-video-medias/process-audio-video-medias.use-case.ts
+  - docker
+    - tmps
+  - http://localhost:15672/
+    - login: admin
+
 
 ---
 ### eventos
@@ -197,7 +214,8 @@
       - eventEmitter2
     - events
     - applyEvents()
-- lidando com eventos de dominio na camada de aplicação, propagando para outras partes ou outras aplicações
+- orquestração de eventos na camada de aplicação
+  - lidando com eventos de dominio na camada de aplicação, propagando para outras partes ou outras aplicações
   - src/core/video/application/upload-audio-video-medias/upload-audio-video-medias.use-case.ts
   1. o usecase manipula o agregado, o agregado gera eventos
   2. o repository é executado como closure dentro do appService, que está dentro do usecase
@@ -207,6 +225,7 @@
   4. o appService abre a transação, executa a closure com repository, dispara os eventos dos agregados e faz o commit 
     - mediator
       - serviço de orquestração de eventos
+      - recebe como dependencia o eventEmmiter2
       - registra handler para um evento
       - publica os eventos do agregado 
       - src/core/shared/domain/events/domain-event-mediator.ts
@@ -214,12 +233,15 @@
       - é um auxiliar para consolidação das regras de negocio na camada de aplicação
       - start, run, finish, fail
       - src/core/shared/application/application.service.ts
-- framework, nest, observable, eventEmitter2
-  - gerencia os eventos, listeners, eventEmitter2
+- integracao dos eventos com nest
+  - observable, eventEmitter2, gerencia listeners
   - src/core/shared/application/domain-event-handler.interface.ts
   - src/core/video/application/handlers/publish-video-media-replaced-in-queue.handler.ts
+    - corromper o dominio com o framework, tradeoff que valeu apena
   - src/nest-modules/event-module/event.module.ts
+    - domainEventMediator
   - src/nest-modules/use-case-module/use-case.module.ts
+   - appService
 
 ----
 ### persistence layer
@@ -540,15 +562,16 @@
 
 ### comandos
 ```bash
+#docker
+  # rebuild e subir se alterar manifesto/dockerfile/docker-compose
+  docker compose -f docker/docker-compose.yaml up --build
+
 # tests
 npm run test
 npm run test — — watch
 
 # coverage html - resultado do teste de unitade e integração
 npm run test:cov
-
-# rebuild se alterar manifesto/dockerfile/docker-compose
-docker compose -f docker/docker-compose.yml up --build
 
 # analise estatica do typescript sem gerar build
  npm run tsc:check

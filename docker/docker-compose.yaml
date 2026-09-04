@@ -28,3 +28,18 @@ services:
       - /var/lib/mysql
     security_opt:
       - seccomp:unconfined
+  fc3-codeflix-rabbitmq:
+    image: rabbitmq:3.8-management-alpine
+    ports:
+      # porta da interface web exposta para o host
+      - 15672:15672
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    #volumes:
+      # consigo salvar os dados das filas
+      #- ./rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+      #- ./rabbitmq_data:/var/lib/rabbitmq
+    #tmpfs:
+      #- /var/lib/rabbitmq
+      #- /etc/rabbitmq
