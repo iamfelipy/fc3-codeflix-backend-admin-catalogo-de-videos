@@ -183,10 +183,16 @@
   - @golevelup/nestjs-rabbitmq
     -  mais recursos que a implementacao nativa do nest
   - exchange, fila, routing key, produtor, consumidor
-  - gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener -> producer -> mensagem -> rabbitmq -> consumer -> microservico-go -> mp4 -> codificar -> mpeg -> bucket -> producer -> rabbitmq -> consumer -> gestao de conteudo -> encoded_location
-  - VideoAudioMediaReplaced
-  - PublishVideoMediaReplacedQueueHandler
-  - src/core/video/application/use-cases/process-audio-video-medias/process-audio-video-medias.use-case.ts
+  - resumo do fluxo
+    - gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener -> producer -> mensagem -> rabbitmq -> consumer -> microservico-go -> mp4 -> codificar -> mpeg -> bucket -> producer -> rabbitmq -> consumer -> gestao de conteudo -> encoded_location
+  - arquivos relacionados uteis
+    - src/rabbitmq-fake
+    - src/rabbitmq-fake.consumer.ts
+    - src/app.module.ts
+    - VideoAudioMediaReplaced
+    - PublishVideoMediaReplacedQueueHandler
+    - src/core/video/application/use-cases/process-audio-video-medias/process-audio-video-medias.use-case.ts
+      - domain event mediator, appservice
   - docker
     - tmps
   - http://localhost:15672/
