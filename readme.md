@@ -181,11 +181,13 @@
 ### mensageria
 - rabbitmq
   - @golevelup/nestjs-rabbitmq
-    -  mais recursos que a implementacao nativa do nest
+    -  mais funcionalidades que a implementacao nativa do nest
   - exchange, fila, routing key, produtor, consumidor
   - resumo do fluxo
     - gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener -> producer -> mensagem -> rabbitmq -> consumer -> microservico-go -> mp4 -> codificar -> mpeg -> bucket -> producer -> rabbitmq -> consumer -> gestao de conteudo -> encoded_location
   - arquivos relacionados uteis
+    - src/core/shared/application/message-broker.interface.ts
+    - src/core/shared/infra/message-broker/rabbitmq-message-broker.ts
     - src/rabbitmq-fake
     - src/rabbitmq-fake.consumer.ts
     - src/app.module.ts
