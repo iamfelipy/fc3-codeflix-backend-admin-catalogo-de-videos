@@ -15,8 +15,13 @@ describe('RabbitMQMessageBroker Integration tests', () => {
   let service: RabbitMQMessageBroker;
   let connection: AmqpConnection;
   beforeEach(async () => {
+    // nao conecta sozinho
     connection = new AmqpConnection({
       uri: Config.rabbitmqUri(),
+      // configura como o .init() se comporta
+      // O init() só resolve quando a conexão estiver pronta
+      // Com wait: false, o init() retorna na hora e a conexão acontece em background (mais útil em app Nest que não deve crashar se o broker estiver offline).
+      // Na prática, { wait: true } é redundante — já é o default.
       connectionInitOptions: { wait: true },
       logger: {
         debug: () => {},
@@ -27,6 +32,7 @@ describe('RabbitMQMessageBroker Integration tests', () => {
       } as any,
     });
 
+    //  tenta conectar e BLOQUEIA até conectar (ou até 5s)
     await connection.init();
     const channel = connection.channel;
 
