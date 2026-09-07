@@ -82,6 +82,8 @@
     - cast-member
   - shared kernel
     - src/core/shared
+  - eventos de dominio e integracao
+    - src/core/video/domain/domain-events/video-audio-media-replaced.event.ts
 ---
 ### generico
 - config, variaveis de ambiente
@@ -250,6 +252,12 @@
     - domainEventMediator
   - src/nest-modules/use-case-module/use-case.module.ts
    - appService
+- tipos de eventos ddd
+  - evento de dominio
+    - fica dentro do contexto do subdominio
+  - evento de integracao
+    - um evento de dominio enviado para outro subdominio
+  - src/core/video/domain/domain-events/video-audio-media-replaced.event.ts
 
 ----
 ### persistence layer
