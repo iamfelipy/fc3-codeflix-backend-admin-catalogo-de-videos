@@ -37,13 +37,23 @@ describe('ApplicationService Unit Tests', () => {
 
   describe('finish', () => {
     it('should call the publish method of domain event mediator and the commit method', async () => {
+      // arrange
       const aggregateRoot = new StubAggregateRoot();
       uow.addAggregateRoot(aggregateRoot);
       const publishSpy = jest.spyOn(domainEventMediator, 'publish');
+      const publishIntegrationEventsSpy = jest.spyOn(
+        domainEventMediator,
+        'publishIntegrationEvents',
+      );
       const commitSpy = jest.spyOn(uow, 'commit');
+      
+      //act
       await applicationService.finish();
+
+      // assert
       expect(publishSpy).toBeCalledWith(aggregateRoot);
       expect(commitSpy).toBeCalled();
+      expect(publishIntegrationEventsSpy).toBeCalledWith(aggregateRoot);
     });
   });
 

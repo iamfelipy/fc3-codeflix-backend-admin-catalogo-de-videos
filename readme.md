@@ -180,30 +180,6 @@
 - para o sdk do gcs funcionar o precisei atualizar a data do container, alterando o volume no docker compose
 
 ---
-### mensageria
-- rabbitmq
-  - @golevelup/nestjs-rabbitmq
-    -  mais funcionalidades que a implementacao nativa do nest
-  - exchange, fila, routing key, produtor, consumidor
-  - resumo do fluxo
-    - gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener -> producer -> mensagem -> rabbitmq -> consumer -> microservico-go -> mp4 -> codificar -> mpeg -> bucket -> producer -> rabbitmq -> consumer -> gestao de conteudo -> encoded_location
-  - arquivos relacionados uteis
-    - src/core/shared/application/message-broker.interface.ts
-    - src/core/shared/infra/message-broker/rabbitmq-message-broker.ts
-    - src/rabbitmq-fake
-    - src/rabbitmq-fake.consumer.ts
-    - src/app.module.ts
-    - VideoAudioMediaReplaced
-    - PublishVideoMediaReplacedQueueHandler
-    - src/core/video/application/use-cases/process-audio-video-medias/process-audio-video-medias.use-case.ts
-      - domain event mediator, appservice
-  - docker
-    - tmps
-  - http://localhost:15672/
-    - login: admin
-
-
----
 ### eventos
 - lidando com eventos de dominio de forma local, propagando dentro do agregado
   1. para tornar o video visivel no catalogo(frontend), trailer e video precisam ter o status completed
@@ -215,49 +191,81 @@
     - eventos
       - VideoCreatedEvent
       - VideoAudioMediaReplaced
-      - ps: esses eventos são ouvidos tambem camada de aplicação
   4. quando os eventos são disparados os handlers tentam executar .tryPublished()
   - src/core/video/domain/video.aggregate.ts
+    - tem o evento e o handler
   - src/core/shared/domain/events/domain-event.interface.ts
   - src/core/shared/domain/aggregate-root.ts
-    - mediator local
+    - localMediator
       - eventEmitter2
-    - events
+    - registerHandler()
     - applyEvents()
 - orquestração de eventos na camada de aplicação
-  - lidando com eventos de dominio na camada de aplicação, propagando para outras partes ou outras aplicações
-  - src/core/video/application/upload-audio-video-medias/upload-audio-video-medias.use-case.ts
-  1. o usecase manipula o agregado, o agregado gera eventos
-  2. o repository é executado como closure dentro do appService, que está dentro do usecase
-    - um insert do repository adiciona o agregado ao unit of work
-      - src/core/video/infra/db/sequelize/video-sequelize.repository.ts
-  3. o usecase recebe o appService e o appService recebe o unit of work e o domain-eventmediator
-  4. o appService abre a transação, executa a closure com repository, dispara os eventos dos agregados e faz o commit 
-    - mediator
-      - serviço de orquestração de eventos
-      - recebe como dependencia o eventEmmiter2
-      - registra handler para um evento
-      - publica os eventos do agregado 
-      - src/core/shared/domain/events/domain-event-mediator.ts
-    - appService
-      - é um auxiliar para consolidação das regras de negocio na camada de aplicação
-      - start, run, finish, fail
-      - src/core/shared/application/application.service.ts
+  - lidando com eventos , propagando no subdominio atual, e para outros ou outras aplicações
+  - tipos de eventos ddd
+    - evento de dominio
+      - fica dentro do contexto do subdominio
+    - evento de integracao
+      - um evento de dominio enviado para outro subdominio
+      - apos a regra de negocio ser totalmente executada
+    - src/core/video/domain/domain-events/video-audio-media-replaced.event.ts
+      - evento do subdominio de gestao de conteudo e do de conversao de video
+  - passo a passo no caso de uso de upload de video
+    - controller chama o usecase
+    - usecase recebe o appService com o unit of work e domainEventMediator
+      - src/core/video/application/upload-audio-video-medias/upload-audio-video-medias.use-case.ts
+      - appService gerencia a transacao do banco e o disparo dos eventos
+        - é um auxiliar para consolidação das regras de negocio na camada de aplicação
+        - src/core/shared/application/application.service.ts
+        - src/core/shared/domain/events/domain-event-mediator.ts
+          - design pattern mediator
+          - eventEmmiter2
+          - registra, publica
+    - usecase manipula o agregado que executa as operacoes e gera eventos
+      - quando o metodo do repository é chamado ele adiciona o agregado ao unit of work no final
+        - src/core/video/infra/db/sequelize/video-sequelize.repository.ts
+    - appService dispara os eventos do dominio, faz commit da transacao e depois dispara os eventos de integracao
 - integracao dos eventos com nest
-  - observable, eventEmitter2, gerencia listeners
+  - passo a passo
+    - carregar eventEmitter2 no container de servicos
+      - injetar eventEmitter2 no domainEventMediator
+    - criar handlers com o decorator no core, para eventos de dominio e integracao
+    - disparar usando o appService e o domainEventMediator
+  - nest tem uma implementacao do design pattern observable com o eventEmitter2
   - src/core/shared/application/domain-event-handler.interface.ts
   - src/core/video/application/handlers/publish-video-media-replaced-in-queue.handler.ts
     - corromper o dominio com o framework, tradeoff que valeu apena
   - src/nest-modules/event-module/event.module.ts
     - domainEventMediator
+    - eventEmmiter2
+    - carregar providers
   - src/nest-modules/use-case-module/use-case.module.ts
    - appService
-- tipos de eventos ddd
-  - evento de dominio
-    - fica dentro do contexto do subdominio
-  - evento de integracao
-    - um evento de dominio enviado para outro subdominio
-  - src/core/video/domain/domain-events/video-audio-media-replaced.event.ts
+    - usa domainEventMediator
+
+---
+### mensageria
+- rabbitmq
+  - @golevelup/nestjs-rabbitmq
+    -  mais funcionalidades que a implementacao nativa do nest
+  - exchange, fila, routing key, produtor, consumidor
+  - resumo do fluxo
+    - gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener -> producer -> mensagem -> rabbitmq -> consumer -> microservico-go -> mp4 -> codificar -> mpeg -> bucket -> producer -> rabbitmq -> consumer -> gestao de conteudo -> encoded_location
+  - arquivos relacionados uteis
+    - src/core/shared/application/message-broker.interface.ts
+    - src/core/shared/infra/message-broker/rabbitmq-message-broker.ts
+    - simulacao para teste rapido
+      - src/rabbitmq-fake
+      - src/rabbitmq-fake.consumer.ts
+    - src/app.module.ts
+    - VideoAudioMediaReplaced
+    - PublishVideoMediaReplacedQueueHandler
+    - src/core/video/application/use-cases/process-audio-video-medias/process-audio-video-medias.use-case.ts
+      - domain event mediator, appservice
+  - docker
+    - tmps
+  - http://localhost:15672/
+    - login: admin
 
 ----
 ### persistence layer
