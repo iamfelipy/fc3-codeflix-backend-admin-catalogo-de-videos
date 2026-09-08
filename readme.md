@@ -226,12 +226,14 @@
         - src/core/video/infra/db/sequelize/video-sequelize.repository.ts
     - appService dispara os eventos do dominio, faz commit da transacao e depois dispara os eventos de integracao
 - integracao dos eventos com nest
+  - combina EventEmitterModule do nest com o DomainEventMediator do core
   - passo a passo
-    - carregar eventEmitter2 no container de servicos
+    - carregar EventEmitterModule no container de servicos
+      - src/nest-modules/event-module/event.module.ts
       - injetar eventEmitter2 no domainEventMediator
     - criar handlers com o decorator no core, para eventos de dominio e integracao
     - disparar usando o appService e o domainEventMediator
-  - nest tem uma implementacao do design pattern observable com o eventEmitter2
+  - nest tem uma implementacao do design pattern observable com eventEmitter2
   - src/core/shared/application/domain-event-handler.interface.ts
   - src/core/video/application/handlers/publish-video-media-replaced-in-queue.handler.ts
     - corromper o dominio com o framework, tradeoff que valeu apena
@@ -246,22 +248,32 @@
 ---
 ### mensageria
 - rabbitmq
-  - @golevelup/nestjs-rabbitmq
-    -  mais funcionalidades que a implementacao nativa do nest
   - exchange, fila, routing key, produtor, consumidor
   - resumo do fluxo
     - gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener -> producer -> mensagem -> rabbitmq -> consumer -> microservico-go -> mp4 -> codificar -> mpeg -> bucket -> producer -> rabbitmq -> consumer -> gestao de conteudo -> encoded_location
   - arquivos relacionados uteis
-    - src/core/shared/application/message-broker.interface.ts
-    - src/core/shared/infra/message-broker/rabbitmq-message-broker.ts
+    - contrato, interface, port
+      - src/core/shared/application/message-broker.interface.ts
+    - adaptador usando o driver
+      - src/core/shared/infra/message-broker/rabbitmq-message-broker.ts
     - simulacao para teste rapido
       - src/rabbitmq-fake
       - src/rabbitmq-fake.consumer.ts
-    - src/app.module.ts
-    - VideoAudioMediaReplaced
-    - PublishVideoMediaReplacedQueueHandler
-    - src/core/video/application/use-cases/process-audio-video-medias/process-audio-video-medias.use-case.ts
-      - domain event mediator, appservice
+      - src/app.module.ts
+    - nest config
+      - src/nest-modules/rabbitmq-module/rabbitmq.module.ts
+        - registra o driver e o adaptador
+      - src/nest-modules/videos-module
+      - src/app.module.ts
+      - src/core/video/application/handlers/publish-video-media-replaced-in-queue.handler.ts
+        - handler que recebe o message broker, adaptador
+      - @golevelup/nestjs-rabbitmq
+        - mais funcionalidades que a implementacao nativa do nest
+    - evento, handler, usecase
+      - VideoAudioMediaReplaced
+      - PublishVideoMediaReplacedQueueHandler
+      - src/core/video/application/use-cases/process-audio-video-medias/process-audio-video-medias.use-case.ts
+        - domain event mediator, appservice
   - docker
     - tmps
   - http://localhost:15672/
