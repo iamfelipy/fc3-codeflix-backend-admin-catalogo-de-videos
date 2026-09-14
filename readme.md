@@ -164,44 +164,65 @@
 
 --- 
 ### upload, storage, gcp
-- o caso de uso de video cria sem upload
-- src/core/video/application/upload-audio-video-medias
-- src/core/video/application/upload-image-medias
-- src/core/video/application/process-audio-video-medias/process-audio-video-medias.use-case.ts
-  - caso de uso usado pelo microserviço de encoded, ele usa para informar o resultado do encoded
+- google cloud storage
+- como foi usado nesse projeto?
+  - upload do video, trailer, imagens
   - Processo de Upload e Publicação de Vídeos
     1. Um funcionário ou administrador faz o upload do arquivo de áudio ou vídeo no microserviço de gestão de conteúdo.
     2. O arquivo é armazenado em um bucket (armazenamento na nuvem).
     3. O sistema dispara um evento indicando que o arquivo de áudio/vídeo foi modificado e publica esse evento no RabbitMQ.
     4. O microserviço em Go responsável pelo encoding consome esse evento, faz o download do arquivo no GCP, realiza o processo de encoding e, ao finalizar, publica um novo evento no RabbitMQ.
     5. O microserviço administrativo possui um consumidor do RabbitMQ que lê esse evento, e então atualiza o vídeo correspondente:
-        - Atualiza o status e o caminho do arquivo já encodado no value-object: vídeo ou trailer no agregado vídeo.
+      - Atualiza o status e o caminho do arquivo já encodado no value-object: vídeo ou trailer no agregado vídeo.
     6. Se o vídeo atender a todos os critérios necessários (ex: ter os arquivos de vídeo/trailer processados), ele é atualizado para o status de "published" (publicado).
-- para o sdk do gcs funcionar o precisei atualizar a data do container, alterando o volume no docker compose
+  - arquivos uteis relacionados
+    - src/core/video/application/use-cases/process-audio-video-medias
+      - caso de uso usado pelo microserviço de encoded, ele usa para informar o resultado do encoded
+    - src/core/video/application/use-cases/upload-image-medias
+    - src/core/video/application/use-cases/upload-audio-video-medias
+    - src/nest-modules/shared-module/shared.module.ts
+      - registra IStorage com o adapter GoogleCloudStorageSdk
+- para o sdk do gcs funcionar, precisei atualizar a data do container, alterando o volume no docker compose
+- o caso de uso de video cria sem upload  
+  - src/core/video/application/use-cases/update-video
 
 ---
 ### eventos
-- lidando com eventos de dominio de forma local, propagando dentro do agregado
-  1. para tornar o video visivel no catalogo(frontend), trailer e video precisam ter o status completed
-  2. os handlers locais são registrados ao instanciar o agregado video
-  3. criar o video ou mudar o anexo(video, trailer) dispacha eventos locais ouvidos apenas dentro do agregado pelos handlers locais
-    - handlers locais do agregado
-      - onVideoCreated
-      - onAudioVideoMediaReplaced
-    - eventos
-      - VideoCreatedEvent
-      - VideoAudioMediaReplaced
-  4. quando os eventos são disparados os handlers tentam executar .tryPublished()
-  - src/core/video/domain/video.aggregate.ts
-    - tem o evento e o handler
-  - src/core/shared/domain/events/domain-event.interface.ts
-  - src/core/shared/domain/aggregate-root.ts
-    - localMediator
-      - eventEmitter2
-    - registerHandler()
-    - applyEvents()
+- contextualizando, como os eventos foram usados nesse projeto
+  1. Um funcionário ou administrador faz o upload do arquivo de áudio ou vídeo no microserviço de gestão de conteúdo.
+  2. O arquivo é armazenado em um bucket (armazenamento na nuvem).
+  3. O sistema dispara um evento indicando que o arquivo de áudio/vídeo foi modificado e publica esse evento no RabbitMQ.
+  4. O microserviço em Go responsável pelo encoding consome esse evento, faz o download do arquivo mp4 no GCP, realiza o processo de encoding convertendo, por exemplo, de mp4 para mpeg, e ao finalizar publica um novo evento no RabbitMQ.
+  5. O microserviço administrativo possui um consumidor do RabbitMQ que lê esse evento, e então atualiza o vídeo correspondente:
+    - Atualiza o status e o caminho do arquivo já encodado no value-object: vídeo ou trailer no agregado vídeo.
+  6. Se o vídeo atender a todos os critérios necessários (ex: ter os arquivos de vídeo/trailer processados), ele é atualizado para o status de "published" (publicado).
+  7. frontend libera o video para o cliente assistir
+  - src/core/video/application/use-cases/process-audio-video-medias
+    - caso de uso usado pelo microserviço de encoded, ele usa para informar o resultado do encoded
+  - src/core/video/application/use-cases/upload-image-medias
+  - src/core/video/application/use-cases/upload-audio-video-medias
+- propagando eventos de dominio dentro do proprio agregado, de forma local
+  - exemplo: agregado video
+    1. para tornar o video visivel no catalogo(frontend), trailer e video precisam ter o status completed
+    2. os handlers locais são registrados ao instanciar o agregado video
+    3. criar o video ou mudar o anexo(video, trailer) dispacha eventos locais ouvidos apenas dentro do agregado pelos handlers locais
+      - handlers locais do agregado
+        - onVideoCreated
+        - onAudioVideoMediaReplaced
+      - eventos
+        - VideoCreatedEvent
+        - VideoAudioMediaReplaced
+    4. quando os eventos são disparados os handlers tentam executar .tryPublished()
+    - arquivos uteis
+      - src/core/video/domain/video.aggregate.ts
+        - tem o evento e o handler
+      - src/core/shared/domain/events/domain-event.interface.ts
+      - src/core/shared/domain/aggregate-root.ts
+        - localMediator
+          - eventEmitter2
+        - registerHandler()
+        - applyEvents()
 - orquestração de eventos na camada de aplicação
-  - lidando com eventos , propagando no subdominio atual, e para outros ou outras aplicações
   - tipos de eventos ddd
     - evento de dominio
       - fica dentro do contexto do subdominio
@@ -209,73 +230,78 @@
       - um evento de dominio enviado para outro subdominio
       - apos a regra de negocio ser totalmente executada
     - src/core/video/domain/domain-events/video-audio-media-replaced.event.ts
-      - evento do subdominio de gestao de conteudo e do de conversao de video
-  - passo a passo no caso de uso de upload de video
-    - controller chama o usecase
-    - usecase recebe o appService com o unit of work e domainEventMediator
-      - src/core/video/application/upload-audio-video-medias/upload-audio-video-medias.use-case.ts
-      - appService gerencia a transacao do banco e o disparo dos eventos
-        - é um auxiliar para consolidação das regras de negocio na camada de aplicação
+  - exemplo
+    - caso de uso de upload de video
+      - agregado produz eventos
+      - repository adiciona o agregado ao unit-of-work
+      - application-service dispara os eventos de dominio e de integracao do agregado
+        - depois da transacao, dispara os eventos de integracao
+        - os ouvintes serao adicionados atraves do nest
+      - arquivos uteis
+        - src/core/video/application/use-cases/upload-audio-video-medias/upload-audio-video-medias.use-case.ts
         - src/core/shared/application/application.service.ts
+          - é um auxiliar para consolidação das regras de negocio na camada de aplicação
         - src/core/shared/domain/events/domain-event-mediator.ts
-          - design pattern mediator
-          - eventEmmiter2
-          - registra, publica
-    - usecase manipula o agregado que executa as operacoes e gera eventos
-      - quando o metodo do repository é chamado ele adiciona o agregado ao unit of work no final
+          - eventEmitter2, registrar, publicar
         - src/core/video/infra/db/sequelize/video-sequelize.repository.ts
-    - appService dispara os eventos do dominio, faz commit da transacao e depois dispara os eventos de integracao
+          - recebe o unit-of-work e adiciona o agregado ao final da operacao
 - integracao dos eventos com nest
-  - combina EventEmitterModule do nest com o DomainEventMediator do core
+  - lidando com eventos, propagando no subdominio atual, e para outros ou outras aplicações
   - passo a passo
-    - carregar EventEmitterModule no container de servicos
-      - src/nest-modules/event-module/event.module.ts
-      - injetar eventEmitter2 no domainEventMediator
+    - registrar EventEmitter2 atraves do EventEmitterModule no container de servicos de forma global
+    - registrar DomainEventMediator com EventEmitter2
     - criar handlers com o decorator no core, para eventos de dominio e integracao
-    - disparar usando o appService e o domainEventMediator
+    - arquivos uteis
+      - src/nest-modules/event-module/event.module.ts
+      - src/core/shared/application/domain-event-handler.interface.ts
+      - src/core/video/application/handlers/publish-video-media-replaced-in-queue.handler.ts
+        - corromper o dominio com o framework, tradeoff que valeu apena
+      - src/nest-modules/use-case-module/use-case.module.ts
+        - registra appService com o unit-of-work e o domainEventMediator
+      - src/nest-modules/event-module/event.module.ts
+        - registrar eventEmitter2 e domainEventMediator
   - nest tem uma implementacao do design pattern observable com eventEmitter2
-  - src/core/shared/application/domain-event-handler.interface.ts
-  - src/core/video/application/handlers/publish-video-media-replaced-in-queue.handler.ts
-    - corromper o dominio com o framework, tradeoff que valeu apena
-  - src/nest-modules/event-module/event.module.ts
-    - domainEventMediator
-    - eventEmmiter2
-    - carregar providers
-  - src/nest-modules/use-case-module/use-case.module.ts
-   - appService
-    - usa domainEventMediator
+  - handlers consumers do rabbitmq sao diferentes do do core
+  
 
 ---
 ### mensageria
 - rabbitmq
   - exchange, fila, routing key, produtor, consumidor
-  - resumo do fluxo
-    - gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener -> producer -> mensagem -> rabbitmq -> consumer -> microservico-go -> mp4 -> codificar -> mpeg -> bucket -> producer -> rabbitmq -> consumer -> gestao de conteudo -> encoded_location
+  - @golevelup/nestjs-rabbitmq
+    - lib usada para integrar com rabbitmq
+    - mais funcionalidades que a implementacao nativa do nest
+  - ler a secao eventos para entender o fluxo, como foi usado no projeto
+    - resumo do fluxo
+      - gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener -> producer -> mensagem -> rabbitmq -> consumer -> microservico-go -> mp4 -> codificar -> mpeg -> bucket -> producer -> rabbitmq -> consumer -> gestao de conteudo -> encoded_location
   - arquivos relacionados uteis
     - contrato, interface, port
       - src/core/shared/application/message-broker.interface.ts
     - adaptador usando o driver
       - src/core/shared/infra/message-broker/rabbitmq-message-broker.ts
-    - simulacao para teste rapido
-      - src/rabbitmq-fake
-      - src/rabbitmq-fake.consumer.ts
-      - src/app.module.ts
     - nest config
       - src/nest-modules/rabbitmq-module/rabbitmq.module.ts
         - registra o driver e o adaptador
       - src/nest-modules/videos-module
+        - registrar o handler que usa o producer
+        - registra o consumidor
       - src/app.module.ts
       - src/core/video/application/handlers/publish-video-media-replaced-in-queue.handler.ts
         - handler que recebe o message broker, adaptador
-      - @golevelup/nestjs-rabbitmq
-        - mais funcionalidades que a implementacao nativa do nest
-    - evento, handler, usecase
+        - produtor
+      - src/nest-modules/videos-module/videos.consumers.ts
+        - consumidor
+        - onProcessVideo
+    - evento, usecase
       - VideoAudioMediaReplaced
-      - PublishVideoMediaReplacedQueueHandler
       - src/core/video/application/use-cases/process-audio-video-medias/process-audio-video-medias.use-case.ts
         - domain event mediator, appservice
+    - simulacao para teste rapido
+      - src/rabbitmq-fake
+      - src/rabbitmq-fake.consumer.ts
+      - src/app.module.ts
   - docker
-    - tmps
+    - nao foi colocado como tmps, mas poderia
   - http://localhost:15672/
     - login: admin
 
@@ -366,7 +392,7 @@
     - a camada interage com a camada diretamente ao lado
   - tipos de duplicação
     - essencial, acidental
-    - src/core/video/application/upload-audio-video-medias/upload-audio-video-medias.use-case.ts
+    src/core/video/application/use-cases/upload-audio-video-medias/upload-audio-video-medias.use-case.ts
 
 ---
 ### hexagonal - ports and adapters
