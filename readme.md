@@ -281,17 +281,31 @@
       - src/core/shared/infra/message-broker/rabbitmq-message-broker.ts
     - nest config
       - src/nest-modules/rabbitmq-module/rabbitmq.module.ts
-        - registra o driver e o adaptador
+        - registrar o driver
+          - criar dead letter queue
+        - registrar o adaptador
       - src/nest-modules/videos-module
         - registrar o handler que usa o producer
         - registra o consumidor
       - src/app.module.ts
       - src/core/video/application/handlers/publish-video-media-replaced-in-queue.handler.ts
         - handler que recebe o message broker, adaptador
-        - produtor
+        - produtor - micro-videos/admin
+          - exchange: amq.direct
+          - routing-key: nome_do_evento_de_integracao
       - src/nest-modules/videos-module/videos.consumers.ts
-        - consumidor
-        - onProcessVideo
+        - consumidor - micro-videos/admin
+          - onProcessVideo
+          - exchange: amq.direct
+          - routingKey: videos.convert
+          - queue: micros-videos/admin
+          - dead letter exchange: dlx.exchange
+            - routing key dl: videos.convert
+        - resiliencia
+          - dead letter exchange: dlx.exchange
+            - topic
+          - routingKey: #
+          - dead letter queue: dlx.queue
     - evento, usecase
       - VideoAudioMediaReplaced
       - src/core/video/application/use-cases/process-audio-video-medias/process-audio-video-medias.use-case.ts
