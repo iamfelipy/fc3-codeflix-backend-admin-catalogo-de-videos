@@ -302,10 +302,16 @@
           - dead letter exchange: dlx.exchange
             - routing key dl: videos.convert
         - resiliencia
-          - dead letter exchange: dlx.exchange
-            - topic
-          - routingKey: #
-          - dead letter queue: dlx.queue
+          - reprocessamento de mensagens
+            - erros nao reprocessaveis
+              - dead letter exchange: dlx.exchange
+                - topic
+              - routingKey: #
+              - dead letter queue: dlx.queue
+            - erros reprocessaveis
+              - retry
+              - plugin rabbitmq-delayed-message-exchange
+                - criar exchange especial e fazer o bind
     - evento, usecase
       - VideoAudioMediaReplaced
       - src/core/video/application/use-cases/process-audio-video-medias/process-audio-video-medias.use-case.ts
@@ -316,6 +322,9 @@
       - src/app.module.ts
   - docker
     - nao foi colocado como tmps, mas poderia
+    - instalacao personalizada com plugin
+      - plugin rabbitmq_delayed_message
+      - docker/.docker/rabbitmq/Dockerfile
   - http://localhost:15672/
     - login: admin
 
@@ -558,6 +567,10 @@
 - devcontainer
   - devcontainer.json.example
     - por padrão está configurando para usar docker-compose.yml
+- rabbitmq
+  - instalacao personalizada com plugin
+    - plugin rabbitmq_delayed_message
+    - docker/.docker/rabbitmq/Dockerfile
 ----
 ### como rodar o projeto
 
