@@ -6,13 +6,13 @@ import { ModuleRef } from '@nestjs/core';
 import { ProcessAudioVideoMediasUseCase } from '@core/video/application/use-cases/process-audio-video-medias/process-audio-video-medias.use-case';
 import { RabbitmqConsumeErrorFilter } from '../rabbitmq-module/rabbitmq-consume-error/rabbitmq-consume-error.filter';
 
-@UseFilters(new RabbitmqConsumeErrorFilter())
+@UseFilters(RabbitmqConsumeErrorFilter)
 @Injectable()
 export class VideosConsumers {
   constructor(private moduleRef: ModuleRef) {}
   
   @RabbitSubscribe({
-    exchange: 'amq.direct',
+    exchange: 'direct.delayed',
     routingKey: 'videos.convert',
     queue: 'micro-videos/admin',
     allowNonJsonMessages: true,
@@ -54,3 +54,10 @@ export class VideosConsumers {
     // }
   }
 }
+
+// pra simular erro no consumidor
+// class FakeError extends Error {
+//   constructor() {
+//     super('Fake error');
+//   }
+// }

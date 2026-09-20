@@ -309,7 +309,7 @@
               - routingKey: #
               - dead letter queue: dlx.queue
             - erros reprocessaveis
-              - retry
+              - retry com logica de tentativa usando header da mensagem
               - plugin rabbitmq-delayed-message-exchange
                 - criar exchange especial e fazer o bind
     - evento, usecase
