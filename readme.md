@@ -100,6 +100,9 @@
     - validação
       - lib typescript joi
 - /core: contem as principais operações do dominio, com poucas influencia do nestjs
+- /cmd
+  - cmd = uma pasta para arquivos que iniciam diferentes partes/modos da aplicação.
+  - commands: pontos de entrada da aplicação.
 
 ---
 ### principios de design de software
@@ -325,6 +328,15 @@
     - instalacao personalizada com plugin
       - plugin rabbitmq_delayed_message
       - docker/.docker/rabbitmq/Dockerfile
+  - modo standalone
+    - scripts
+      - http e consumidor no mesmo processo
+        - env - RABBITMQ_REGISTER_HANDLERS = true
+        - "rabbitmq:consumers:dev": "npm run start:dev -- --entryFile cmd/rabbitmq",
+      - http e consumidor em processos separados
+        - env - RABBITMQ_REGISTER_HANDLERS = false
+        - start:prod
+        - "rabbitmq:consumers:prod": "node dist/cmd/rabbitmq"
   - http://localhost:15672/
     - login: admin
 

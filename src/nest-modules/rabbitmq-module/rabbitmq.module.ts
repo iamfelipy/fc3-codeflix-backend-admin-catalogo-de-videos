@@ -24,8 +24,11 @@ import { RabbitmqConsumeErrorFilter } from './rabbitmq-consume-error/rabbitmq-co
 //   ],
 //   exports: ['IMessageBroker'],
 // })
+type RabbitMQModuleOptions = {
+  enableConsumers?: boolean;
+};
 export class RabbitmqModule {
-  static forRoot(): DynamicModule {
+  static forRoot(options: RabbitMQModuleOptions = {}): DynamicModule {
     return {
       // O campo module é obrigatório em Dynamic Modules do NestJS. Ele indica qual é o próprio módulo sendo configurado e exportado, permitindo que o Nest interne relacione corretamente os provedores, imports e exports com essa classe de módulo específica.
       module: RabbitmqModule,
@@ -33,6 +36,9 @@ export class RabbitmqModule {
         RabbitMQModule.forRootAsync(RabbitMQModule, {
           useFactory: (configService: ConfigService) => ({
             uri: configService.get('RABBITMQ_URI') as string,
+            registerHandlers:
+              options.enableConsumers ||
+              configService.get('RABBITMQ_REGISTER_HANDLERS'),
             exchanges: [
               {
                 name: 'dlx.exchange',
