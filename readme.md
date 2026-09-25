@@ -266,7 +266,6 @@
   - nest tem uma implementacao do design pattern observable com eventEmitter2
   - handlers consumers do rabbitmq sao diferentes do do core
   
-
 ---
 ### mensageria
 - rabbitmq
@@ -337,8 +336,22 @@
         - env - RABBITMQ_REGISTER_HANDLERS = false
         - start:prod
         - "rabbitmq:consumers:prod": "node dist/cmd/rabbitmq"
+    - env
+      - RABBITMQ_REGISTER_HANDLERS
+        - se true os consumidores sao registrados na aplicacao
   - http://localhost:15672/
     - login: admin
+
+----
+### autenticacao
+- keycloak
+  - sistema que gerencia autenticação e autorização.
+  - open id connect
+  - open authorization
+  - token jwt
+    - token com role
+    - role: Função: aquilo que alguém deve fazer em uma situação.
+  - usado para testar o fluxo com a aplicacao backend
 
 ----
 ### persistence layer
@@ -583,6 +596,15 @@
   - instalacao personalizada com plugin
     - plugin rabbitmq_delayed_message
     - docker/.docker/rabbitmq/Dockerfile
+- keycloak
+  - docker compose -f ./docker/docker-compose.keycloak.yaml up
+    - sudo chmod -R 777 docker/.docker/keycloak_data
+  - extra_hosts
+    - mapeamentos de nomes de host para endereços IP
+  - localhost:8080
+    - admin
+    - admin
+  - mapeia o volume keycloak, talvez quando iniciar nao precisar criar o realm, client, user
 ----
 ### como rodar o projeto
 
@@ -591,9 +613,12 @@
   - como executar como dev container?
     - criar devcontainer.json baseado no ./devcontainer/devcontainer.json.example
       - posso escolher a opção dockercomposefile dentro do arquivo devcontainer.json para apontar para:
-        - docker-compose.yaml: tmpfs mysql - modo test
-          - por padrão está em modo test
-        - docker-compose.dev.yaml: volume mysql -> modo dev
+        - docker-compose.yaml:
+          - volume do mysql em tmpfs
+            - util para teste ou usar em memoria
+        - docker-compose.dev.yaml: 
+          - volume mysql persistente
+          - modo dev
     - instalar extensão dev container
       - abrir command pallete: ctrl + shift + p 
       - digitar > dev container
@@ -644,6 +669,7 @@
       - sqlite inmemory
     - usar docker-compose.dev.yaml
       - mysql com volume mapeado
+      - posso usar tambem o docker-compose.yml que usa tmps
     - executar em modo dev
       - npm run start:dev
     - banco de dados
@@ -651,6 +677,19 @@
         - executar as migrations 
           - migrate:ts:with-paths up
         - comandos de exemplo na seção mais abaixo
+- rabbitmq
+  - modo standalone
+  - scripts
+    - http e consumidor no mesmo processo
+      - env - RABBITMQ_REGISTER_HANDLERS = true
+      - "rabbitmq:consumers:dev": "npm run start:dev -- --entryFile cmd/rabbitmq",
+    - http e consumidor em processos separados
+      - env - RABBITMQ_REGISTER_HANDLERS = false
+      - start:prod
+      - "rabbitmq:consumers:prod": "node dist/cmd/rabbitmq"
+- keycloak
+  - docker compose -f ./docker/docker-compose.keycloak.yaml up
+    - sudo chmod -R 777 docker/.docker/keycloak_data
 - extra
   - env
     - usou .env com mysql e DB_AUTO_LOAD_MODELS=false e sem sequelize.sync, evita conflito entre migrations e com o array de models carregados na inicialização nest
