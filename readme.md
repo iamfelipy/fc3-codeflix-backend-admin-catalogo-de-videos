@@ -344,6 +344,7 @@
 
 ----
 ### autenticacao
+- usuario -> autentica no keycloak -> pega token -> acessa aplicacao backend com token -> aplicacao backend valida o token
 - keycloak
   - sistema que gerencia autenticação e autorização.
   - open id connect
@@ -351,7 +352,14 @@
   - token jwt
     - token com role
     - role: Função: aquilo que alguém deve fazer em uma situação.
-  - usado para testar o fluxo com a aplicacao backend
+  - usado para testar o fluxo de autenticacao e autorizacao com a aplicacao backend
+  - criptografia algoritmo rs256
+    - chave publica e privada
+- nest
+  - import { JwtModule } from '@nestjs/jwt';
+  - usar guards para verificar os tokens jwt com a chave publica 
+  - src/nest-modules/auth-module/auth.module.ts
+  - UnauthorizedException, 401
 
 ----
 ### persistence layer
@@ -755,3 +763,5 @@ select * from SequelizeMeta;
 ---
 projeto pai:
 [Link para o projeto pai](https://github.com/iamfelipy/fc3-codeflix-netflix)
+---
+[Resumo de aprendizados do Full Cycle 3.0](./fc3-aprendizado.md)
