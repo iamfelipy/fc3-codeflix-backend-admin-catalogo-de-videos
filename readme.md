@@ -378,6 +378,9 @@
     - lib jsonwebtoken 
   - /crypto
     - pasta com os scripts
+    - node crypto/create-rsa.js
+    - node crypto/generate-token.js
+    - vai ser muito util nos testes e2e
 
 ----
 ### persistence layer
