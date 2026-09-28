@@ -344,16 +344,17 @@
 
 ----
 ### autenticacao
-- usuario -> autentica no keycloak -> pega token -> acessa aplicacao backend com token -> aplicacao backend valida o token
+- fluxo
+  - usuario -> autentica no keycloak -> pega token -> acessa aplicacao backend com token -> aplicacao backend valida o token
 - keycloak
   - sistema que gerencia autenticação e autorização.
+  - usado para testar o fluxo de autenticacao e autorizacao com a aplicacao backend, quem vai usar ele vai ser o frontend
   - open id connect
   - open authorization
   - token jwt
     - token com role
     - role/papel
-  - usado para testar o fluxo de autenticacao e autorizacao com a aplicacao backend, quem vai usar ele vai ser o frontend
-  - criptografia algoritmo rs256
+  - criptografia/assinar com rs256
     - chave publica e privada
     - olhar .env
       - JWT_PUBLIC_KEY
@@ -361,11 +362,22 @@
       - JWT_PRIVATE_KEY
   - endpoints
     - olhar api.http
+    - xc5
+      - chave publica
 - nest
   - import { JwtModule } from '@nestjs/jwt';
   - usar guards para verificar os tokens jwt com a chave publica 
   - src/nest-modules/auth-module/auth.module.ts
   - UnauthorizedException, 401
+- criptografia
+  - scripts
+  - usar para testar sem as chaves do keycloak
+  - script para criar chave publica e privada com rs256
+    - lib nativa crypto do node
+  - script para gerar token jwt assinado com a chave privada
+    - lib jsonwebtoken 
+  - /crypto
+    - pasta com os scripts
 
 ----
 ### persistence layer
