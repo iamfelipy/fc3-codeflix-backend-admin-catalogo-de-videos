@@ -351,10 +351,16 @@
   - open authorization
   - token jwt
     - token com role
-    - role: Função: aquilo que alguém deve fazer em uma situação.
-  - usado para testar o fluxo de autenticacao e autorizacao com a aplicacao backend
+    - role/papel
+  - usado para testar o fluxo de autenticacao e autorizacao com a aplicacao backend, quem vai usar ele vai ser o frontend
   - criptografia algoritmo rs256
     - chave publica e privada
+    - olhar .env
+      - JWT_PUBLIC_KEY
+        - vem do keycloak
+      - JWT_PRIVATE_KEY
+  - endpoints
+    - olhar api.http
 - nest
   - import { JwtModule } from '@nestjs/jwt';
   - usar guards para verificar os tokens jwt com a chave publica 
