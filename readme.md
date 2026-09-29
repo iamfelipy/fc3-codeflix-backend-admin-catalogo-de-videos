@@ -349,31 +349,35 @@
 - keycloak
   - sistema que gerencia autenticação e autorização.
   - usado para testar o fluxo de autenticacao e autorizacao com a aplicacao backend, quem vai usar ele vai ser o frontend
-  - open id connect
-  - open authorization
   - token jwt
-    - token com role
-    - role/papel
-  - criptografia/assinar com rs256
-    - chave publica e privada
-    - olhar .env
-      - JWT_PUBLIC_KEY
-        - vem do keycloak
-      - JWT_PRIVATE_KEY
   - endpoints
     - olhar api.http
     - xc5
       - chave publica
+  - roles
+    - admin-catalog
+      - gestao de videos no micro-admin-videos
+    - assinante
+  - config
+    - versionei o banco do keycloak, estrutura ja esta montada
+    - realm custom, client, user, realm role, role associada ao user
 - nest
   - import { JwtModule } from '@nestjs/jwt';
   - usar guards para verificar os tokens jwt com a chave publica 
   - src/nest-modules/auth-module/auth.module.ts
   - UnauthorizedException, 401
+  - criptografia -> assinar com rs256
+    - chave publica e privada
+    - olhar .env
+      - JWT_PUBLIC_KEY
+        - vem do keycloak
+      - JWT_PRIVATE_KEY
   - testar authGuard 
     - src/nest-modules/categories-module/categories.controller.ts
-- criptografia
-  - scripts
-  - usar para testar sem as chaves do keycloak
+- scripts
+  - usar para 
+    - teste e2e
+    - gerar chave e token para testar fluxo sem o keycloak
   - script para criar chave publica e privada com rs256
     - lib nativa crypto do node
   - script para gerar token jwt assinado com a chave privada
@@ -382,7 +386,6 @@
     - pasta com os scripts
     - node crypto/create-rsa.js
     - node crypto/generate-token.js
-    - vai ser muito util nos testes e2e
 
 ----
 ### persistence layer
@@ -604,6 +607,8 @@
   - nest tem decorator pra registrar evento e handler
   - nest implementa o pattern observer com eventEmitter2
   - ao carregar o eventEmitter2 do pacote nest, ele registra o servico de forma global no container de servicos
+- guard
+  - proteger requisicao
 
 ----
 ### docker
