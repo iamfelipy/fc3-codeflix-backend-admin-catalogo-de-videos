@@ -17,6 +17,7 @@ GET http://localhost:3000/categories
 
 ###
 GET http://localhost:3000/categories/8f4b7b9c-3f7a-4b6c-8b0c-1c9c5b8b9b6a
+Authorization: Bearer {{jwtToken}}
 
 
 ### 
@@ -227,6 +228,10 @@ GET http://host.docker.internal:8080/realms/codeflix/.well-known/openid-configur
 GET http://host.docker.internal:8080/realms/codeflix/protocol/openid-connect/certs
 
 ###
+
+@jwtToken = eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQHVzZXIuY29tIiwibmFtZSI6InRlc3QiLCJpYXQiOjE3OTA2MjQxNjZ9.DjnspzRyYlt_VY0KGHJF6IMqt5ZMl_NPRPSbBCBNTZiyjN55p7yDQTqFK1BNgab-4EKye1XLS0-egX3oQkbXejoTpeiU1d7ajZcTCbPow2Dp2LkT7uF9R9PTwIEHqIgWDjfz77BD2O7q6eJL_x_JSb6AMB09TGBobCF9lhRHG6sczNg45ZbiPt30vUiT_5nwhjdDNyBN5edpl3HyHh-GZZZ_MJUTFVY5GNZi_TsY35w_0Pst2q72r0piR4p3Awr7m87v1EiYVfg3PjclYkSOT6w3Mi1ez3IRDiueGtm3tOHyUWkUYmgpf8n5DcCUte2Ie3J44l06Z_rf_ML4CByPIg
+
+###
 POST http://localhost:3000/auth
 Content-Type: application/json
 
@@ -238,4 +243,4 @@ Content-Type: application/json
 ###
 GET http://localhost:3000/auth
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQHVzZXIuY29tIiwibmFtZSI6InRlc3QiLCJpYXQiOjE3OTA2MjQxNjZ9.DjnspzRyYlt_VY0KGHJF6IMqt5ZMl_NPRPSbBCBNTZiyjN55p7yDQTqFK1BNgab-4EKye1XLS0-egX3oQkbXejoTpeiU1d7ajZcTCbPow2Dp2LkT7uF9R9PTwIEHqIgWDjfz77BD2O7q6eJL_x_JSb6AMB09TGBobCF9lhRHG6sczNg45ZbiPt30vUiT_5nwhjdDNyBN5edpl3HyHh-GZZZ_MJUTFVY5GNZi_TsY35w_0Pst2q72r0piR4p3Awr7m87v1EiYVfg3PjclYkSOT6w3Mi1ez3IRDiueGtm3tOHyUWkUYmgpf8n5DcCUte2Ie3J44l06Z_rf_ML4CByPIg
+Authorization: Bearer {{jwtToken}}

@@ -369,6 +369,8 @@
   - usar guards para verificar os tokens jwt com a chave publica 
   - src/nest-modules/auth-module/auth.module.ts
   - UnauthorizedException, 401
+  - testar authGuard 
+    - src/nest-modules/categories-module/categories.controller.ts
 - criptografia
   - scripts
   - usar para testar sem as chaves do keycloak
