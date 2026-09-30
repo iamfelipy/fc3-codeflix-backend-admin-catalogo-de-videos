@@ -343,7 +343,7 @@
     - login: admin
 
 ----
-### autenticacao
+### autenticacao e autorizacao
 - fluxo
   - usuario -> autentica no keycloak -> pega token -> acessa aplicacao backend com token -> aplicacao backend valida o token
 - keycloak
@@ -362,24 +362,36 @@
     - versionei o banco do keycloak, estrutura ja esta montada
     - realm custom, client, user, realm role, role associada ao user
 - nest
-  - import { JwtModule } from '@nestjs/jwt';
-  - usar guards para verificar os tokens jwt com a chave publica 
-  - src/nest-modules/auth-module/auth.module.ts
-  - UnauthorizedException, 401
-  - criptografia -> assinar com rs256
-    - chave publica e privada
+  - guard
+    - src/nest-modules/auth-module/auth.module.ts
+    - autenticacao
+      - src/nest-modules/auth-module/auth.guard.ts
+      - verificar os tokens jwt com a chave publica 
+        - import { JwtModule } from '@nestjs/jwt';
+      - UnauthorizedException, 401
+    - autorizacao
+      - src/nest-modules/auth-module/check-is-admin.guard.ts
+      - verificar se tem a permissao admin-catalog
+      - 401, 403, nestExceptions 
+    - testar authGuard 
+      - src/nest-modules/categories-module/categories.controller.ts
+  - criptografia 
+    - assinatura digital
+      - algoritmo criptografico 
+        - rs256
+        - chave publica e privada
     - olhar .env
       - JWT_PUBLIC_KEY
         - vem do keycloak
       - JWT_PRIVATE_KEY
-  - testar authGuard 
-    - src/nest-modules/categories-module/categories.controller.ts
+        - esta no keycloak
 - scripts
   - usar para 
     - teste e2e
     - gerar chave e token para testar fluxo sem o keycloak
   - script para criar chave publica e privada com rs256
     - lib nativa crypto do node
+    - atualizar env
   - script para gerar token jwt assinado com a chave privada
     - lib jsonwebtoken 
   - /crypto
@@ -535,16 +547,24 @@
     - teste de unidade e integração
   - src/nest-modules/shared-module/testing/helpers.ts
    - teste de integração e e2e
+  - src/nest-modules/shared-module/testing/supertest-extend.ts
+   - teste e2e
+   - atalho para autenticar rotas protegidas
 - fixtures (configuração para teste, arranges)
   - teste de integração, e2e
 - inmemory
 - tecnologia
   - jest
     - arquivo de configuracao diferente para unit, integration e e2e
+    - jest-setup.ts -> arquivo codigo na inicializacao
 - quantidade de testes:
   - unidade: 500
   - integração: 50
   - e2e: 97
+----
+### typescript
+- @types
+  - extender interface
 ----
 
 ### nestjs
