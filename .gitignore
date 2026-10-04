@@ -40,3 +40,6 @@ jest/coverage
 
 # keycloak
 docker/.docker/keycloak_data/tmp
+
+# elasticstack
+docker/.docker/filebeatdata

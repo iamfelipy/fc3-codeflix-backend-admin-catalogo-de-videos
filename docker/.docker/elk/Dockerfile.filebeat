@@ -1,0 +1,8 @@
+FROM docker.elastic.co/beats/filebeat:7.17.9
+
+# chown = quem é o dono
+# Ex.: root:filebeat → dono root, grupo filebeat
+# chmod = o que cada um pode fazer
+# Ex.: 644 → dono lê/escreve; grupo e outros só leem
+# Exigência de segurança do próprio Filebeat: o filebeat.yml deve ser dono root (e não writable por outros). Se não for, ele recusa subir.
+COPY --chown=root:filebeat --chmod=0644 ./filebeat.yml /usr/share/filebeat/filebeat.yml
