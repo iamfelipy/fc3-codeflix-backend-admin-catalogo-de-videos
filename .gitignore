@@ -37,9 +37,3 @@ lerna-debug.log*
 .history/
 
 jest/coverage
-
-# keycloak
-docker/.docker/keycloak_data/tmp
-
-# elasticstack
-docker/.docker/filebeatdata

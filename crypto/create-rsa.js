@@ -13,6 +13,9 @@ const { privateKey, publicKey } = crypto.generateKeyPairSync('rsa', {
   },
 });
 
+// Ele troca quebras de linha (\n) por \\n para deixar a chave num formato de string única (inline), facilitando salvar em arquivos .env ou variáveis de ambiente, já que essas não suportam múltiplas linhas.
+// no env
+// A chave precisa das quebras de linha (\n) em formato string para ser lida corretamente pelo JWT/funções criptográficas. Sem elas, a chave ficará toda em uma linha e dará erro ao importar/parsing.
 const privateKeyInline = privateKey.replace(/\n/g, '\\n');
 console.log(privateKeyInline);
 

@@ -1,1 +1,8 @@
+# database
 dbdata/
+
+# keycloak
+/keycloak_data/tmp
+
+# elasticstack
+/filebeatdata

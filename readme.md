@@ -542,32 +542,54 @@
   - Métricas → valores medidos ao longo do tempo.
   - Traces → percurso de uma requisição entre componentes.
 - Elastic stack
-  ![Arquitetura Elastic Stack](docs/elastic-arch.png)
+  - ![exemplo - Arquitetura Elastic Stack](docs/elastic-arch.png)
   - elastic Stack → conjunto de componentes para coletar, processar, armazenar e analisar dados.
-  - Elasticsearch → armazena e pesquisa dados.
-    - banco de dados nosql que guarda as informacoes
-  - Logstash → coleta, transforma e encaminha dados.
-    - usa a elasticsearch para recuperar as informacoes
-  - Kibana → visualiza e analisa dados.
-  - Elastic Agent → agente instalado na máquina para coletar dados e enviá-los para a infraestrutura Elastic.
-  - Filebeat → é um agente que lê dados de fontes e os envia para um destino. É uma tecnologia anterior ao uso mais amplo do Elastic Agent.
-  - Relação simplificada:
-    - arquivo → Filebeat → Logstash → Elasticsearch → Kibana
-- no projeto
+    - Elasticsearch → armazena e pesquisa dados.
+      - banco de dados nosql que guarda as informacoes
+    - Logstash → coleta, transforma e encaminha dados.
+      - usa a elasticsearch para recuperar as informacoes
+    - Kibana → visualiza e analisa dados.
+    - Elastic Agent → agente instalado na máquina para coletar dados e enviá-los para a infraestrutura Elastic.
+      - Filebeat → é um agente que lê dados de fontes e os envia para um destino. É uma tecnologia anterior ao uso mais amplo do Elastic Agent.
+- config no projeto
   - integrar nest com elastic stack
+  - fluxo
+    - stdout processo -> arquivo log → Filebeat → Logstash → Elasticsearch → Kibana
   - docker
     - config da elasticstack no /docker + ./docker, .gitignore
-  - filebeat
-    - container independente
-    - le o arquivo de log dos outros containers que tem a label
-  - executando em desenvolvimento 
-    - npm run start:dev &> /proc/1/fd/1
-      - fazer o stdout do start:dev sair no processo principal, para filebeat conseguir ler, pois o pid 1 de start.sh não é a aplicação nest; preciso usar um comando diferente para testar
-    - docker compose -f ./docker/docker-compose.elk.yaml up --build
-      - subir containers elastic
-    - kibana precisa do index patter/data view configurado
-      - logstash-*
-      ![kibana](docs/kibana.png)
+      - docker/docker-compose.elk.yaml
+    - filebeat
+      - container independente
+      - le o arquivo de log dos outros containers que tem a label
+  - executando
+    - em desenvolvimento
+      - iniciar aplicacao
+        - fazer o stdout do start:dev sair no processo principal, para filebeat conseguir ler, pois o start.sh levanta outro processo no pid 1 que não é a aplicação nest. 
+        - npm run start:dev &> /proc/1/fd/1
+          - log vem com muita formatacao
+        - NODE_ENV=production npm run start:dev &> /proc/1/fd/1
+          - log simplificado
+            - olhar main.ts
+      - iniciar o elastic stack
+        - docker compose -f ./docker/docker-compose.elk.yaml up --build
+      - produzir dados
+        - chamar get categories no api.http
+        - chave no .env precisa ter assinado o jwtToken do api.http
+      - kibana
+        - criar index-pattern/data-view
+          - menu -> analytics -> discovery
+            - logstash-*
+            - selecionar @timestamp
+        - visualizar dataview
+          - menu -> analytics -> discovery
+            - filtrar por message
+            - exemplo
+            - ![kibana](docs/kibana.png) 
+        - criar relatorio com metrica
+          - menu -> dashboard 
+            - na secao filter, adicionar campos ao workspace
+            - fullcycle.keyword, test.keyword
+            - ![Configuração Data View Kibana](docs/kibana-dashboard-dataview.png)
     - outros
       - log dos containers no so
         - /var/lib/docker/containers
@@ -575,7 +597,6 @@
         - docker compose -f docker/docker-compose.elk.yaml logs -f codeflix-kibana
       - testar curl
         - docker compose -f docker/docker-compose.elk.yaml exec codeflix-kibana curl http://codeflix-elasticsearch:9200
-
 
 ---
 ### testes

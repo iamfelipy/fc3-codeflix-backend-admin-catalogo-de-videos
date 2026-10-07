@@ -39,7 +39,11 @@ export class CategoriesController {
 
   @Get()
   async search(@Query() searchParamsDto: SearchCategoriesDto) {
+    // teste para kibana
+    console.log('[fullcycle:init] xpto')
     const output = await this.listUseCase.execute(searchParamsDto);
+    // teste para kibana
+    console.log('[fullcycle:finish] [test:1] xpto')
     return new CategoryCollectionPresenter(output);
   }
 

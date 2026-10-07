@@ -6,6 +6,7 @@ import { AuthGuard } from './auth.guard';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
+  // isso foi usado para testar a autenticação, mas agora é usado o keycloak
   @Post()
   login(@Body() body) {
     return this.authService.login(body.email, body.password);
