@@ -1,0 +1,52 @@
+FROM node:20.5.1-slim as development
+
+USER node
+
+RUN mkdir /home/node/app
+
+WORKDIR /home/node/app
+
+COPY --chown=node:node package*.json ./
+# ./ == WORKDIR /home/node/app.
+RUN npm ci
+
+COPY --chown=node:node . .
+
+CMD [ "tail", "-f", "/dev/null" ]
+
+FROM node:20.5.1-slim as builder
+
+USER node
+
+RUN mkdir /home/node/app
+
+WORKDIR /home/node/app
+
+COPY --chown=node:node --from=development /home/node/app ./
+
+RUN npm run build
+
+# pode incluenciar as libs no npm ci
+ENV NODE_ENV production
+
+#  só instala dependências de produção e nao devDependences
+# na versao nova do node usa omit inves de only
+RUN npm ci --only=production
+
+FROM node:20.5.1-slim as production
+
+ENV NODE_ENV production
+
+USER node
+
+RUN mkdir /home/node/app
+
+WORKDIR /home/node/app
+
+COPY --chown=node:node --from=builder /home/node/app/dist ./dist
+COPY --chown=node:node --from=builder /home/node/app/node_modules ./node_modules
+COPY --chown=node:node --from=builder /home/node/app/package.json ./
+
+EXPOSE 3000
+
+CMD [ "npm", "run", "start:prod"]
