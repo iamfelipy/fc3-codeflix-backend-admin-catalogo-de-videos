@@ -2,8 +2,10 @@
 services:
   
   fc3-codeflix-backend-admin-catalogo-de-videos:
-    build: .
-    command: ./docker/.docker/start.sh
+    build: 
+      context: ..
+      dockerfile: docker/Dockerfile
+    command: docker/.docker/start.sh
     ports:
       - 3000:3000
     volumes:
@@ -14,6 +16,9 @@ services:
       - "host.docker.internal:host-gateway"
     labels:
       filebeat_collector: true
+    depends_on:
+      - db-fc3-codeflix-backend-admin-catalogo-de-videos
+      - fc3-codeflix-rabbitmq
 
   db-fc3-codeflix-backend-admin-catalogo-de-videos:
     image: mysql:8.0.30-debian
@@ -25,7 +30,7 @@ services:
     security_opt:
       - seccomp:unconfined
   fc3-codeflix-rabbitmq:
-    build: ./.docker/rabbitmq
+    build: .docker/rabbitmq
     ports:
       - 15672:15672
     environment:

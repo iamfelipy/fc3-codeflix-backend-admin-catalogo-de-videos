@@ -1,0 +1,37 @@
+.devcontainer/
+.git/
+.github/
+docker/
+.history/
+coverage/
+dist/
+envs/
+node_modules/
+*.sqlite
+*.md
+api.http
+crypto/
+
+# versao original
+# .devcontainer/
+# .git/
+# .github/
+# .docker/dbdata/
+# .docker/filebeatdata/
+# .docker/elk/
+# .docker/rabbitmq/
+# .docker/.gitignore
+# .history/
+# coverage/
+# dist/
+# envs/
+# node_modules/
+# *.sqlite
+# docker-compose*.yaml
+# docker-compose*.yml
+# *.md
+# api.http
+# create-rsa.js
+# generate-token.js
+# Dockerfile
+# Dockerfile.prod
