@@ -97,24 +97,12 @@ jobs:
           docker compose -f docker/docker-compose.ci.yaml exec -u root -T fc3-codeflix-backend-admin-catalogo-de-videos cp ./envs/.env.test.example ./envs/.env.test
           docker compose -f docker/docker-compose.ci.yaml exec -u root -T fc3-codeflix-backend-admin-catalogo-de-videos cp ./envs/.env.e2e.example ./envs/.env.e2e
 
-      - name: Check GitHub secrets
-        env:
-          GOOGLE_CLOUD_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_CREDENTIALS }}
-          GOOGLE_CLOUD_STORAGE_BUCKET_NAME: ${{ secrets.GOOGLE_CLOUD_STORAGE_BUCKET_NAME }}
-        run: |
-          test -n "$GOOGLE_CLOUD_CREDENTIALS" \
-            && echo "CREDENTIALS disponível" \
-            || echo "CREDENTIALS vazia"
+      - name: run unit and integration tests
+        run: docker compose -f docker/docker-compose.ci.yaml exec -T fc3-codeflix-backend-admin-catalogo-de-videos npm run test
 
-          test -n "$GOOGLE_CLOUD_STORAGE_BUCKET_NAME" \
-            && echo "BUCKET disponível" \
-            || echo "BUCKET vazio"
+      - name: run e2e tests
+        run: docker compose -f docker/docker-compose.ci.yaml exec -T fc3-codeflix-backend-admin-catalogo-de-videos npm run test:e2e -- --runInBand --detectOpenHandles --forceExit
 
-      - name: Show env files content
-        run: |
-          docker compose -f docker/docker-compose.ci.yaml exec -T fc3-codeflix-backend-admin-catalogo-de-videos cat ./envs/.env.test
-          docker compose -f docker/docker-compose.ci.yaml exec -T fc3-codeflix-backend-admin-catalogo-de-videos cat ./envs/.env.e2e
-     
       - name: Check Docker Compose variables
         env:
           GOOGLE_CLOUD_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_CREDENTIALS }}
@@ -123,19 +111,13 @@ jobs:
           docker compose -f docker/docker-compose.ci.yaml config --environment |
             grep -E '^(GOOGLE_CLOUD_CREDENTIALS|GOOGLE_CLOUD_STORAGE_BUCKET_NAME)=' |
             sed 's/=.*/=[REDACTED]/'
-
-            - name: Check container variables
-              run: |
-                docker compose -f docker/docker-compose.ci.yaml exec -T fc3-codeflix-backend-admin-catalogo-de-videos sh -c '
-                  printf "CREDENTIALS: %s\n" "${GOOGLE_CLOUD_CREDENTIALS:+PRESENTE}"
-                  printf "BUCKET: %s\n" "${GOOGLE_CLOUD_STORAGE_BUCKET_NAME:+PRESENTE}"
-                '
-
-      - name: run unit and integration tests
-        run: docker compose -f docker/docker-compose.ci.yaml exec -T fc3-codeflix-backend-admin-catalogo-de-videos npm run test
-
-      - name: run e2e tests
-        run: docker compose -f docker/docker-compose.ci.yaml exec -T fc3-codeflix-backend-admin-catalogo-de-videos npm run test:e2e -- --runInBand --detectOpenHandles --forceExit
+      
+      - name: Check container variables
+        run: |
+          docker compose -f docker/docker-compose.ci.yaml exec -T fc3-codeflix-backend-admin-catalogo-de-videos sh -c '
+            printf "CREDENTIALS: %s\n" "${GOOGLE_CLOUD_CREDENTIALS:+PRESENTE}"
+            printf "BUCKET: %s\n" "${GOOGLE_CLOUD_STORAGE_BUCKET_NAME:+PRESENTE}"
+          '
       
       - name: Generate error intentionally
         run: exit 1
