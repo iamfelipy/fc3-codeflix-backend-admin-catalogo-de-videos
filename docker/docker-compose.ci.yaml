@@ -1,7 +1,6 @@
 
 
 services:
-  
   fc3-codeflix-backend-admin-catalogo-de-videos:
     build: 
       context: ..
@@ -18,6 +17,9 @@ services:
     depends_on:
       - db-fc3-codeflix-backend-admin-catalogo-de-videos
       - fc3-codeflix-rabbitmq
+    environment:
+      - GOOGLE_CLOUD_STORAGE_BUCKET_NAME
+      - GOOGLE_CLOUD_CREDENTIALS
 
   db-fc3-codeflix-backend-admin-catalogo-de-videos:
     image: mysql:8.0.30-debian
