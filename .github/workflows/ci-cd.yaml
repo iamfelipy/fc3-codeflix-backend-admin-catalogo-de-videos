@@ -115,21 +115,21 @@ jobs:
           docker compose -f docker/docker-compose.ci.yaml exec -T fc3-codeflix-backend-admin-catalogo-de-videos cat ./envs/.env.test
           docker compose -f docker/docker-compose.ci.yaml exec -T fc3-codeflix-backend-admin-catalogo-de-videos cat ./envs/.env.e2e
      
-      - name: Check environment variables
+      - name: Check Docker Compose variables
+        env:
+          GOOGLE_CLOUD_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_CREDENTIALS }}
+          GOOGLE_CLOUD_STORAGE_BUCKET_NAME: ${{ secrets.GOOGLE_CLOUD_STORAGE_BUCKET_NAME }}
         run: |
-          docker compose -f docker/docker-compose.ci.yaml exec -T fc3-codeflix-backend-admin-catalogo-de-videos sh -c '
-            if [ -n "$GOOGLE_CLOUD_CREDENTIALS" ]; then
-              echo "GOOGLE_CLOUD_CREDENTIALS: presente"
-            else
-              echo "GOOGLE_CLOUD_CREDENTIALS: vazia"
-            fi
+          docker compose -f docker/docker-compose.ci.yaml config --environment |
+            grep -E '^(GOOGLE_CLOUD_CREDENTIALS|GOOGLE_CLOUD_STORAGE_BUCKET_NAME)=' |
+            sed 's/=.*/=[REDACTED]/'
 
-            if [ -n "$GOOGLE_CLOUD_STORAGE_BUCKET_NAME" ]; then
-              echo "GOOGLE_CLOUD_STORAGE_BUCKET_NAME: presente"
-            else
-              echo "GOOGLE_CLOUD_STORAGE_BUCKET_NAME: vazia"
-            fi
-          '
+            - name: Check container variables
+              run: |
+                docker compose -f docker/docker-compose.ci.yaml exec -T fc3-codeflix-backend-admin-catalogo-de-videos sh -c '
+                  printf "CREDENTIALS: %s\n" "${GOOGLE_CLOUD_CREDENTIALS:+PRESENTE}"
+                  printf "BUCKET: %s\n" "${GOOGLE_CLOUD_STORAGE_BUCKET_NAME:+PRESENTE}"
+                '
 
       - name: run unit and integration tests
         run: docker compose -f docker/docker-compose.ci.yaml exec -T fc3-codeflix-backend-admin-catalogo-de-videos npm run test
