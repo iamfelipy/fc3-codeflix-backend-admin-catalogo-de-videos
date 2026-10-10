@@ -86,7 +86,18 @@ jobs:
         run: docker compose -f docker/docker-compose.ci.yaml up -d
 
       - name: wait for mysql
-        run: docker compose -f docker/docker-compose.ci.yaml exec -T db mysqladmin ping --silent --wait=30 -uroot -proot
+        run: docker compose -f docker/docker-compose.ci.yaml exec -T db-fc3-codeflix-backend-admin-catalogo-de-videos mysqladmin ping --silent --wait=30 -uroot -proot
+
+      - name: Debug Docker image and Compose
+        run: |
+          echo "=== FOLDER_NAME ==="
+          echo "${{ env.FOLDER_NAME }}"
+
+          echo "=== Docker images ==="
+          docker images
+
+          echo "=== Compose configuration ==="
+          docker compose -f docker/docker-compose.ci.yaml config
 
       # remover depois
       - name: exit early sample step
