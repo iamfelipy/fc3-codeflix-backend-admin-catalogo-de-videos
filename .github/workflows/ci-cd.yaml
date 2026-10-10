@@ -69,8 +69,9 @@ jobs:
         with:
           context: .
           push: false
-          # fiz isso para o cache das layers funcionar na proxima etapa
-          tags: ${{ env.FOLDER_NAME }}
+          # como estava na aula, precisei mudar isos pois coloquei os arquivos docker em uma pasta diferente da do professor
+          #tags: ${{ env.FOLDER_NAME }}
+          tags: docker-fc3-codeflix-backend-admin-catalogo-de-videos
           cache-from: type=gha
           cache-to: type=gha,mode=max
           # permiti usar no proximo step
