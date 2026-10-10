@@ -96,13 +96,7 @@ jobs:
         run: |
           docker compose -f docker/docker-compose.ci.yaml exec -u root -T fc3-codeflix-backend-admin-catalogo-de-videos cp ./envs/.env.test.example ./envs/.env.test
           docker compose -f docker/docker-compose.ci.yaml exec -u root -T fc3-codeflix-backend-admin-catalogo-de-videos cp ./envs/.env.e2e.example ./envs/.env.e2e
-
-      - name: run unit and integration tests
-        run: docker compose -f docker/docker-compose.ci.yaml exec -T fc3-codeflix-backend-admin-catalogo-de-videos npm run test
-
-      - name: run e2e tests
-        run: docker compose -f docker/docker-compose.ci.yaml exec -T fc3-codeflix-backend-admin-catalogo-de-videos npm run test:e2e -- --runInBand --detectOpenHandles --forceExit
-
+      
       - name: Check Docker Compose variables
         env:
           GOOGLE_CLOUD_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_CREDENTIALS }}
@@ -118,6 +112,12 @@ jobs:
             printf "CREDENTIALS: %s\n" "${GOOGLE_CLOUD_CREDENTIALS:+PRESENTE}"
             printf "BUCKET: %s\n" "${GOOGLE_CLOUD_STORAGE_BUCKET_NAME:+PRESENTE}"
           '
+
+      - name: run unit and integration tests
+        run: docker compose -f docker/docker-compose.ci.yaml exec -T fc3-codeflix-backend-admin-catalogo-de-videos npm run test
+
+      - name: run e2e tests
+        run: docker compose -f docker/docker-compose.ci.yaml exec -T fc3-codeflix-backend-admin-catalogo-de-videos npm run test:e2e -- --runInBand --detectOpenHandles --forceExit
       
       - name: Generate error intentionally
         run: exit 1
