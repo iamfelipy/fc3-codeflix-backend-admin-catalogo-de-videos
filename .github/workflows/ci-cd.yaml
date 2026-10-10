@@ -97,6 +97,27 @@ jobs:
           docker compose -f docker/docker-compose.ci.yaml exec -u root -T fc3-codeflix-backend-admin-catalogo-de-videos cp ./envs/.env.test.example ./envs/.env.test
           docker compose -f docker/docker-compose.ci.yaml exec -u root -T fc3-codeflix-backend-admin-catalogo-de-videos cp ./envs/.env.e2e.example ./envs/.env.e2e
 
+      - name: Show env files content
+        run: |
+          docker compose -f docker/docker-compose.ci.yaml exec -T fc3-codeflix-backend-admin-catalogo-de-videos cat ./envs/.env.test
+          docker compose -f docker/docker-compose.ci.yaml exec -T fc3-codeflix-backend-admin-catalogo-de-videos cat ./envs/.env.e2e
+     
+      - name: Check environment variables
+        run: |
+          docker compose -f docker/docker-compose.ci.yaml exec -T fc3-codeflix-backend-admin-catalogo-de-videos sh -c '
+            if [ -n "$GOOGLE_CLOUD_CREDENTIALS" ]; then
+              echo "GOOGLE_CLOUD_CREDENTIALS: presente"
+            else
+              echo "GOOGLE_CLOUD_CREDENTIALS: vazia"
+            fi
+
+            if [ -n "$GOOGLE_CLOUD_STORAGE_BUCKET_NAME" ]; then
+              echo "GOOGLE_CLOUD_STORAGE_BUCKET_NAME: presente"
+            else
+              echo "GOOGLE_CLOUD_STORAGE_BUCKET_NAME: vazia"
+            fi
+          '
+
       - name: run unit and integration tests
         run: docker compose -f docker/docker-compose.ci.yaml exec -T fc3-codeflix-backend-admin-catalogo-de-videos npm run test
 
