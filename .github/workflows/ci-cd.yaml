@@ -97,6 +97,19 @@ jobs:
           docker compose -f docker/docker-compose.ci.yaml exec -u root -T fc3-codeflix-backend-admin-catalogo-de-videos cp ./envs/.env.test.example ./envs/.env.test
           docker compose -f docker/docker-compose.ci.yaml exec -u root -T fc3-codeflix-backend-admin-catalogo-de-videos cp ./envs/.env.e2e.example ./envs/.env.e2e
 
+      - name: Check GitHub secrets
+        env:
+          GOOGLE_CLOUD_CREDENTIALS: ${{ secrets.GOOGLE_CLOUD_CREDENTIALS }}
+          GOOGLE_CLOUD_STORAGE_BUCKET_NAME: ${{ secrets.GOOGLE_CLOUD_STORAGE_BUCKET_NAME }}
+        run: |
+          test -n "$GOOGLE_CLOUD_CREDENTIALS" \
+            && echo "CREDENTIALS disponível" \
+            || echo "CREDENTIALS vazia"
+
+          test -n "$GOOGLE_CLOUD_STORAGE_BUCKET_NAME" \
+            && echo "BUCKET disponível" \
+            || echo "BUCKET vazio"
+
       - name: Show env files content
         run: |
           docker compose -f docker/docker-compose.ci.yaml exec -T fc3-codeflix-backend-admin-catalogo-de-videos cat ./envs/.env.test
