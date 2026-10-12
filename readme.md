@@ -329,9 +329,6 @@
       - docker/.docker/rabbitmq/Dockerfile
   - modo standalone
     - scripts
-      - http e consumidor no mesmo processo
-        - env - RABBITMQ_REGISTER_HANDLERS = true
-        - "rabbitmq:consumers:dev": "npm run start:dev -- --entryFile cmd/rabbitmq",
       - http e consumidor em processos separados
         - env - RABBITMQ_REGISTER_HANDLERS = false
         - start:prod
@@ -397,6 +394,7 @@
   - /crypto
     - pasta com os scripts
     - node crypto/create-rsa.js
+      - colar no env
     - node crypto/generate-token.js
 
 ----
@@ -599,6 +597,72 @@
         - docker compose -f docker/docker-compose.elk.yaml exec codeflix-kibana curl http://codeflix-elasticsearch:9200
 
 ---
+### ci, cdel, cdep
+- Integração contínua — Continuous Integration (CI)
+  - Prática de juntar frequentemente alterações de código em um mesmo projeto e verificar automaticamente se essas alterações funcionam corretamente.
+- Entrega contínua — Continuous Delivery (CD)
+  - Prática de manter o software sempre preparado para ser disponibilizado aos usuários.
+- Implantação contínua — Continuous Deployment (CD)
+  - Prática de colocar automaticamente em produção cada nova versão que passa pelas verificações necessárias.
+- config no projeto
+  - dockerfile de producao que vai servir para o deployment
+    - docker/Dockerfile.prod
+      - imagem pequena e otimizada
+        - menos disco, dados transferidos na rede
+        - download rapido no servidor/kubernetes
+        - .dockerignore
+      - seguranca
+        - principio do menor privilegio
+          - non-root user
+            - apenas as permissões estritamente necessárias para realizar suas funções
+      - artefato
+  - docker compose para o CI
+    - docker/docker-compose.ci.yaml
+    - tmpfs 
+    - docker compose -f docker/docker-compose.ci.yaml up --build
+    - docker compose exec fc3-codeflix-backend-admin-catalogo-de-videos bash
+      - rodar migrations
+      - gerar token se precisar
+      - printenv | grep NODE_ENV
+    - github
+      - precisa dos secrets do google storage
+      - docker-compose.ci mapeia
+  - integracao continua usando github action
+    - pipeline (fluxo automatizado)
+      - montagem da imagem docker
+      - todo: analise estatica
+      - rodar os testes
+    - github actions
+      - automatizar processos
+    - docker no ci
+      - multi-stage build
+        - target: development
+          - teste de unidade, integracao, e2e
+        - 3 camadas
+          - development, builder, production
+        - usar o multistage build para otimizar a producao da imagem
+      - cache dos layers da imagem
+        - github cache
+        - acelerar a construção da imagem 
+        - Cache → armazenamento temporário de dados que podem ser usados novamente, mantido para evitar buscá-los ou produzi-los novamente.
+    - artefatos
+      - .github/workflows/ci-cd.yaml
+    - ![Exemplo de pipeline de integração contínua configurada com GitHub Actions](docs/action-ci-github.png)
+  - cdel
+    - pipeline
+      - build imagem de producao
+      - criar tag github
+        - semver
+      - gerar pacote no github package
+      - publicar imagem no github container registry
+    - github packages
+      - artefatos empacotados
+    - github container registry
+      - armazenar imagens
+    - ![Exemplo de etapa de criação de tag e pacote no GitHub Packages](docs/tag-package-github.png)
+  - cdep
+
+---
 ### testes
 - tdd(test driven development), triple aaa(arrange, act, assert), piramidade de testes
 - Test Data Builder(Gof - criacional)
@@ -727,85 +791,87 @@
 ----
 ### como rodar o projeto
 
-- instalar o docker
-- executando o projeto
-  - como executar como dev container?
-    - criar devcontainer.json baseado no ./devcontainer/devcontainer.json.example
-      - posso escolher a opção dockercomposefile dentro do arquivo devcontainer.json para apontar para:
-        - docker-compose.yaml:
-          - volume do mysql em tmpfs
-            - util para teste ou usar em memoria
-        - docker-compose.dev.yaml: 
-          - volume mysql persistente
-          - modo dev
-    - instalar extensão dev container
-      - abrir command pallete: ctrl + shift + p 
-      - digitar > dev container
-      - escolher: reopen in container
-  - como executar o projeto sem dev container?
-    - instalar extensoes vscode
-      - devcontainer
-      - eslint
-        - regra de codigo
-      - pretty
-        - formatar
-      - jest
-        - botão no codigo
-        - icones de quimica - arvore de testes
-        - executa apenas o teste isolado
-        - jest
-          - orta.vscode-jest
-        - jest runner
-          - firsttris.vscode-jest-runner
-      - rest client
-        - testar api com o arquivo api.http e com npm run start:dev
-    - comandos
-      - iniciar ambiente
-        - docker compose -f docker/docker-compose.yml up
-      - acessar container
-        - docker exec -it fc3-codeflix-backend-admin-catalogo bash
-- escolhendo entre modo test ou desenvolvimento
-  - executar em modo test
-    - tecnologia: jest
-    - teste de unidade, integração
-      - jest, arquivo de configuracao
-        - jest.config.ts
-      - criar /envs/.env.test com base no .env.test.example
-        - sqlite inmemory
-      - npm run test
-        - se NODE_ENV estiver undefined ou null, o Jest define como 'test'.
-    - teste end-to-end(e2e)
-      - jest, arquivo de configuracao
-        - test/jest-e2e.config.ts
-      - criar /envs/.env.e2e com base no .env.e2e.example
-      - usar docker-compose.yaml
-        - mysql em memoria
-      - npm run test:e2e:runInBand
-        - os testes foram projetos para funcionar só de forma sequencial para não dar conflito ao mudar o mesmo schema
-        - Para npm run test:e2e:runInBand, o test/jest-setup.ts sobrescreve o valor de NODE_ENV para e2e
-  - executar em modo dev
-    - criar /envs/.env com base no .env.example
-      - sqlite inmemory
-    - usar docker-compose.dev.yaml
-      - mysql com volume mapeado
-      - posso usar tambem o docker-compose.yml que usa tmps
+- como executar o projeto localmente
+  - etapa 1: instalar o docker
+  - etapa 2: com ou sem devcontainer
+    - como executar com dev container
+      - criar devcontainer.json baseado no ./devcontainer/devcontainer.json.example
+        - posso escolher a opção dockercomposefile dentro do arquivo devcontainer.json para apontar para:
+          - docker-compose.yaml:
+            - volume do mysql em tmpfs
+              - util para teste ou usar em memoria
+          - docker-compose.dev.yaml: 
+            - volume mysql persistente
+            - modo dev
+      - instalar extensão dev container
+        - abrir command pallete: ctrl + shift + p 
+        - digitar > dev container
+        - escolher: reopen in container
+    - como executar sem dev container
+      - instalar extensoes vscode
+        - devcontainer
+        - eslint
+          - regra de codigo
+          - dbaeumer.vscode-eslint
+        - pretty
+          - yoavbls.pretty-ts-errors
+          - formatar
+        - rest client
+          - testar api com o arquivo api.http e com npm run start:dev
+      - comandos
+        - iniciar ambiente
+          - docker compose -f docker/docker-compose.yml up --build
+        - acessar container
+          - docker exec -it fc3-codeflix-backend-admin-catalogo bash
+  - etapa 3: dentro do container
+    - como executar os testes
+      - tecnologia: jest
+      - teste de unidade, integração
+        - jest, arquivo de configuracao
+          - jest.config.ts
+        - criar /envs/.env.test com base no .env.test.example
+          - sqlite inmemory
+        - npm run test
+          - se NODE_ENV estiver undefined ou null, o Jest define como 'test'.
+      - teste end-to-end(e2e)
+        - jest, arquivo de configuracao
+          - test/jest-e2e.config.ts
+        - criar /envs/.env.e2e com base no .env.e2e.example
+        - usar docker-compose.yaml
+          - mysql em memoria
+        - npm run test:e2e:runInBand
+          - os testes foram projetos para funcionar só de forma sequencial para não dar conflito ao mudar o mesmo schema
+          - Para npm run test:e2e:runInBand, o test/jest-setup.ts sobrescreve o valor de NODE_ENV para e2e
     - executar em modo dev
-      - npm run start:dev
-    - banco de dados
-      - migrations
-        - executar as migrations 
-          - migrate:ts:with-paths up
-        - comandos de exemplo na seção mais abaixo
+      - criar /envs/.env com base no .env.example
+        - sqlite inmemory
+      - executar em modo dev
+        - npm run start:dev
+        - se precisar de observabilidade, ler a secao dela e complementar com essa
+      - banco de dados
+        - migrations
+          - para mysql persistente usar o docker-compose.dev.yaml
+          - executar as migrations 
+            - migrate:ts:with-paths up
+          - comandos de exemplo na seção mais abaixo
+      - rabbitmq
+        - ler a abaixo
+        - usar o 1
+      - autenticacao 
+        - ler a secao dela
+        - relacionada com keycloak
+      - observabilidade
+        - ler a secao de dela
 - rabbitmq
-  - modo standalone
-  - scripts
-    - http e consumidor no mesmo processo
-      - env - RABBITMQ_REGISTER_HANDLERS = true
-      - "rabbitmq:consumers:dev": "npm run start:dev -- --entryFile cmd/rabbitmq",
-    - http e consumidor em processos separados
-      - env - RABBITMQ_REGISTER_HANDLERS = false
-      - start:prod
-      - "rabbitmq:consumers:prod": "node dist/cmd/rabbitmq"
+  - cenarios
+  - 1. HTTP e consumidores juntos: env `RABBITMQ_REGISTER_HANDLERS=true` e `npm run start:dev`. 
+    - Um único processo atende HTTP e consome mensagens.
+    - No processo HTTP, o Nest mantém um socket HTTP aberto para receber requisições; o módulo RabbitMQ mantém uma conexão AMQP aberta para consumir mensagens. Os dois sockets podem manter o mesmo processo Node ativo.
+  - 2. Só HTTP: `RABBITMQ_REGISTER_HANDLERS=false` e `npm run start:dev`. A API inicia sem consumidores.
+  - 3. HTTP e consumidores em processos separados
+      - Processo HTTP: `RABBITMQ_REGISTER_HANDLERS=false` \+ `npm run start:prod`
+      - Processo consumidor: `RABBITMQ_REGISTER_HANDLERS=true` \+ `npm run rabbitmq:consumers:prod`
+      - recomendavel para producao
 - keycloak
   - docker compose -f ./docker/docker-compose.keycloak.yaml up
     - sudo chmod -R 777 docker/.docker/keycloak_data
@@ -871,6 +937,11 @@ select * from SequelizeMeta;
 
 ```
 
+----
+### como rodar o projeto em producao
+- todo -> deploy
+  - github action so faz ci, cdel
+  - a imagem de producao nao precisa redirecionar o stdout, pois o processo principal eh o nest
 ---
 projeto pai:
 [Link para o projeto pai](https://github.com/iamfelipy/fc3-codeflix-netflix)
