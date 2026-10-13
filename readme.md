@@ -341,6 +341,7 @@
 
 ----
 ### autenticacao e autorizacao
+- seguranca
 - fluxo
   - usuario -> autentica no keycloak -> pega token -> acessa aplicacao backend com token -> aplicacao backend valida o token
 - keycloak
@@ -598,6 +599,7 @@
 
 ---
 ### ci, cdel, cdep
+- devops
 - Integração contínua — Continuous Integration (CI)
   - Prática de juntar frequentemente alterações de código em um mesmo projeto e verificar automaticamente se essas alterações funcionam corretamente.
 - Entrega contínua — Continuous Delivery (CD)
@@ -627,40 +629,41 @@
     - github
       - precisa dos secrets do google storage
       - docker-compose.ci mapeia
-  - integracao continua usando github action
-    - pipeline (fluxo automatizado)
-      - montagem da imagem docker
-      - todo: analise estatica
-      - rodar os testes
-    - github actions
-      - automatizar processos
-    - docker no ci
-      - multi-stage build
-        - target: development
-          - teste de unidade, integracao, e2e
-        - 3 camadas
-          - development, builder, production
-        - usar o multistage build para otimizar a producao da imagem
-      - cache dos layers da imagem
-        - github cache
-        - acelerar a construção da imagem 
-        - Cache → armazenamento temporário de dados que podem ser usados novamente, mantido para evitar buscá-los ou produzi-los novamente.
-    - artefatos
-      - .github/workflows/ci-cd.yaml
-    - ![Exemplo de pipeline de integração contínua configurada com GitHub Actions](docs/action-ci-github.png)
-  - cdel
-    - pipeline
-      - build imagem de producao
-      - criar tag github
-        - semver
-      - gerar pacote no github package
-      - publicar imagem no github container registry
-    - github packages
-      - artefatos empacotados
-    - github container registry
-      - armazenar imagens
-    - ![Exemplo de etapa de criação de tag e pacote no GitHub Packages](docs/tag-package-github.png)
-  - cdep
+  - CI/CD (Integração e Entrega Contínuas): Configurar um pipeline no GitHub Actions
+    - ci
+      - pipeline (fluxo automatizado)
+        - montagem da imagem docker
+        - todo: analise estatica
+        - rodar os testes
+      - github actions
+        - automatizar processos
+      - docker no ci
+        - multi-stage build
+          - target: development
+            - teste de unidade, integracao, e2e
+          - 3 camadas
+            - development, builder, production
+          - usar o multistage build para otimizar a producao da imagem
+        - cache dos layers da imagem
+          - github cache
+          - acelerar a construção da imagem 
+          - Cache → armazenamento temporário de dados que podem ser usados novamente, mantido para evitar buscá-los ou produzi-los novamente.
+      - artefatos
+        - .github/workflows/ci-cd.yaml
+      - ![Exemplo de pipeline de integração contínua configurada com GitHub Actions](docs/action-ci-github.png)
+    - cdel
+      - pipeline
+        - build imagem de producao
+        - criar tag github
+          - semver
+        - gerar pacote no github package
+        - publicar imagem no github container registry
+      - github packages
+        - artefatos empacotados
+      - github container registry
+        - armazenar imagens
+      - ![Exemplo de etapa de criação de tag e pacote no GitHub Packages](docs/tag-package-github.png)
+    - cdep
 
 ---
 ### testes
@@ -684,10 +687,12 @@
   - jest
     - arquivo de configuracao diferente para unit, integration e e2e
     - jest-setup.ts -> arquivo codigo na inicializacao
-- quantidade de testes:
-  - unidade: 500
-  - integração: 50
-  - e2e: 97
+- teste de unidade e integracao
+  - npm run test
+  - ![Exemplo de pirâmide de testes – unidade e integração](docs/teste-unidade-integracao.png)
+- teste e2e
+  - npm run test:e2e:runInBand
+  - ![Exemplo de teste E2E – execução e verificação](docs/teste-e2e.png)
 ----
 ### typescript
 - @types
