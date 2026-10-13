@@ -11,6 +11,8 @@ services:
     # relativo ao docker compose
     volumes:
       - ../:/home/node/app
+      # Volume nomeado para /home/node/.codex
+      - fc3_codex_data:/home/node/.codex
       # Por padrão, o container não vem com o horário/fuso do host configurado corretamente.
       # Essas linhas sincronizam o horário do container com o host, evitando erro de expiração de JWT no SDK do Google Cloud por diferença de fuso horário.
       # OBS: Funciona apenas em ambientes Linux. No Windows seria preciso outra configuração para timezone, pois esses arquivos não existem.
@@ -54,3 +56,6 @@ services:
     #tmpfs:
       #- /var/lib/rabbitmq
       #- /etc/rabbitmq
+
+volumes:
+  fc3_codex_data:
