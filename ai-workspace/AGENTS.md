@@ -28,3 +28,11 @@
 * Ao executar comandos ou scripts do Spec Kit, verifique o diretório de trabalho e os caminhos utilizados antes de criar ou modificar arquivos.
 * Não presuma que a raiz do Spec Kit e a raiz do repositório Git sejam o mesmo diretório.
 * Não mova nem duplique configurações do Spec Kit para a raiz da aplicação sem necessidade.
+
+## Idioma e comunicação
+
+- Utilize português brasileiro (pt-BR) como idioma padrão para todas as especificações, planos, tarefas, documentação e respostas.
+- Escreva os artefatos do Spec Kit (por exemplo: `spec.md`, `plan.md`, `tasks.md` e demais documentos relacionados) em português brasileiro.
+- Mantenha em inglês nomes de comandos, skills, identificadores técnicos, nomes de arquivos, código-fonte e termos que, por convenção do projeto, devam permanecer assim.
+- Preserve o idioma original de nomes e interfaces de bibliotecas e ferramentas externas sempre que necessário.
+- Ao atualizar documentos existentes, mantenha a consistência do idioma e evite misturar português e inglês sem necessidade.

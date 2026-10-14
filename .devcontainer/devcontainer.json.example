@@ -36,7 +36,8 @@
 			"extensions": [
 				"humao.rest-client",
 				"dbaeumer.vscode-eslint",
-				"yoavbls.pretty-ts-errors"
+				"yoavbls.pretty-ts-errors",
+				"esbenp.prettier-vscode"
 			]
 		}
 	}
