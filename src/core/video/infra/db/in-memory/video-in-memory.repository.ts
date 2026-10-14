@@ -29,19 +29,19 @@ export class VideoInMemoryRepository
         filter.title &&
         i.title.toLowerCase().includes(filter.title.toLowerCase());
       const containsCategoriesId =
-        filter.categories_id &&
+        filter.categories_id?.length &&
         filter.categories_id.some((c) => i.categories_id.has(c.id));
       const containsGenresId =
-        filter.genres_id && filter.genres_id.some((c) => i.genres_id.has(c.id));
+        filter.genres_id?.length && filter.genres_id.some((c) => i.genres_id.has(c.id));
       const containsCastMembersId =
-        filter.cast_members_id &&
+        filter.cast_members_id?.length &&
         filter.cast_members_id.some((c) => i.cast_members_id.has(c.id));
 
       const filterMap = [
         [filter.title, containsTitle],
-        [filter.categories_id, containsCategoriesId],
-        [filter.genres_id, containsGenresId],
-        [filter.cast_members_id, containsCastMembersId],
+        [filter.categories_id?.length ? filter.categories_id : null, containsCategoriesId],
+        [filter.genres_id?.length ? filter.genres_id : null, containsGenresId],
+        [filter.cast_members_id?.length ? filter.cast_members_id : null, containsCastMembersId],
       ].filter((i) => i[0]);
 
       return filterMap.every((i) => i[1]);

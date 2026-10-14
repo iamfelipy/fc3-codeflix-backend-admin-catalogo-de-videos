@@ -392,13 +392,13 @@ export class VideoSequelizeRepository implements IVideoRepository {
       'SELECT',
       `DISTINCT ${videoAlias}.\`video_id\`,${columnOrder} FROM ${videoTableName} as ${videoAlias}`,
       props.filter?.categories_id
-        ? `INNER JOIN ${videoCategoryTableName} ON ${videoAlias}.\`video_id\` = ${videoCategoryTableName}.\`category_id\``
+        ? `INNER JOIN ${videoCategoryTableName} ON ${videoAlias}.\`video_id\` = ${videoCategoryTableName}.\`video_id\``
         : '',
       props.filter?.genres_id
-        ? `INNER JOIN ${videoGenreTableName} ON ${videoAlias}.\`video_id\` = ${videoGenreTableName}.\`genre_id\``
+        ? `INNER JOIN ${videoGenreTableName} ON ${videoAlias}.\`video_id\` = ${videoGenreTableName}.\`video_id\``
         : '',
       props.filter?.cast_members_id
-        ? `INNER JOIN ${videoGenreTableName} ON ${videoAlias}.\`video_id\` = ${videoGenreTableName}.\`cast_member_id\``
+        ? `INNER JOIN ${videoCastMemberTableName} ON ${videoAlias}.\`video_id\` = ${videoCastMemberTableName}.\`video_id\``
         : '',
       wheres.length
         ? `WHERE ${wheres.map((w) => w.rawCondition).join(' AND ')}`

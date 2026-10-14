@@ -1,4 +1,7 @@
-import { CategoryId } from '../../../../category/domain/category.aggregate';
+import {
+  CategoryId,
+} from '../../../../category/domain/category.aggregate';
+import { CastMemberId } from '../../../../cast-member/domain/cast-member.aggregate';
 import { GenreId } from '../../../../genre/domain/genre.aggregate';
 import { Video } from '../../../domain/video.aggregate';
 import { VideoInMemoryRepository } from './video-in-memory.repository';
@@ -162,6 +165,44 @@ describe('VideoInMemoryRepository', () => {
       genres_id: [genreId1],
     });
     expect(itemsFiltered).toStrictEqual([items[2]]);
+  });
+
+  it('should apply association filters with any ID within each list and all active types', async () => {
+    const categoryIds = [new CategoryId(), new CategoryId(), new CategoryId()];
+    const genreIds = [new GenreId(), new GenreId()];
+    const castMemberIds = [new CastMemberId(), new CastMemberId()];
+    const items = [
+      Video.fake().aVideoWithoutMedias().addCategoryId(categoryIds[0])
+        .addGenreId(genreIds[0]).addCastMemberId(castMemberIds[0]).build(),
+      Video.fake().aVideoWithoutMedias().addCategoryId(categoryIds[1])
+        .addGenreId(genreIds[1]).addCastMemberId(castMemberIds[1]).build(),
+      Video.fake().aVideoWithoutMedias().addCategoryId(categoryIds[0])
+        .addGenreId(genreIds[1]).addCastMemberId(castMemberIds[0]).build(),
+      Video.fake().aVideoWithoutMedias().addCategoryId(categoryIds[2])
+        .addGenreId(genreIds[0]).addCastMemberId(castMemberIds[1]).build(),
+    ];
+
+    const filtered = await repository['applyFilter'](items, {
+      categories_id: [categoryIds[0], categoryIds[2]],
+      genres_id: genreIds,
+      cast_members_id: [castMemberIds[0]],
+    });
+    expect(filtered).toStrictEqual([items[0], items[2]]);
+  });
+
+  it('should treat empty association ID lists as no filters', async () => {
+    const items = [
+      Video.fake().aVideoWithoutMedias().build(),
+      Video.fake().aVideoWithoutMedias().build(),
+    ];
+
+    const filtered = await repository['applyFilter'](items, {
+      categories_id: [],
+      genres_id: [],
+      cast_members_id: [],
+    });
+
+    expect(filtered).toStrictEqual(items);
   });
 
   it('should sort by created_at when sort param is null', async () => {
