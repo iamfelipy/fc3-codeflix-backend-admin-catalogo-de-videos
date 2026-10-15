@@ -11,8 +11,16 @@ services:
     # relativo ao docker compose
     volumes:
       - ../:/home/node/app
-      # Volume nomeado para /home/node/.codex
+
+      # Persistência do Codex (Sua configuração atual)
       - fc3_codex_data:/home/node/.codex
+      # 1. PERSISTÊNCIA DO GEMINI CLI (Salva histórico do chat e políticas locais)
+      - fc3_gemini_data:/home/node/.gemini
+      # 2. PERSISTÊNCIA GLOBAL DE CONFIGURAÇÕES NODE (Caso o Gemini CLI use o escopo geral do NPM)
+      - fc3_node_config:/home/node/.config
+      # 3. CACHE DO UV (Opcional, mas evita que ele baixe o Python 3.11 toda vez que reconstruir)
+      - fc3_uv_cache:/home/node/.cache/uv
+
       # Por padrão, o container não vem com o horário/fuso do host configurado corretamente.
       # Essas linhas sincronizam o horário do container com o host, evitando erro de expiração de JWT no SDK do Google Cloud por diferença de fuso horário.
       # OBS: Funciona apenas em ambientes Linux. No Windows seria preciso outra configuração para timezone, pois esses arquivos não existem.
@@ -59,3 +67,6 @@ services:
 
 volumes:
   fc3_codex_data:
+  fc3_gemini_data:
+  fc3_node_config:
+  fc3_uv_cache:

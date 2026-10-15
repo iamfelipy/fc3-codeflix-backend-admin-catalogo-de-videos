@@ -8,7 +8,8 @@ RUN apt-get update \
        curl \
     && rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g @nestjs/cli@10.1.17
+# Instala o NestJS CLI e o Gemini CLI oficial globalmente via npm
+RUN npm install -g @nestjs/cli@10.1.17 @google/gemini-cli
 
 USER node
 WORKDIR /home/node/app
@@ -26,8 +27,10 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
     && uv tool install specify-cli --python 3.11
 
 # Valida as instalações durante a construção da imagem.
+# Passamos uma chave temporária para o comando "gemini -v" validar o binário sem travar por falta de autenticação.
 RUN codex --version \
     && specify version \
+    && GEMINI_API_KEY=dummy_key_for_build gemini -v \
     && uv --version
 
 CMD ["tail", "-f", "/dev/null"]
