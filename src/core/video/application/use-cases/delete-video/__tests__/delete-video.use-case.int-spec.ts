@@ -52,7 +52,7 @@ describe("DeleteVideoUseCase Integration Tests", () => {
       .addCategoryId(category.category_id)
       .build();
     await genreRepo.insert(genre);
-    const castMember = CastMember.fake().aCastMember().build();
+    const castMember = CastMember.fake().anActor().build();
     await castMemberRepo.insert(castMember);
 
     const video = Video.fake()
