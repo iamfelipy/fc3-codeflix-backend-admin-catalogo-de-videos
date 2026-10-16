@@ -1,3 +1,4 @@
+import { DeleteVideoUseCase } from "../../core/video/application/use-cases/delete-video/delete-video.use-case";
 import { getModelToken } from '@nestjs/sequelize';
 import { VideoInMemoryRepository } from '../../core/video/infra/db/in-memory/video-in-memory.repository';
 import { IVideoRepository } from '../../core/video/domain/video.repository';
@@ -166,6 +167,13 @@ export const USE_CASES = {
       GENRES_PROVIDERS.REPOSITORIES.GENRE_REPOSITORY.provide,
       CAST_MEMBERS_PROVIDERS.REPOSITORIES.CAST_MEMBER_REPOSITORY.provide,
     ],
+  },
+  DELETE_VIDEO_USE_CASE: {
+    provide: DeleteVideoUseCase,
+    useFactory: (videoRepo: IVideoRepository) => {
+      return new DeleteVideoUseCase(videoRepo);
+    },
+    inject: [REPOSITORIES.VIDEO_REPOSITORY.provide],
   },
   PROCESS_AUDIO_VIDEO_MEDIA_USE_CASE: {
     provide: ProcessAudioVideoMediasUseCase,

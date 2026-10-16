@@ -1,3 +1,4 @@
+import { DeleteVideoUseCase } from "../../core/video/application/use-cases/delete-video/delete-video.use-case";
 import {
   Controller,
   Get,
@@ -13,6 +14,8 @@ import {
   BadRequestException,
   Query,
   UseGuards,
+  Delete,
+  HttpCode,
 } from '@nestjs/common';
 import { CreateVideoUseCase } from '../../core/video/application/use-cases/create-video/create-video.use-case';
 import { UpdateVideoUseCase } from '../../core/video/application/use-cases/update-video/update-video.use-case';
@@ -51,6 +54,9 @@ export class VideosController {
 
   @Inject(ListVideosUseCase)
   private listUseCase!: ListVideosUseCase;
+
+  @Inject(DeleteVideoUseCase)
+  private deleteUseCase!: DeleteVideoUseCase;
 
   @Post()
   async create(@Body() createVideoDto: CreateVideoDto) {
@@ -316,5 +322,13 @@ export class VideosController {
     }
     
     return await this.getUseCase.execute({ id });
+  }
+
+  @HttpCode(204)
+  @Delete(":id")
+  remove(
+    @Param("id", new ParseUUIDPipe({ errorHttpStatusCode: 422 })) id: string,
+  ) {
+    return this.deleteUseCase.execute({ id });
   }
 }

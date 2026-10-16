@@ -1,3 +1,4 @@
+import { DeleteVideoUseCase } from '../../../core/video/application/use-cases/delete-video/delete-video.use-case';
 import { Test, TestingModule } from '@nestjs/testing';
 import { IVideoRepository } from '../../../core/video/domain/video.repository';
 import { ICategoryRepository } from '../../../core/category/domain/category.repository';
@@ -80,6 +81,7 @@ describe('VideosController Integration Tests', () => {
   it('should be defined', () => {
     expect(controller).toBeDefined();
     expect(controller['listUseCase']).toBeInstanceOf(ListVideosUseCase);
+    expect(controller['deleteUseCase']).toBeInstanceOf(DeleteVideoUseCase);
   });
 
   it('should search videos', async () => {
@@ -101,5 +103,26 @@ describe('VideosController Integration Tests', () => {
     const presenter = await controller.search({});
     expect(presenter.meta.total).toBe(1);
     expect(presenter.data[0].id).toBe(video.video_id.id);
+  });
+
+  it('should delete a video', async () => {
+    const category = Category.fake().aCategory().build();
+    const genre = Genre.fake().aGenre().addCategoryId(category.category_id).build();
+    const castMember = CastMember.fake().anActor().build();
+    await categoryRepo.insert(category);
+    await genreRepo.insert(genre);
+    await castMemberRepo.insert(castMember);
+
+    const video = Video.fake()
+      .aVideoWithoutMedias()
+      .addCategoryId(category.category_id)
+      .addGenreId(genre.genre_id)
+      .addCastMemberId(castMember.cast_member_id)
+      .build();
+    await videoRepo.insert(video);
+
+    await controller.remove(video.video_id.id);
+
+    await expect(videoRepo.findById(video.video_id)).resolves.toBeNull();
   });
 });

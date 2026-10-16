@@ -47,4 +47,15 @@ describe('VideosController Unit Tests', () => {
     expect(presenter).toBeInstanceOf(VideoCollectionPresenter);
     expect(presenter).toStrictEqual(new VideoCollectionPresenter(output));
   });
+
+  it("should delete a video", async () => {
+    const mockDeleteUseCase = {
+      execute: jest.fn().mockReturnValue(Promise.resolve(undefined)),
+    };
+    //@ts-expect-error defined part of methods
+    controller["deleteUseCase"] = mockDeleteUseCase;
+    const id = "9366b7dc-2d71-4799-b91c-c64adb205104";
+    expect(await controller.remove(id)).toBeUndefined();
+    expect(mockDeleteUseCase.execute).toHaveBeenCalledWith({ id });
+  });
 });
