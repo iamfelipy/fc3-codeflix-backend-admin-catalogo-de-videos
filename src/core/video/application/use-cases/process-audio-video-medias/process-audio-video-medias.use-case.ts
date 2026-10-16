@@ -6,10 +6,10 @@ import { Video, VideoId } from '../../../domain/video.aggregate';
 import { IVideoRepository } from '../../../domain/video.repository';
 import { ProcessAudioVideoMediasInput } from './process-audio-video-medias.input';
 
-export class ProcessAudioVideoMediasUseCase
-  implements
-    IUseCase<ProcessAudioVideoMediasInput, ProcessAudioVideoMediasOutput>
-{
+export class ProcessAudioVideoMediasUseCase implements IUseCase<
+  ProcessAudioVideoMediasInput,
+  ProcessAudioVideoMediasOutput
+> {
   constructor(
     private uow: IUnitOfWork,
     private videoRepo: IVideoRepository,
@@ -45,7 +45,7 @@ export class ProcessAudioVideoMediasUseCase
           : video.video.fail();
     }
 
-    this.uow.do(async () => {
+    await this.uow.do(async () => {
       await this.videoRepo.update(video);
     });
   }
