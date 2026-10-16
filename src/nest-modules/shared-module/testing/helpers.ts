@@ -22,6 +22,7 @@ export function startApp() {
     })
     .compile();
 
+    // Fixture é um objeto, conjunto de dados ou configuração usada em testes automatizados para preparar o ambiente necessário antes da execução dos testes. No contexto de testes, fixtures criam um estado inicial previsível, garantindo que os testes sejam reprodutíveis e independentes.
     const sequelize = moduleFixture.get<Sequelize>(getConnectionToken());
 
     // dropa e recria as tabelas.

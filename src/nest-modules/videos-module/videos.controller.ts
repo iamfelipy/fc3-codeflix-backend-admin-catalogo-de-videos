@@ -10,42 +10,61 @@ import {
   UploadedFiles,
   ValidationPipe,
   UseInterceptors,
-  BadRequestException
+  BadRequestException,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CreateVideoUseCase } from '../../core/video/application/use-cases/create-video/create-video.use-case';
 import { UpdateVideoUseCase } from '../../core/video/application/use-cases/update-video/update-video.use-case';
 import { UploadAudioVideoMediasUseCase } from '../../core/video/application/use-cases/upload-audio-video-medias/upload-audio-video-medias.use-case';
 import { GetVideoUseCase } from '../../core/video/application/use-cases/get-video/get-video.use-case';
+import { ListVideosUseCase } from '../../core/video/application/use-cases/list-videos/list-videos.use-case';
 import { CreateVideoDto } from './dto/create-video.dto';
 import { UpdateVideoDto } from './dto/update-video.dto';
+import { SearchVideosDto } from './dto/search-videos.dto';
+import { VideoCollectionPresenter } from './videos.presenter';
 import { UpdateVideoInput } from '../../core/video/application/use-cases/update-video/update-video.input';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { UploadAudioVideoMediaInput } from '../../core/video/application/use-cases/upload-audio-video-medias/upload-audio-video-media.input';
 import { UploadImageMediasInput } from '@core/video/application/use-cases/upload-image-medias/upload-image-medias.input';
 import { UploadImageMediasUseCase } from '@core/video/application/use-cases/upload-image-medias/upload-image-medias.use-case';
+import { CheckIsAdminGuard } from '../auth-module/check-is-admin.guard';
+import { AuthGuard } from '../auth-module/auth.guard';
 
+@UseGuards(AuthGuard, CheckIsAdminGuard)
 @Controller('videos')
 export class VideosController {
   @Inject(CreateVideoUseCase)
-  private createUseCase: CreateVideoUseCase;
+  private createUseCase!: CreateVideoUseCase;
 
   @Inject(UpdateVideoUseCase)
-  private updateUseCase: UpdateVideoUseCase;
+  private updateUseCase!: UpdateVideoUseCase;
 
   @Inject(UploadAudioVideoMediasUseCase)
-  private uploadAudioVideoMedia: UploadAudioVideoMediasUseCase;
+  private uploadAudioVideoMedia!: UploadAudioVideoMediasUseCase;
 
   @Inject(UploadImageMediasUseCase)
-  private uploadImageMedias: UploadImageMediasUseCase;
+  private uploadImageMedias!: UploadImageMediasUseCase;
 
   @Inject(GetVideoUseCase)
-  private getUseCase: GetVideoUseCase;
+  private getUseCase!: GetVideoUseCase;
+
+  @Inject(ListVideosUseCase)
+  private listUseCase!: ListVideosUseCase;
 
   @Post()
   async create(@Body() createVideoDto: CreateVideoDto) {
     const { id } = await this.createUseCase.execute(createVideoDto);
     // videoPresenter ficou pendente
     return await this.getUseCase.execute({ id });
+  }
+
+  @Get()
+  // example
+  // videos?filter[title]=avatar&filter[categories_id]=uuid1,uuid2&filter[genres_id]=uuid3&filter[cast_members_id]=uuid4,uuid5&page=1&per_page=20&sort=created_at&sort_dir=desc
+  async search(@Query() searchParams: SearchVideosDto) {
+    const output = await this.listUseCase.execute(searchParams);
+    return new VideoCollectionPresenter(output);
   }
 
   @Get(':id')
@@ -148,7 +167,6 @@ export class VideosController {
     const hasAudioVideoMedia = audioVideoFields.some(field => files[field]?.length);
     const hasImageMedia = imageFields.some(field => files[field]?.length);
 
-    
     if (hasAudioVideoMedia) {
       const fileField = Object.keys(files)[0];
       const file = files[fileField][0];
@@ -249,7 +267,6 @@ export class VideosController {
     const hasAudioVideoMedia = audioVideoFields.some(field => files[field]?.length);
     const hasImageMedia = imageFields.some(field => files[field]?.length);
 
-    
     if (hasAudioVideoMedia) {
       const fileField = Object.keys(files)[0];
       const file = files[fileField][0];

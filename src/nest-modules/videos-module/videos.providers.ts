@@ -20,6 +20,7 @@ import { CastMembersIdExistsInDatabaseValidator } from '../../core/cast-member/a
 import { UpdateVideoUseCase } from '../../core/video/application/use-cases/update-video/update-video.use-case';
 import { UploadAudioVideoMediasUseCase } from '../../core/video/application/use-cases/upload-audio-video-medias/upload-audio-video-medias.use-case';
 import { GetVideoUseCase } from '../../core/video/application/use-cases/get-video/get-video.use-case';
+import { ListVideosUseCase } from '../../core/video/application/use-cases/list-videos/list-videos.use-case';
 import { ProcessAudioVideoMediasUseCase } from '../../core/video/application/use-cases/process-audio-video-medias/process-audio-video-medias.use-case';
 import { UploadImageMediasUseCase } from '@core/video/application/use-cases/upload-image-medias/upload-image-medias.use-case';
 import { PublishVideoMediaReplacedInQueueHandler } from '@core/video/application/handlers/publish-video-media-replaced-in-queue.handler';
@@ -36,7 +37,6 @@ export const REPOSITORIES = {
   },
   VIDEO_SEQUELIZE_REPOSITORY: {
     provide: VideoSequelizeRepository,
-    // typeof VideoModel significa o construtor (a classe) VideoModel, não uma instância. Você recebe a própria classe para poder criar instâncias, acessar métodos estáticos, etc. Não é uma instância.
     useFactory: (videoModel: typeof VideoModel, uow: UnitOfWorkSequelize) => {
       return new VideoSequelizeRepository(videoModel, uow);
     },
@@ -132,6 +132,28 @@ export const USE_CASES = {
       castMemberRepo: ICastMemberRepository,
     ) => {
       return new GetVideoUseCase(
+        videoRepo,
+        categoryRepo,
+        genreRepo,
+        castMemberRepo,
+      );
+    },
+    inject: [
+      REPOSITORIES.VIDEO_REPOSITORY.provide,
+      CATEGORY_PROVIDERS.REPOSITORIES.CATEGORY_REPOSITORY.provide,
+      GENRES_PROVIDERS.REPOSITORIES.GENRE_REPOSITORY.provide,
+      CAST_MEMBERS_PROVIDERS.REPOSITORIES.CAST_MEMBER_REPOSITORY.provide,
+    ],
+  },
+  LIST_VIDEOS_USE_CASE: {
+    provide: ListVideosUseCase,
+    useFactory: (
+      videoRepo: IVideoRepository,
+      categoryRepo: ICategoryRepository,
+      genreRepo: IGenreRepository,
+      castMemberRepo: ICastMemberRepository,
+    ) => {
+      return new ListVideosUseCase(
         videoRepo,
         categoryRepo,
         genreRepo,
