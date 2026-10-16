@@ -289,9 +289,6 @@ describe('VideoSequelizeRepository Integration Tests', () => {
 
   describe('search method tests', () => {
     it('should order by created_at DESC when search params are null', async () => {
-      
-      // arrange
-      
       const { category, genre, castMember } = await createRelations();
 
       const videos = Video.fake()
@@ -303,12 +300,8 @@ describe('VideoSequelizeRepository Integration Tests', () => {
         .build();
       await videoRepo.bulkInsert(videos);
       const spyToEntity = jest.spyOn(VideoModelMapper, 'toEntity');
-      
-      // act
-      
-      const searchOutput = await videoRepo.search(VideoSearchParams.create());
 
-      // assert
+      const searchOutput = await videoRepo.search(VideoSearchParams.create());
 
       expect(searchOutput).toBeInstanceOf(VideoSearchResult);
       expect(spyToEntity).toHaveBeenCalledTimes(15);
@@ -332,9 +325,6 @@ describe('VideoSequelizeRepository Integration Tests', () => {
     });
 
     it('should apply paginate and filter by title', async () => {
-      
-      // arrange
-      
       const { category, genre, castMember } = await createRelations();
       const videos = [
         Video.fake()
@@ -372,8 +362,6 @@ describe('VideoSequelizeRepository Integration Tests', () => {
       ];
       await videoRepo.bulkInsert(videos);
 
-      // act
-
       let searchOutput = await videoRepo.search(
         VideoSearchParams.create({
           page: 1,
@@ -381,8 +369,6 @@ describe('VideoSequelizeRepository Integration Tests', () => {
           filter: { title: 'TEST' },
         }),
       );
-
-      // assert
 
       let expected = new VideoSearchResult({
         items: [videos[0], videos[2]],
@@ -431,521 +417,239 @@ describe('VideoSequelizeRepository Integration Tests', () => {
         ],
       });
     });
+
+    it('should apply paginate and filter by categories_id', async () => {
+      const categories = Category.fake().theCategories(3).build();
+      await categoryRepo.bulkInsert(categories);
+      const { genre, castMember } = await createRelations();
+
+      const videos = [
+        Video.fake()
+          .aVideoWithAllMedias()
+          .addCategoryId(categories[0].category_id)
+          .addGenreId(genre.genre_id)
+          .addCastMemberId(castMember.cast_member_id)
+          .withCreatedAt(new Date(new Date().getTime() + 1000))
+          .build(),
+        Video.fake()
+          .aVideoWithAllMedias()
+          .addCategoryId(categories[0].category_id)
+          .addCategoryId(categories[1].category_id)
+          .addGenreId(genre.genre_id)
+          .addCastMemberId(castMember.cast_member_id)
+          .withCreatedAt(new Date(new Date().getTime() + 2000))
+          .build(),
+        Video.fake()
+          .aVideoWithAllMedias()
+          .addCategoryId(categories[2].category_id)
+          .addGenreId(genre.genre_id)
+          .addCastMemberId(castMember.cast_member_id)
+          .withCreatedAt(new Date(new Date().getTime() + 3000))
+          .build(),
+      ];
+      await videoRepo.bulkInsert(videos);
+
+      const searchOutput = await videoRepo.search(
+        VideoSearchParams.create({
+          page: 1,
+          per_page: 2,
+          filter: { categories_id: [categories[0].category_id.id] },
+        }),
+      );
+
+      expect(searchOutput.items.length).toBe(2);
+      expect(searchOutput.total).toBe(2);
+      expect(searchOutput.items[0].video_id.id).toBe(videos[1].video_id.id);
+      expect(searchOutput.items[1].video_id.id).toBe(videos[0].video_id.id);
+    });
+
+    it('should apply paginate and filter by genres_id', async () => {
+      const { category, castMember } = await createRelations();
+      const genres = Genre.fake().theGenres(2).addCategoryId(category.category_id).build();
+      await genreRepo.bulkInsert(genres);
+
+      const videos = [
+        Video.fake()
+          .aVideoWithAllMedias()
+          .addCategoryId(category.category_id)
+          .addGenreId(genres[0].genre_id)
+          .addCastMemberId(castMember.cast_member_id)
+          .withCreatedAt(new Date(new Date().getTime() + 1000))
+          .build(),
+        Video.fake()
+          .aVideoWithAllMedias()
+          .addCategoryId(category.category_id)
+          .addGenreId(genres[1].genre_id)
+          .addCastMemberId(castMember.cast_member_id)
+          .withCreatedAt(new Date(new Date().getTime() + 2000))
+          .build(),
+      ];
+      await videoRepo.bulkInsert(videos);
+
+      const searchOutput = await videoRepo.search(
+        VideoSearchParams.create({
+          page: 1,
+          per_page: 2,
+          filter: { genres_id: [genres[0].genre_id.id] },
+        }),
+      );
+
+      expect(searchOutput.items.length).toBe(1);
+      expect(searchOutput.total).toBe(1);
+      expect(searchOutput.items[0].video_id.id).toBe(videos[0].video_id.id);
+    });
+
+    it('should apply paginate and filter by cast_members_id', async () => {
+      const { category, genre } = await createRelations();
+      const castMembers = CastMember.fake().theCastMembers(2).build();
+      await castMemberRepo.bulkInsert(castMembers);
+
+      const videos = [
+        Video.fake()
+          .aVideoWithAllMedias()
+          .addCategoryId(category.category_id)
+          .addGenreId(genre.genre_id)
+          .addCastMemberId(castMembers[0].cast_member_id)
+          .withCreatedAt(new Date(new Date().getTime() + 1000))
+          .build(),
+        Video.fake()
+          .aVideoWithAllMedias()
+          .addCategoryId(category.category_id)
+          .addGenreId(genre.genre_id)
+          .addCastMemberId(castMembers[1].cast_member_id)
+          .withCreatedAt(new Date(new Date().getTime() + 2000))
+          .build(),
+      ];
+      await videoRepo.bulkInsert(videos);
+
+      const searchOutput = await videoRepo.search(
+        VideoSearchParams.create({
+          page: 1,
+          per_page: 2,
+          filter: { cast_members_id: [castMembers[0].cast_member_id.id] },
+        }),
+      );
+
+      expect(searchOutput.items.length).toBe(1);
+      expect(searchOutput.total).toBe(1);
+      expect(searchOutput.items[0].video_id.id).toBe(videos[0].video_id.id);
+    });
+
+    it('should apply paginate and sort', async () => {
+      const { category, genre, castMember } = await createRelations();
+
+      const videos = [
+        Video.fake()
+          .aVideoWithAllMedias()
+          .withTitle('b')
+          .addCategoryId(category.category_id)
+          .addGenreId(genre.genre_id)
+          .addCastMemberId(castMember.cast_member_id)
+          .build(),
+        Video.fake()
+          .aVideoWithAllMedias()
+          .withTitle('a')
+          .addCategoryId(category.category_id)
+          .addGenreId(genre.genre_id)
+          .addCastMemberId(castMember.cast_member_id)
+          .build(),
+        Video.fake()
+          .aVideoWithAllMedias()
+          .withTitle('c')
+          .addCategoryId(category.category_id)
+          .addGenreId(genre.genre_id)
+          .addCastMemberId(castMember.cast_member_id)
+          .build(),
+      ];
+      await videoRepo.bulkInsert(videos);
+
+      const searchOutput = await videoRepo.search(
+        VideoSearchParams.create({
+          page: 1,
+          per_page: 2,
+          sort: 'title',
+          sort_dir: 'asc',
+        }),
+      );
+
+      expect(searchOutput.items.length).toBe(2);
+      expect(searchOutput.total).toBe(3);
+      expect(searchOutput.items[0].title).toBe('a');
+      expect(searchOutput.items[1].title).toBe('b');
+    });
+
+    it('should apply paginate and filter by title, categories_id, genres_id, cast_members_id (multiple filters together)', async () => {
+      // arrange
+      const categories = Category.fake().theCategories(3).build();
+      await categoryRepo.bulkInsert(categories);
+      const genres = Genre.fake().theGenres(3).addCategoryId(categories[0].category_id).build();
+      await genreRepo.bulkInsert(genres);
+      const castMembers = CastMember.fake().theCastMembers(3).build();
+      await castMemberRepo.bulkInsert(castMembers);
+
+      const videos = [
+        Video.fake()
+          .aVideoWithAllMedias()
+          .withTitle('Filme Especial')
+          .addCategoryId(categories[0].category_id)
+          .addGenreId(genres[0].genre_id)
+          .addCastMemberId(castMembers[0].cast_member_id)
+          .withCreatedAt(new Date(new Date().getTime() + 1000))
+          .build(),
+        // don't match all filters
+        Video.fake()
+          .aVideoWithAllMedias()
+          .withTitle('Outro Filme')
+          .addCategoryId(categories[1].category_id)
+          .addGenreId(genres[1].genre_id)
+          .addCastMemberId(castMembers[1].cast_member_id)
+          .withCreatedAt(new Date(new Date().getTime() + 2000))
+          .build(),
+        // matches some filters but not all
+        Video.fake()
+          .aVideoWithAllMedias()
+          .withTitle('Filme especial')
+          .addCategoryId(categories[0].category_id)
+          .addGenreId(genres[2].genre_id)
+          .addCastMemberId(castMembers[0].cast_member_id)
+          .withCreatedAt(new Date(new Date().getTime() + 3000))
+          .build(),
+        // matches all but title
+        Video.fake()
+          .aVideoWithAllMedias()
+          .withTitle('Sem título relevante')
+          .addCategoryId(categories[0].category_id)
+          .addGenreId(genres[0].genre_id)
+          .addCastMemberId(castMembers[0].cast_member_id)
+          .withCreatedAt(new Date(new Date().getTime() + 4000))
+          .build(),
+      ];
+      await videoRepo.bulkInsert(videos);
+
+      // act
+      const searchOutput = await videoRepo.search(
+        VideoSearchParams.create({
+          page: 1,
+          per_page: 10,
+          filter: {
+            title: 'especial',
+            categories_id: [categories[0].category_id.id],
+            genres_id: [genres[0].genre_id.id],
+            cast_members_id: [castMembers[0].cast_member_id.id],
+          },
+        }),
+      );
+
+      // assert
+      expect(searchOutput.items.length).toBe(1);
+      expect(searchOutput.total).toBe(1);
+      expect(searchOutput.items[0].video_id.id).toBe(videos[0].video_id.id);
+      expect(searchOutput.items[0].title.toLowerCase()).toContain('especial');
+      expect(searchOutput.items[0].categories_id.has(categories[0].category_id.id)).toBeTruthy();
+      expect(searchOutput.items[0].genres_id.has(genres[0].genre_id.id)).toBeTruthy();
+      expect(searchOutput.items[0].cast_members_id.has(castMembers[0].cast_member_id.id)).toBeTruthy();
+    });
   });
-
-  // testes que faltaram implementar
-  /*
-  
-    //TODO - fazer testes para buscas de categories_id, genres_id e cast_members
-    //     const categories = Category.fake().theCategories(4).build();
-    //     await categoryRepo.bulkInsert(categories);
-    //     const genres = [
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[0].category_id)
-    //         .withCreatedAt(new Date(new Date().getTime() + 1000))
-    //         .build(),
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[0].category_id)
-    //         .addCategoryId(categories[1].category_id)
-    //         .withCreatedAt(new Date(new Date().getTime() + 2000))
-    //         .build(),
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[0].category_id)
-    //         .addCategoryId(categories[1].category_id)
-    //         .addCategoryId(categories[2].category_id)
-    //         .withCreatedAt(new Date(new Date().getTime() + 3000))
-    //         .build(),
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[3].category_id)
-    //         .withCreatedAt(new Date(new Date().getTime() + 4000))
-    //         .build(),
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[1].category_id)
-    //         .addCategoryId(categories[2].category_id)
-    //         .withCreatedAt(new Date(new Date().getTime() + 5000))
-    //         .build(),
-    //     ];
-    //     await video.bulkInsert(genres);
-
-    //     const arrange = [
-    //       {
-    //         params: VideoSearchParams.create({
-    //           page: 1,
-    //           per_page: 2,
-    //           filter: { categories_id: [categories[0].category_id.id] },
-    //         }),
-    //         result: {
-    //           items: [genres[2], genres[1]],
-    //           total: 3,
-    //           current_page: 1,
-    //           per_page: 2,
-    //         },
-    //       },
-    //       {
-    //         params: VideoSearchParams.create({
-    //           page: 2,
-    //           per_page: 2,
-    //           filter: { categories_id: [categories[0].category_id.id] },
-    //         }),
-    //         result: {
-    //           items: [genres[0]],
-    //           total: 3,
-    //           current_page: 2,
-    //           per_page: 2,
-    //         },
-    //       },
-    //       {
-    //         params: VideoSearchParams.create({
-    //           page: 1,
-    //           per_page: 2,
-    //           filter: {
-    //             categories_id: [
-    //               categories[0].category_id.id,
-    //               categories[1].category_id.id,
-    //             ],
-    //           },
-    //         }),
-    //         result: {
-    //           items: [genres[4], genres[2]],
-    //           total: 4,
-    //           current_page: 1,
-    //           per_page: 2,
-    //         },
-    //       },
-    //       {
-    //         params: VideoSearchParams.create({
-    //           page: 2,
-    //           per_page: 2,
-    //           filter: {
-    //             categories_id: [
-    //               categories[0].category_id.id,
-    //               categories[1].category_id.id,
-    //             ],
-    //           },
-    //         }),
-    //         result: {
-    //           items: [genres[1], genres[0]],
-    //           total: 4,
-    //           current_page: 2,
-    //           per_page: 2,
-    //         },
-    //       },
-    //     ];
-    //     for (const arrangeItem of arrange) {
-    //       const searchOutput = await video.search(arrangeItem.params);
-    //       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    //       const { items, ...otherOutput } = searchOutput;
-    //       const { items: itemsExpected, ...otherExpected } = arrangeItem.result;
-    //       expect(otherOutput).toMatchObject(otherExpected);
-    //       expect(searchOutput.items.length).toBe(itemsExpected.length);
-    //       searchOutput.items.forEach((item, key) => {
-    //         const expected = itemsExpected[key].toJSON();
-    //         expect(item.toJSON()).toStrictEqual(
-    //           expect.objectContaining({
-    //             ...expected,
-    //             categories_id: expect.arrayContaining(expected.categories_id),
-    //           }),
-    //         );
-    //       });
-    //     }
-    //   });
-
-    //   it('should apply paginate and sort', async () => {
-    //     expect(video.sortableFields).toStrictEqual(['name', 'created_at']);
-
-    //     const categories = Category.fake().theCategories(4).build();
-    //     await categoryRepo.bulkInsert(categories);
-    //     const genres = [
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[0].category_id)
-    //         .addCategoryId(categories[1].category_id)
-    //         .addCategoryId(categories[2].category_id)
-    //         .withName('b')
-    //         .build(),
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[0].category_id)
-    //         .addCategoryId(categories[1].category_id)
-    //         .addCategoryId(categories[2].category_id)
-    //         .withName('a')
-    //         .build(),
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[0].category_id)
-    //         .addCategoryId(categories[1].category_id)
-    //         .addCategoryId(categories[2].category_id)
-    //         .withName('d')
-    //         .build(),
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[0].category_id)
-    //         .addCategoryId(categories[1].category_id)
-    //         .addCategoryId(categories[2].category_id)
-    //         .withName('e')
-    //         .build(),
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[0].category_id)
-    //         .addCategoryId(categories[1].category_id)
-    //         .addCategoryId(categories[2].category_id)
-    //         .withName('c')
-    //         .build(),
-    //     ];
-    //     await video.bulkInsert(genres);
-
-    //     const arrange = [
-    //       {
-    //         params: VideoSearchParams.create({
-    //           page: 1,
-    //           per_page: 2,
-    //           sort: 'name',
-    //         }),
-    //         result: new VideoSearchResult({
-    //           items: [genres[1], genres[0]],
-    //           total: 5,
-    //           current_page: 1,
-    //           per_page: 2,
-    //         }),
-    //       },
-    //       {
-    //         params: VideoSearchParams.create({
-    //           page: 2,
-    //           per_page: 2,
-    //           sort: 'name',
-    //         }),
-    //         result: new VideoSearchResult({
-    //           items: [genres[4], genres[2]],
-    //           total: 5,
-    //           current_page: 2,
-    //           per_page: 2,
-    //         }),
-    //       },
-    //       {
-    //         params: VideoSearchParams.create({
-    //           page: 1,
-    //           per_page: 2,
-    //           sort: 'name',
-    //           sort_dir: 'desc',
-    //         }),
-    //         result: new VideoSearchResult({
-    //           items: [genres[3], genres[2]],
-    //           total: 5,
-    //           current_page: 1,
-    //           per_page: 2,
-    //         }),
-    //       },
-    //       {
-    //         params: VideoSearchParams.create({
-    //           page: 2,
-    //           per_page: 2,
-    //           sort: 'name',
-    //           sort_dir: 'desc',
-    //         }),
-    //         result: new VideoSearchResult({
-    //           items: [genres[4], genres[0]],
-    //           total: 5,
-    //           current_page: 2,
-    //           per_page: 2,
-    //         }),
-    //       },
-    //     ];
-
-    //     for (const i of arrange) {
-    //       const result = await video.search(i.params);
-    //       const expected = i.result.toJSON(true);
-
-    //       expect(result.toJSON(true)).toMatchObject({
-    //         ...expected,
-    //         items: expected.items.map((i) => ({
-    //           ...i,
-    //           categories_id: expect.arrayContaining(i.categories_id),
-    //         })),
-    //       });
-    //     }
-    //   });
-
-    //   describe('should search using filter by name, sort and paginate', () => {
-    //     const categories = Category.fake().theCategories(3).build();
-
-    //     const genres = [
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[0].category_id)
-    //         .addCategoryId(categories[1].category_id)
-    //         .addCategoryId(categories[2].category_id)
-    //         .withName('test')
-    //         .build(),
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[0].category_id)
-    //         .addCategoryId(categories[1].category_id)
-    //         .addCategoryId(categories[2].category_id)
-    //         .withName('a')
-    //         .build(),
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[0].category_id)
-    //         .addCategoryId(categories[1].category_id)
-    //         .addCategoryId(categories[2].category_id)
-    //         .withName('TEST')
-    //         .build(),
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[0].category_id)
-    //         .addCategoryId(categories[1].category_id)
-    //         .addCategoryId(categories[2].category_id)
-    //         .withName('e')
-    //         .build(),
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[0].category_id)
-    //         .addCategoryId(categories[1].category_id)
-    //         .addCategoryId(categories[2].category_id)
-    //         .withName('TeSt')
-    //         .build(),
-    //     ];
-
-    //     const arrange = [
-    //       {
-    //         search_params: VideoSearchParams.create({
-    //           page: 1,
-    //           per_page: 2,
-    //           sort: 'name',
-    //           filter: { name: 'TEST' },
-    //         }),
-    //         search_result: new VideoSearchResult({
-    //           items: [genres[2], genres[4]],
-    //           total: 3,
-    //           current_page: 1,
-    //           per_page: 2,
-    //         }),
-    //       },
-    //       {
-    //         search_params: VideoSearchParams.create({
-    //           page: 2,
-    //           per_page: 2,
-    //           sort: 'name',
-    //           filter: { name: 'TEST' },
-    //         }),
-    //         search_result: new VideoSearchResult({
-    //           items: [genres[0]],
-    //           total: 3,
-    //           current_page: 2,
-    //           per_page: 2,
-    //         }),
-    //       },
-    //     ];
-
-    //     beforeEach(async () => {
-    //       await categoryRepo.bulkInsert(categories);
-    //       await video.bulkInsert(genres);
-    //     });
-
-    //     test.each(arrange)(
-    //       'when value is $search_params',
-    //       async ({ search_params, search_result: expected_result }) => {
-    //         const result = await video.search(search_params);
-    //         const expected = expected_result.toJSON(true);
-    //         expect(result.toJSON(true)).toMatchObject({
-    //           ...expected,
-    //           items: expected.items.map((i) => ({
-    //             ...i,
-    //             categories_id: expect.arrayContaining(i.categories_id),
-    //           })),
-    //         });
-    //       },
-    //     );
-    //   });
-
-    //   describe('should search using filter by categories_id, sort and paginate', () => {
-    //     const categories = Category.fake().theCategories(4).build();
-
-    //     const genres = [
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[0].category_id)
-    //         .withName('test')
-    //         .build(),
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[0].category_id)
-    //         .addCategoryId(categories[1].category_id)
-    //         .withName('a')
-    //         .build(),
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[0].category_id)
-    //         .addCategoryId(categories[1].category_id)
-    //         .addCategoryId(categories[2].category_id)
-    //         .withName('TEST')
-    //         .build(),
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[3].category_id)
-    //         .withName('e')
-    //         .build(),
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[1].category_id)
-    //         .addCategoryId(categories[2].category_id)
-    //         .withName('TeSt')
-    //         .build(),
-    //     ];
-
-    //     const arrange = [
-    //       {
-    //         search_params: VideoSearchParams.create({
-    //           page: 1,
-    //           per_page: 2,
-    //           sort: 'name',
-    //           filter: { categories_id: [categories[0].category_id.id] },
-    //         }),
-    //         search_result: new VideoSearchResult({
-    //           items: [genres[2], genres[1]],
-    //           total: 3,
-    //           current_page: 1,
-    //           per_page: 2,
-    //         }),
-    //       },
-    //       {
-    //         search_params: VideoSearchParams.create({
-    //           page: 2,
-    //           per_page: 2,
-    //           sort: 'name',
-    //           filter: { categories_id: [categories[0].category_id.id] },
-    //         }),
-    //         search_result: new VideoSearchResult({
-    //           items: [genres[0]],
-    //           total: 3,
-    //           current_page: 2,
-    //           per_page: 2,
-    //         }),
-    //       },
-    //     ];
-
-    //     beforeEach(async () => {
-    //       await categoryRepo.bulkInsert(categories);
-    //       await video.bulkInsert(genres);
-    //     });
-
-    //     test.each(arrange)(
-    //       'when value is $search_params',
-    //       async ({ search_params, search_result: expected_result }) => {
-    //         const result = await video.search(search_params);
-    //         const expected = expected_result.toJSON(true);
-    //         expect(result.toJSON(true)).toMatchObject({
-    //           ...expected,
-    //           items: expected.items.map((i) => ({
-    //             ...i,
-    //             categories_id: expect.arrayContaining(i.categories_id),
-    //           })),
-    //         });
-    //       },
-    //     );
-    //   });
-
-    //   describe('should search using filter by name and categories_id, sort and paginate', () => {
-    //     const categories = Category.fake().theCategories(4).build();
-
-    //     const genres = [
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[0].category_id)
-    //         .addCategoryId(categories[1].category_id)
-    //         .withName('test')
-    //         .build(),
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[0].category_id)
-    //         .addCategoryId(categories[1].category_id)
-    //         .withName('a')
-    //         .build(),
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[0].category_id)
-    //         .addCategoryId(categories[1].category_id)
-    //         .addCategoryId(categories[2].category_id)
-    //         .withName('TEST')
-    //         .build(),
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[3].category_id)
-    //         .withName('e')
-    //         .build(),
-    //       Video.fake()
-    //         .aVideo()
-    //         .addCategoryId(categories[1].category_id)
-    //         .addCategoryId(categories[2].category_id)
-    //         .withName('TeSt')
-    //         .build(),
-    //     ];
-
-    //     const arrange = [
-    //       {
-    //         search_params: VideoSearchParams.create({
-    //           page: 1,
-    //           per_page: 2,
-    //           sort: 'name',
-    //           filter: {
-    //             name: 'TEST',
-    //             categories_id: [categories[1].category_id],
-    //           },
-    //         }),
-    //         search_result: new VideoSearchResult({
-    //           items: [genres[2], genres[4]],
-    //           total: 3,
-    //           current_page: 1,
-    //           per_page: 2,
-    //         }),
-    //       },
-    //       {
-    //         search_params: VideoSearchParams.create({
-    //           page: 2,
-    //           per_page: 2,
-    //           sort: 'name',
-    //           filter: {
-    //             name: 'TEST',
-    //             categories_id: [categories[1].category_id],
-    //           },
-    //         }),
-    //         search_result: new VideoSearchResult({
-    //           items: [genres[0]],
-    //           total: 3,
-    //           current_page: 2,
-    //           per_page: 2,
-    //         }),
-    //       },
-    //     ];
-
-    //     beforeEach(async () => {
-    //       await categoryRepo.bulkInsert(categories);
-    //       await video.bulkInsert(genres);
-    //     });
-
-    //     test.each(arrange)(
-    //       'when value is $search_params',
-    //       async ({ search_params, search_result: expected_result }) => {
-    //         const result = await video.search(search_params);
-    //         const expected = expected_result.toJSON(true);
-    //         expect(result.toJSON(true)).toMatchObject({
-    //           ...expected,
-    //           items: expected.items.map((i) => ({
-    //             ...i,
-    //             categories_id: expect.arrayContaining(i.categories_id),
-    //           })),
-    //         });
-    //       },
-    //     );
-    //   });
-    // });
-
-  */
 
   describe('transaction mode', () => {
     describe('insert method', () => {
