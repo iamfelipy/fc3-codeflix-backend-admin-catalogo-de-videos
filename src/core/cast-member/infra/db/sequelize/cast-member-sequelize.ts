@@ -105,13 +105,11 @@ export class CastMemberSequelizeRepository implements ICastMemberRepository {
     ids: CastMemberId[],
   ): Promise<{ exists: CastMemberId[]; not_exists: CastMemberId[] }> {
     if (!ids.length) {
-      throw new InvalidArgumentError(
-        'ids must be an array with at least one element',
-      );
+      return { exists: [], not_exists: [] };
     }
 
     const existsCastMemberModels = await this.castMemberModel.findAll({
-      // attributes serve para especificar quais colunas (fields) devem ser retornadas na query. 
+      // attributes serve para especificar quais colunas (fields) devem ser retornadas na query.
       attributes: ['cast_member_id'],
       where: {
         cast_member_id: {

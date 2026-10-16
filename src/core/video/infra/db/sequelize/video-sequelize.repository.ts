@@ -82,9 +82,7 @@ export class VideoSequelizeRepository implements IVideoRepository {
     ids: VideoId[],
   ): Promise<{ exists: VideoId[]; not_exists: VideoId[] }> {
     if (!ids.length) {
-      throw new InvalidArgumentError(
-        'ids must be an array with at least one element',
-      );
+      return { exists: [], not_exists: [] };
     }
 
     const existsVideoModels = await this.videoModel.findAll({
@@ -259,7 +257,7 @@ export class VideoSequelizeRepository implements IVideoRepository {
     // step: criar preparativos para query crua
     const videoTableName = this.videoModel.getTableName();
     const videoAlias = this.videoModel.name;
-    
+
     // step: pegar nome das tabelas pivos categories, genres, castmembers para usar na query crua
     const videoCategoryRelation =
       this.videoModel.associations.categories_id.target;
@@ -269,7 +267,6 @@ export class VideoSequelizeRepository implements IVideoRepository {
     const videoCastMemberRelation =
       this.videoModel.associations.cast_members_id.target;
     const videoCastMemberTableName = videoCastMemberRelation.getTableName();
-
 
     // step: construir where com filters não vazios
     const wheres: any[] = [];

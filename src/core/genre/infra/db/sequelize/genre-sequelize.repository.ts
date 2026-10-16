@@ -71,9 +71,7 @@ export class GenreSequelizeRepository implements IGenreRepository {
     ids: GenreId[],
   ): Promise<{ exists: GenreId[]; not_exists: GenreId[] }> {
     if (!ids.length) {
-      throw new InvalidArgumentError(
-        'ids must be an array with at least one element',
-      );
+      return { exists: [], not_exists: [] };
     }
 
     const existsGenreModels = await this.genreModel.findAll({
@@ -179,7 +177,7 @@ export class GenreSequelizeRepository implements IGenreRepository {
           value: props.filter.categories_id.map((c) => c.id),
           get condition() {
             return {
-              // O $ indica um caminho para um campo aninhado numa associação/join no Sequelize. 
+              // O $ indica um caminho para um campo aninhado numa associação/join no Sequelize.
               ['$categories_id.category_id$']: {
                 [Op.in]: this.value,
               },
@@ -198,7 +196,7 @@ export class GenreSequelizeRepository implements IGenreRepository {
     //@ts-expect-error  - count is a number
     // Isso retorna o total de gêneros conforme os filtros aplicados.
     const count: number = await this.genreModel.count({
-      //  O distinct: true garante que registros duplicados (por join com categorias) não sejam contados duas vezes. 
+      //  O distinct: true garante que registros duplicados (por join com categorias) não sejam contados duas vezes.
       distinct: true,
       //@ts-expect-error - add include only if categories_id is defined
       include: [props.filter?.categories_id && 'categories_id'].filter(

@@ -82,9 +82,7 @@ export class CategorySequelizeRepository implements ICategoryRepository {
     ids: CategoryId[],
   ): Promise<{ exists: CategoryId[]; not_exists: CategoryId[] }> {
     if (!ids.length) {
-      throw new InvalidArgumentError(
-        'ids must be an array with at least one element',
-      );
+      return { exists: [], not_exists: [] };
     }
 
     const existsCategoryModels = await this.categoryModel.findAll({
