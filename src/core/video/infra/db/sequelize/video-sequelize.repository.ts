@@ -14,12 +14,12 @@ import { VideoModel } from './video.model';
 import { Op } from 'sequelize';
 
 export class VideoSequelizeRepository implements IVideoRepository {
-  sortableFields: string[] = ['name', 'created_at'];
+  sortableFields: string[] = ['title', 'created_at'];
   // binary torna a ordenação case sensitive,
   orderBy = {
     mysql: {
-      name: (sort_dir: SortDirection) =>
-        `binary ${this.videoModel.name}.name ${sort_dir}`,
+      title: (sort_dir: SortDirection) =>
+        `binary ${this.videoModel.name}.title ${sort_dir}`,
     },
   };
   relations_include = [
