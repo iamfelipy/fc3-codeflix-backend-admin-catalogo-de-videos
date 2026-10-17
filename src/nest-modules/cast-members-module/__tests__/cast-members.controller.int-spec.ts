@@ -1,3 +1,4 @@
+import { AuthModule } from '../../auth-module/auth.module';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ICastMemberRepository } from '../../../core/cast-member/domain/cast-member.repository';
 import { CastMembersController } from '../cast-members.controller';
@@ -27,7 +28,7 @@ describe('CastMembersController Integration Tests', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       // A conexão com o banco não é explicitamente fechada neste trecho; o NestJS fecha automaticamente as conexões ao finalizar o processo ou se você chamar await app.close()/await module.close(). Em testes, normalmente o módulo só é fechado ao fim do arquivo/spec (afterAll ou afterEach, se implementado). Se não houver module.close(), a conexão pode ficar aberta até o processo terminar.
-      imports: [ConfigModule.forRoot(), DatabaseModule, CastMembersModule],
+      imports: [ConfigModule.forRoot(), DatabaseModule, AuthModule, CastMembersModule],
     }).compile();
 
     controller = module.get(CastMembersController);

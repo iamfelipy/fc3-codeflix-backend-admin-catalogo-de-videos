@@ -37,7 +37,7 @@ describe('GenresController (e2e)', () => {
 
       test.each(arrange)('when id is $id', async ({ id, expected }) => {
         return request(nestApp.app.getHttpServer())
-          .get(`/genres/${id}`)
+          .get(`/genres/${id}`).authenticate(nestApp.app, true)
           .expect(expected.statusCode)
           .expect(expected);
       });
@@ -61,7 +61,7 @@ describe('GenresController (e2e)', () => {
       await genreRepo.insert(genre);
 
       const res = await request(nestApp.app.getHttpServer())
-        .get(`/genres/${genre.genre_id.id}`)
+        .get(`/genres/${genre.genre_id.id}`).authenticate(nestApp.app, true)
         .expect(200);
       const keyInResponse = GetGenreFixture.keysInResponse;
       expect(Object.keys(res.body)).toStrictEqual(['data']);

@@ -44,7 +44,7 @@ describe('GenresController (e2e)', () => {
         'when id is $id',
         async ({ id, send_data, expected }) => {
           return request(nestApp.app.getHttpServer())
-            .patch(`/genres/${id}`)
+            .patch(`/genres/${id}`).authenticate(nestApp.app, true)
             .send(send_data)
             .expect(expected.statusCode)
             .expect(expected);
@@ -61,7 +61,7 @@ describe('GenresController (e2e)', () => {
       }));
       test.each(arrange)('when body is $label', ({ value }) => {
         return request(app.app.getHttpServer())
-          .patch(`/genres/${uuid}`)
+          .patch(`/genres/${uuid}`).authenticate(app.app, true)
           .send(value.send_data)
           .expect(422)
           .expect(value.expected);
@@ -96,7 +96,7 @@ describe('GenresController (e2e)', () => {
           .build();
         await genreRepo.insert(genre);
         return request(app.app.getHttpServer())
-          .patch(`/genres/${genre.genre_id.id}`)
+          .patch(`/genres/${genre.genre_id.id}`).authenticate(app.app, true)
           .send(value.send_data)
           .expect(422)
           .expect(value.expected);
@@ -128,7 +128,7 @@ describe('GenresController (e2e)', () => {
           await genreRepo.insert(genreCreated);
 
           const res = await request(app.app.getHttpServer())
-            .patch(`/genres/${genreCreated.genre_id.id}`)
+            .patch(`/genres/${genreCreated.genre_id.id}`).authenticate(app.app, true)
             .send(send_data)
             .expect(200);
 

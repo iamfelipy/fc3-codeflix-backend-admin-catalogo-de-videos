@@ -12,6 +12,26 @@ import { GenreOutputMapper } from '../../src/core/genre/application/use-cases/co
 
 describe('GenresController (e2e)', () => {
   describe('/genres (POST)', () => {
+    describe('unauthenticated', () => {
+      const app = startApp();
+
+      test('should return 401 when not authenticated', () => {
+        return request(app.app.getHttpServer())
+          .post('/genres')
+          .send({})
+          .expect(401);
+      });
+
+      test('should return 403 when not authenticated as admin', () => {
+        return request(app.app.getHttpServer())
+          .post('/genres')
+          .authenticate(app.app, false)
+          .send({})
+          .expect(403);
+      });
+    });
+
+
     describe('should a response error with 422 when request body is invalid', () => {
       const app = startApp();
       const invalidRequest = CreateGenreFixture.arrangeInvalidRequest();
@@ -21,7 +41,7 @@ describe('GenresController (e2e)', () => {
       }));
       test.each(arrange)('when body is $label', ({ value }) => {
         return request(app.app.getHttpServer())
-          .post('/genres')
+          .post('/genres').authenticate(app.app, true)
           .send(value.send_data)
           .expect(422)
           .expect(value.expected);
@@ -38,7 +58,7 @@ describe('GenresController (e2e)', () => {
       }));
       test.each(arrange)('when body is $label', ({ value }) => {
         return request(app.app.getHttpServer())
-          .post('/genres')
+          .post('/genres').authenticate(app.app, true)
           .send(value.send_data)
           .expect(422)
           .expect(value.expected);
@@ -63,7 +83,7 @@ describe('GenresController (e2e)', () => {
         async ({ send_data, expected, relations }) => {
           await categoryRepo.bulkInsert(relations.categories);
           const res = await request(app.app.getHttpServer())
-            .post('/genres')
+            .post('/genres').authenticate(app.app, true)
             .send(send_data)
             .expect(201);
           const keyInResponse = CreateGenreFixture.keysInResponse;

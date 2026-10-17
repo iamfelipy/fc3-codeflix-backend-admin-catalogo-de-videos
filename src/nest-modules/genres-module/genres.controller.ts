@@ -1,3 +1,6 @@
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from '../auth-module/auth.guard';
+import { CheckIsAdminGuard } from '../auth-module/check-is-admin.guard';
 import {
   Controller,
   Get,
@@ -23,6 +26,7 @@ import { ListGenresUseCase } from '../../core/genre/application/use-cases/list-g
 import { UpdateGenreInput } from '../../core/genre/application/use-cases/update-genre/update-genre.input';
 import { GenreOutput } from '../../core/genre/application/use-cases/common/genre-output';
 
+@UseGuards(AuthGuard, CheckIsAdminGuard)
 @Controller('genres')
 export class GenresController {
   @Inject(CreateGenreUseCase)

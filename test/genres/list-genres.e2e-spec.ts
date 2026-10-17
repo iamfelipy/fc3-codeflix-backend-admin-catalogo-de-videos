@@ -52,7 +52,7 @@ describe('GenresController (e2e)', () => {
             created_at: e.created_at.toISOString(),
           }));
           const response = await request(nestApp.app.getHttpServer())
-            .get(`/genres/?${queryParams}`)
+            .get(`/genres/?${queryParams}`).authenticate(nestApp.app, true)
             .expect(200);
           expect(response.body).toStrictEqual({
             data: data,
@@ -109,7 +109,7 @@ describe('GenresController (e2e)', () => {
             created_at: e.created_at.toISOString(),
           }));
           const response = await request(nestApp.app.getHttpServer())
-            .get(`/genres/?${queryParams}`)
+            .get(`/genres/?${queryParams}`).authenticate(nestApp.app, true)
             .expect(200);
           expect(response.body).toStrictEqual({
             data: data,

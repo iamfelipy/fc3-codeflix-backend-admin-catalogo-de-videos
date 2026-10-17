@@ -34,7 +34,7 @@ describe('CastMembersController (e2e)', () => {
 
       test.each(arrange)('when id is $id', async ({ id, expected }) => {
         return request(nestApp.app.getHttpServer())
-          .get(`/cast-members/${id}`)
+          .get(`/cast-members/${id}`).authenticate(nestApp.app, true)
           .expect(expected.statusCode)
           .expect(expected);
       });
@@ -48,7 +48,7 @@ describe('CastMembersController (e2e)', () => {
       await castMemberRepo.insert(castMember);
 
       const res = await request(nestApp.app.getHttpServer())
-        .get(`/cast-members/${castMember.cast_member_id.id}`)
+        .get(`/cast-members/${castMember.cast_member_id.id}`).authenticate(nestApp.app, true)
         .expect(200);
       const keyInResponse = GetCastMemberFixture.keysInResponse;
       expect(Object.keys(res.body)).toStrictEqual(['data']);

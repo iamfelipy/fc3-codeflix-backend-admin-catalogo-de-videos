@@ -28,7 +28,7 @@ describe('CastMembersController (e2e)', () => {
         async ({ send_data, expected }) => {
           const queryParams = new URLSearchParams(send_data as any).toString();
           return request(nestApp.app.getHttpServer())
-            .get(`/cast-members/?${queryParams}`)
+            .get(`/cast-members/?${queryParams}`).authenticate(nestApp.app, true)
             .expect(200)
             .expect({
               data: expected.entities.map((e) =>
@@ -64,7 +64,7 @@ describe('CastMembersController (e2e)', () => {
           // - /cast-members?filter.name=João&filter.type=1&page=1&per_page=10
           const queryParams = qs.stringify(send_data as any);
           return request(nestApp.app.getHttpServer())
-            .get(`/cast-members/?${queryParams}`)
+            .get(`/cast-members/?${queryParams}`).authenticate(nestApp.app, true)
             .expect(200)
             .expect({
               data: expected.entities.map((e) =>

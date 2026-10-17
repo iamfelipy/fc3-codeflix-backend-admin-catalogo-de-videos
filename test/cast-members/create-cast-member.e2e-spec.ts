@@ -10,6 +10,26 @@ import { CastMemberOutputMapper } from '../../src/core/cast-member/application/u
 
 describe('CastMembersController (e2e)', () => {
   describe('/cast-members (POST)', () => {
+    describe('unauthenticated', () => {
+      const app = startApp();
+
+      test('should return 401 when not authenticated', () => {
+        return request(app.app.getHttpServer())
+          .post('/cast-members')
+          .send({})
+          .expect(401);
+      });
+
+      test('should return 403 when not authenticated as admin', () => {
+        return request(app.app.getHttpServer())
+          .post('/cast-members')
+          .authenticate(app.app, false)
+          .send({})
+          .expect(403);
+      });
+    });
+
+
     describe('should a response error with 422 when request body is invalid', () => {
       const app = startApp();
       const invalidRequest = CreateCastMemberFixture.arrangeInvalidRequest();
@@ -19,7 +39,7 @@ describe('CastMembersController (e2e)', () => {
       }));
       test.each(arrange)('when body is $label', ({ value }) => {
         return request(app.app.getHttpServer())
-          .post('/cast-members')
+          .post('/cast-members').authenticate(app.app, true)
           .send(value.send_data)
           .expect(422)
           .expect(value.expected);
@@ -36,7 +56,7 @@ describe('CastMembersController (e2e)', () => {
       }));
       test.each(arrange)('when body is $label', ({ value }) => {
         return request(app.app.getHttpServer())
-          .post('/cast-members')
+          .post('/cast-members').authenticate(app.app, true)
           .send(value.send_data)
           .expect(422)
           .expect(value.expected);
@@ -56,7 +76,7 @@ describe('CastMembersController (e2e)', () => {
         'when body is $send_data',
         async ({ send_data, expected }) => {
           const res = await request(app.app.getHttpServer())
-            .post('/cast-members')
+            .post('/cast-members').authenticate(app.app, true)
             .send(send_data)
             .expect(201);
 
