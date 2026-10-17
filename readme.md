@@ -1,8 +1,33 @@
-# microserviço, backend: Admin catalogo de vídeo - Codeflix 
+# microserviço, backend, serviço: admin catálogo de vídeo
 
-### c4 model
-![Imagem 2](docs/c4-model-baixa-amplitude.png)
-![Imagem 1](docs/c4-model-ampla.png)
+Introdução:  
+A aplicação backend Admin Catálogo de Vídeo é responsável por gerenciar o catálogo de vídeos, incluindo categorias, gêneros e membros do elenco. Ela é um componente do sistema Codeflix, que é similar à Netflix, desenvolvida como parte do projeto prático do curso Full Cycle 3.0.
+- Gerenciar significa administrar, organizar, coordenar ou controlar algo, como recursos, pessoas ou processos, para atingir determinados objetivos.
+
+---
+### docs
+  
+<details>
+  <summary><strong>Event Storming</strong><br>
+    <em>Técnica de modelagem colaborativa para entender processos de negócio e domínio.</em><br>
+    <a href="https://whimsical.com/felipy-s-workspace/event-storming-RYPkBfeTH251u5Fk4e7JQV@6HYTAunKLgTX1VPDZZjEEoTC6AqBfhF1vnb4Yo2fTv8r31o" target="_blank">Diagrama interativo no Whimsical</a><br>
+    <small>Imagem (clique para expandir)</small>
+  </summary>
+  <img src="docs/event-storming-contextos.png" alt="Contextos Event Storming" style="max-width:100%; margin-top:10px;">
+</details>  
+<br>
+
+**Design Docs**  
+  Design docs são documentos que detalham a arquitetura, decisões técnicas, fluxos e estruturas do sistema. Eles servem para alinhar o time de desenvolvimento e são referência durante a implementação e manutenção do projeto.
+  - <details>
+      <summary>
+        <strong>Diagrama C4</strong> (níveis de container e contexto)<br/>
+        Utilizado para descrever a arquitetura do sistema em diferentes níveis de detalhe visual.<br>
+        <small>Imagem (clique para expandir)</small>
+      </summary>
+      <img src="docs/c4-model-baixa-amplitude.png" alt="Diagrama C4 - Baixa Amplitude" style="max-width:100%; margin-top:10px;">
+      <img src="docs/c4-model-ampla.png" alt="Diagrama C4 - Ampla" style="max-width:100%; margin-top:10px;">
+    </details>
 
 ---
 
@@ -84,6 +109,50 @@
     - src/core/shared
   - eventos de dominio e integracao
     - src/core/video/domain/domain-events/video-audio-media-replaced.event.ts
+
+---
+### The Twelve-Factor App
+Este projeto aplica várias metodologias do The Twelve-Factor App:
+
+   1. III. Config (Configurações no ambiente): Uso do ConfigModule do NestJS e variáveis de ambiente (.env) para gerenciar parâmetros de configuração sem hardcoding.
+   2. II. Dependencies (Dependências explícitas): Gerenciamento de dependências isoladas e declaradas no package.json e package-lock.json.
+   3. IV. Backing services (Serviços de suporte): Tratamento de bancos de dados (MySQL/SQLite via Sequelize) e mensageria (RabbitMQ) como recursos acoplados/externos
+      configuráveis.
+   4. V. Build, release, run (Estágios separados): Separação estrita entre build (npm run build, gerando a pasta dist) e execução (node dist/main).
+   5. VII. Port binding (Exportação de serviços): A aplicação expõe sua API REST via ligação de porta HTTP gerenciada pelo NestJS.
+   6. X. Dev/prod parity (Paridade entre ambientes): Uso de Docker / Docker Compose e containerização para manter consistência entre desenvolvimento, testes e produção.
+   7. XII. Admin processes (Processos administrativos): Scripts dedicados para tarefas de migração de banco de dados (migrate.ts, npm run migration:run).
+
+
+---
+### Design Patterns (padrões de projeto)
+Neste projeto, podemos identificar vários Design Patterns (padrões de projeto) e padrões arquiteturais consolidados:
+
+   1. Repository Pattern (Padrão Repositório):
+      - Abstração da camada de persistência de dados (ex: VideoRepository, CategoryRepository, GenreRepository), desacoplando as regras de negócio do ORM (Sequelize) ou
+        armazenamento em memória.
+
+   2. Factory Pattern (Padrão Fábrica):
+      - Uso de métodos estáticos de criação (ex: Category.create(...), Video.fake()) e Builders (ex: CategoryFakeBuilder) para instanciar agregados e entidades complexas de
+        forma controlada.
+
+   3. Dependency Injection (Injeção de Dependência):
+      - Nativo do NestJS, injetando serviços, repositórios e casos de uso via construtores e provedores (providers/useFactory).
+
+   4. Decorator Pattern (Padrão Decorator):
+      - Uso extensivo de decorators do NestJS e class-validator (ex: @Controller, @Get, @Post, @UseGuards, @Inject, @Param, @Body, @IsUUID).
+
+   5. Unit of Work (Unidade de Trabalho):
+      - Gerenciamento de transações de banco de dados de forma atômica (ex: UnitOfWorkSequelize).
+
+   6. Presenter Pattern (Padrão Apresentador / Serialização):
+      - Transformação de objetos de domínio/saída de casos de uso em estruturas serializadas para a API (ex: CategoryPresenter, VideoCollectionPresenter).
+
+   7. Command / Use Case Pattern (Padrão Caso de Uso):
+      - Encapsulamento de cada operação de negócio em uma classe dedicada de Caso de Uso que implementa uma interface comum IUseCase (Clean Architecture / DDD).
+
+   8. Observer / Event-Driven Pattern (Eventos de Domínio e Mensageria):
+      - Uso de brokers de mensagens (RabbitMQ) e manipuladores de eventos para processamento assíncrono (ex: VideosConsumers, handlers de mídia).
 ---
 ### generico
 - config, variaveis de ambiente
