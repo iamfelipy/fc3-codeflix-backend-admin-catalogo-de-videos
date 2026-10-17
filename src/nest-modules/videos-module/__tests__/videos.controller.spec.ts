@@ -58,4 +58,57 @@ describe('VideosController Unit Tests', () => {
     expect(await controller.remove(id)).toBeUndefined();
     expect(mockDeleteUseCase.execute).toHaveBeenCalledWith({ id });
   });
+
+  it('should create a video', async () => {
+    const output = { id: '9366b7dc-2d71-4799-b91c-c64adb205104' };
+    const mockCreateUseCase = {
+      execute: jest.fn().mockReturnValue(Promise.resolve(output)),
+    };
+    const mockGetUseCase = {
+      execute: jest.fn().mockReturnValue(Promise.resolve({ id: output.id, title: 'Test' })),
+    };
+    //@ts-expect-error defined part of methods
+    controller['createUseCase'] = mockCreateUseCase;
+    //@ts-expect-error defined part of methods
+    controller['getUseCase'] = mockGetUseCase;
+    const input: any = { title: 'Test' };
+    const res = await controller.create(input);
+    expect(mockCreateUseCase.execute).toHaveBeenCalledWith(input);
+    expect(mockGetUseCase.execute).toHaveBeenCalledWith({ id: output.id });
+    expect(res).toEqual({ id: output.id, title: 'Test' });
+  });
+
+  it('should find a video', async () => {
+    const id = '9366b7dc-2d71-4799-b91c-c64adb205104';
+    const output = { id, title: 'Test' };
+    const mockGetUseCase = {
+      execute: jest.fn().mockReturnValue(Promise.resolve(output)),
+    };
+    //@ts-expect-error defined part of methods
+    controller['getUseCase'] = mockGetUseCase;
+    const res = await controller.findOne(id);
+    expect(mockGetUseCase.execute).toHaveBeenCalledWith({ id });
+    expect(res).toEqual(output);
+  });
+
+  it('should update a video', async () => {
+    const id = '9366b7dc-2d71-4799-b91c-c64adb205104';
+    const output = { id, title: 'Updated' };
+    const mockUpdateUseCase = {
+      execute: jest.fn().mockReturnValue(Promise.resolve(output)),
+    };
+    const mockGetUseCase = {
+      execute: jest.fn().mockReturnValue(Promise.resolve(output)),
+    };
+    //@ts-expect-error defined part of methods
+    controller['updateUseCase'] = mockUpdateUseCase;
+    //@ts-expect-error defined part of methods
+    controller['getUseCase'] = mockGetUseCase;
+    const input: any = { title: 'Updated' };
+    const res = await controller.update(id, input);
+    expect(mockUpdateUseCase.execute).toHaveBeenCalledWith({ id, ...input });
+    expect(mockGetUseCase.execute).toHaveBeenCalledWith({ id });
+    expect(res).toEqual(output);
+  });
+
 });

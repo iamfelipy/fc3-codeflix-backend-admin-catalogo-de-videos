@@ -1,3 +1,8 @@
+import { RatingValues } from '../../../core/video/domain/rating.vo';
+import { VideoId } from '../../../core/video/domain/video.aggregate';
+import { CreateVideoUseCase } from '../../../core/video/application/use-cases/create-video/create-video.use-case';
+import { UpdateVideoUseCase } from '../../../core/video/application/use-cases/update-video/update-video.use-case';
+import { GetVideoUseCase } from '../../../core/video/application/use-cases/get-video/get-video.use-case';
 import { DeleteVideoUseCase } from '../../../core/video/application/use-cases/delete-video/delete-video.use-case';
 import { Test, TestingModule } from '@nestjs/testing';
 import { IVideoRepository } from '../../../core/video/domain/video.repository';
@@ -81,6 +86,10 @@ describe('VideosController Integration Tests', () => {
   it('should be defined', () => {
     expect(controller).toBeDefined();
     expect(controller['listUseCase']).toBeInstanceOf(ListVideosUseCase);
+    expect(controller['createUseCase']).toBeInstanceOf(CreateVideoUseCase);
+    expect(controller['updateUseCase']).toBeInstanceOf(UpdateVideoUseCase);
+    expect(controller['getUseCase']).toBeInstanceOf(GetVideoUseCase);
+    expect(controller['deleteUseCase']).toBeInstanceOf(DeleteVideoUseCase);
     expect(controller['deleteUseCase']).toBeInstanceOf(DeleteVideoUseCase);
   });
 
@@ -125,4 +134,75 @@ describe('VideosController Integration Tests', () => {
 
     await expect(videoRepo.findById(video.video_id)).resolves.toBeNull();
   });
+
+  it('should create a video', async () => {
+    const category = Category.fake().aCategory().build();
+    const genre = Genre.fake().aGenre().addCategoryId(category.category_id).build();
+    const castMember = CastMember.fake().anActor().build();
+    await categoryRepo.insert(category);
+    await genreRepo.insert(genre);
+    await castMemberRepo.insert(castMember);
+
+    const presenter = await controller.create({
+      title: 'Test video',
+      description: 'test description',
+      year_launched: 2022,
+      duration: 120,
+      rating: RatingValues.R10,
+      is_opened: true,
+      categories_id: [category.category_id.id],
+      genres_id: [genre.genre_id.id],
+      cast_members_id: [castMember.cast_member_id.id],
+    });
+
+    const video = await videoRepo.findById(new VideoId(presenter.id));
+    expect(video).toBeDefined();
+    expect(video!.title).toBe('Test video');
+  });
+
+  it('should get a video', async () => {
+    const category = Category.fake().aCategory().build();
+    const genre = Genre.fake().aGenre().addCategoryId(category.category_id).build();
+    const castMember = CastMember.fake().anActor().build();
+    await categoryRepo.insert(category);
+    await genreRepo.insert(genre);
+    await castMemberRepo.insert(castMember);
+
+    const video = Video.fake()
+      .aVideoWithoutMedias()
+      .addCategoryId(category.category_id)
+      .addGenreId(genre.genre_id)
+      .addCastMemberId(castMember.cast_member_id)
+      .build();
+    await videoRepo.insert(video);
+
+    const presenter = await controller.findOne(video.video_id.id);
+    expect(presenter.id).toBe(video.video_id.id);
+    expect(presenter.title).toBe(video.title);
+  });
+
+  it('should update a video', async () => {
+    const category = Category.fake().aCategory().build();
+    const genre = Genre.fake().aGenre().addCategoryId(category.category_id).build();
+    const castMember = CastMember.fake().anActor().build();
+    await categoryRepo.insert(category);
+    await genreRepo.insert(genre);
+    await castMemberRepo.insert(castMember);
+
+    const video = Video.fake()
+      .aVideoWithoutMedias()
+      .addCategoryId(category.category_id)
+      .addGenreId(genre.genre_id)
+      .addCastMemberId(castMember.cast_member_id)
+      .build();
+    await videoRepo.insert(video);
+
+    await controller.update(video.video_id.id, {
+      title: 'Updated title',
+    });
+
+    const updatedVideo = await videoRepo.findById(video.video_id);
+    expect(updatedVideo!.title).toBe('Updated title');
+  });
+
 });

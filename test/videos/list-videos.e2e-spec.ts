@@ -36,9 +36,28 @@ describe('VideosController (e2e)', () => {
       );
     });
 
+    describe('unauthenticated', () => {
+
+      test('should return 401 when not authenticated', () => {
+        return request(nestApp.app.getHttpServer())
+          .get('/videos')
+          .expect(401);
+      });
+
+      test('should return 403 when not authenticated as admin', () => {
+        return request(nestApp.app.getHttpServer())
+          .get('/videos')
+          .authenticate(nestApp.app, false)
+          .expect(403);
+      });
+    });
+
     it('should return videos list', async () => {
       const category = Category.fake().aCategory().build();
-      const genre = Genre.fake().aGenre().addCategoryId(category.category_id).build();
+      const genre = Genre.fake()
+        .aGenre()
+        .addCategoryId(category.category_id)
+        .build();
       const castMember = CastMember.fake().anActor().build();
       await categoryRepo.insert(category);
       await genreRepo.insert(genre);
