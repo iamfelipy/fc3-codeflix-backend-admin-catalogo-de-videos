@@ -1,59 +1,128 @@
-# microserviço, backend, serviço: admin catálogo de vídeo
+# Microserviço de Administração do Catálogo de Vídeo do Sistema Codeflix
 
-Introdução:  
-A aplicação backend Admin Catálogo de Vídeo é responsável por gerenciar o catálogo de vídeos, incluindo categorias, gêneros e membros do elenco. Ela é um componente do sistema Codeflix, que é similar à Netflix, desenvolvida como parte do projeto prático do curso Full Cycle 3.0.
-- Gerenciar significa administrar, organizar, coordenar ou controlar algo, como recursos, pessoas ou processos, para atingir determinados objetivos.
+### sumario
+- [apresentacao do projeto](#apresentacao-do-projeto)
+Documentação/Design: 
+  explique DDD, C4, event storming, hexagonal, princípios de design.
+Características do projeto: 
+  visão geral, tecnologias, arquitetura.
+Etapas de construção: 
+  descreva seu processo (modelagem, core, testes, integração etc.).
+
+Implementação técnica: 
+  detalhar cada seção do sumário da imagem (nestjs, docker, testes, mensageria, eventos etc.).
+Boas práticas: 
+  validações, tratamento de erros, observabilidade, CI/CD, configurações de qualidade.
+Execução: 
+  orientações finais (como rodar o projeto).
 
 ---
-### docs
-  
+### apresentacao do projeto
+- Aplicação backend administrativa do catálogo de vídeos do sistema Codeflix (inspirado na Netflix).
+  - Backend: processa regras de negócio e dados, fornecendo APIs e serviços para outros consumirem, sem interação direta com o usuário final.
+  - administrativa: organização e ao gerenciamento de atividades, recursos ou pessoas.
+    - Gerenciamento: atividade de organizar e controlar recursos ou tarefas para alcançar um objetivo.
+  - Catálogo: conjunto organizado de itens, apresentado para que possam ser conhecidos, consultados ou escolhidos.
+- Construído durante o curso Full Cycle 3.
+
+- Principais tecnologias utilizadas: TypeScript, NestJS, MySQL/SQLite, Sequelize(ORM), RabbitMQ(mensageria) e Google Cloud Storage.
+- arquitetura de microserviços
+
+---
+### documentacao, arquitetura, design
+
 <details>
-  <summary><strong>Event Storming</strong><br>
-    <em>Técnica de modelagem colaborativa para entender processos de negócio e domínio.</em><br>
-    <a href="https://whimsical.com/felipy-s-workspace/event-storming-RYPkBfeTH251u5Fk4e7JQV@6HYTAunKLgTX1VPDZZjEEoTC6AqBfhF1vnb4Yo2fTv8r31o" target="_blank">Diagrama interativo no Whimsical</a><br>
+  <summary>
+    <strong>Diagrama C4</strong> (níveis de container e contexto)<br/>
+    Utilizado para descrever a arquitetura do sistema em diferentes níveis de detalhe visual.<br>
     <small>Imagem (clique para expandir)</small>
   </summary>
-  <img src="docs/event-storming-contextos.png" alt="Contextos Event Storming" style="max-width:100%; margin-top:10px;">
-</details>  
+  <img src="docs/c4-model-baixa-amplitude.png" alt="Diagrama C4 - Baixa Amplitude" style="max-width:100%; margin-top:10px;">
+  <img src="docs/c4-model-ampla.png" alt="Diagrama C4 - Ampla" style="max-width:100%; margin-top:10px;">
+</details>
 <br>
 
 **Design Docs**  
-  Design docs são documentos que detalham a arquitetura, decisões técnicas, fluxos e estruturas do sistema. Eles servem para alinhar o time de desenvolvimento e são referência durante a implementação e manutenção do projeto.
-  - <details>
-      <summary>
-        <strong>Diagrama C4</strong> (níveis de container e contexto)<br/>
-        Utilizado para descrever a arquitetura do sistema em diferentes níveis de detalhe visual.<br>
-        <small>Imagem (clique para expandir)</small>
-      </summary>
-      <img src="docs/c4-model-baixa-amplitude.png" alt="Diagrama C4 - Baixa Amplitude" style="max-width:100%; margin-top:10px;">
-      <img src="docs/c4-model-ampla.png" alt="Diagrama C4 - Ampla" style="max-width:100%; margin-top:10px;">
-    </details>
+  Design docs são documentos que detalham a arquitetura, decisões técnicas, fluxos e estruturas do sistema. Eles servem para alinhar o time de desenvolvimento e são referência durante a implementação e manutenção do projeto.  
+
+
+--
+
+
+### principios de design
+- Orientações para tomar decisões e avaliar se uma solução está bem estruturada.
+- por que você organizou o código dessa maneira?
+- princípios específicos  
+  - cqs: Command Query Separation
+    - insert, find
+      - src/core/video/infra/db/sequelize/video-sequelize.repository.ts
+    - cqrs
+      - src/core/video/application/create-video/create-video.use-case.ts
+      - src/core/video/application/get-video/get-video.use-case.ts
+      - src/nest-modules/videos-module/videos.controller.ts
+  - ocp: Open Closed Principle (Princípio Aberto-Fechado)
+  - Separação de concerns (separation of concerns(interesse, responsabilidade))
+    - core, nest-modules
+  - solid, poo
+    - srp
+      - usecase, execute 
+        - src/core/cast-member/application/use-cases/create-cast-member/create-cast-member.use-case.ts
+      - mapper -> tiro do repository
+        - src/core/genre/infra/db/sequelize/genre-model-mapper.ts
+      - helper -> tiro do teste
+        - src/core/shared/infra/testing/helpers.ts
+      - .validate -> tiro de dentro da classe dependente a validacao
+        - src/core/cast-member/domain/cast-member.validator.ts
+        - src/core/cast-member/application/use-cases/create-cast-member/create-cast-member.input.ts
+    - open/closed principle (OCP):
+      - Composição
+        - injeção no construtor que segue contrato
+          - src/core/cast-member/application/use-cases/create-cast-member/create-cast-member.use-case.ts
+      - heranca
+        - IRepository, ISearchableRepository
+          - filter -> personalizar o comportamento do filtro
+        - SearchParams
+          - filter -> personalizar sanitizacao do filtro
+        - config extende NestConfigModule
+          - src/nest-modules/config-module/config.module.ts
+        - validacao extende ClassValidatorFields
+          - src/core/cast-member/domain/cast-member.validator.ts
+        - custom error extende BaseValidationError
+          - src/core/shared/domain/validators/validation.error.ts 
+        - objeto de valor extende ImageMedia
+          - src/core/video/domain/banner.vo.ts 
+    - liskov substitution principle (LSP):
+      - Corretude: Manter o funcionamento esperado do sistema sem introduzir erros ou efeitos colaterais.
+    - Interface Segregation Principle, ISP
+      - IRepository e ISearchableRepository separados
+    - dip: dependency inversion principle (inversão de dependência)
+      - exemplo:
+        - usecase
+          - constructor
+            - repository
+        - repository
+          - constructor
+            - sequelize
+  - acoplamento: 
+    - ex: usecase com injecao, core + nest-modules
+  - coesão: 
+    - ex: modulo no core
+--- 
+
+### arquitetura
+- arquitetura
+- estilo
+- padrao
 
 ---
 
-### caracteristica do projeto
-- microserviço da parte administrativa do catalogo de video
-- typescript, javascript
-- clean architecture, domain driven design, solid, conceitos da arquitetura de microserviços, design patterns
-- piramide de testes, tdd
-- framework backend: nestjs
-- spa: frontend conversa com o backend de administração de video
-- api rest
-- storage - google cloude storage - assets(imagens, videos)
-- sincronizando dados usando kafka connect
-- comunicação assincrona com rabbitmq
-- construir o nucleo primeiro e deixar o mais puro possivel
-    - manter livre de tecnologia
-    - mantivel ao longo do tempo e independente de tecnologia
-    - consigo trocar os frameworks com essa estrategia, ex: nestjs, express, banco
-    - uncle bob - framework é detalhe
-- utlizando conceitos de uma modelagem mais rica, facilita o entendimento da arquitetura em camadas do software de forma mais madura
-- ddd: domain driven design
-  - design tatico
-    - entidade, objeto de valor, repository
-- backend para a gestão de conteúdos para a CodeFlix,
+### paradigmas de programacao
+- estilos ou modelos de pensamento usados para estruturar e organizar programas
+- poo
+  - encapsulamento, herança, composição, interfaces e imutabilidade.
+- funcional
+  - src/core/cast-member/domain/cast-member-fake.builder.ts
 
-----
 ### etapas de construção da aplicação backend
 - Montagem do ambiente de desenvolvimento (Docker e IDE)
 - modelar o core(regras de negocio, ...) antes de ir para o framework nestjs, usando ddd e clean archtecture
@@ -76,6 +145,7 @@ A aplicação backend Admin Catálogo de Vídeo é responsável por gerenciar o 
       - imagem menor, otimizada
       - vai ser usada no cd
 ---
+
 ### DDD
   - entities, aggregates
     - category
@@ -109,8 +179,41 @@ A aplicação backend Admin Catálogo de Vídeo é responsável por gerenciar o 
     - src/core/shared
   - eventos de dominio e integracao
     - src/core/video/domain/domain-events/video-audio-media-replaced.event.ts
+  - encapsulamento
+    - src/core/cast-member/domain
+      - As regras de validação e o estado crítico das regras de negócio são mantidos dentro do domínio. Os objetos protegem seus invariantes através de validadores dedicados e classes base (Entity, ValueObject).
+        - Regra de negócio: condição ou critério que define como o negócio funciona.
+        - Invariante: condição que deve permanecer verdadeira em determinado estado do sistema.
+  - Imutabilidade (Imutability):
+    - Imutabilidade: um valor não pode ser alterado depois de criado.
+      - Como funciona: para representar um novo valor, cria-se outro objeto.
+      - Finalidade: evitar que uma alteração em um lugar afete inesperadamente outras partes do sistema.
+    - src/core/cast-member/domain/cast-member-type.vo.ts
+      - Forte utilização de Value Objects (Uuid, Rating, Banner, AudioVideoMedia, etc.). 
+
+<details>
+  <summary><strong>Event Storming</strong><br>
+    <em>Técnica de modelagem colaborativa para entender processos de negócio e domínio</em><br>
+    <strong>Domínio:</strong> <em>streaming de vídeo</em><br>
+    <a href="https://whimsical.com/felipy-s-workspace/event-storming-RYPkBfeTH251u5Fk4e7JQV@6HYTAunKLgTX1VPDZZjEEoTC6AqBfhF1vnb4Yo2fTv8r31o" target="_blank">Diagrama interativo no Whimsical</a><br>
+    <small>Imagem (clique para expandir)</small>
+  </summary>
+  <img src="docs/event-storming-contextos.png" alt="Contextos Event Storming" style="max-width:100%; margin-top:10px;">
+</details>  
+<br>
+
+DDD  
+DDD é uma abordagem de modelagem/arquitetura 
+detalhando como o domínio e as decisões de modelagem foram aplicados no projeto
+
+- utlizando conceitos de uma modelagem mais rica, facilita o entendimento da arquitetura em camadas do software de forma mais madura
+- ddd: domain driven design
+  - design tatico
+    - entidade, objeto de valor, repository
+
 
 ---
+
 ### The Twelve-Factor App
 Este projeto aplica várias metodologias do The Twelve-Factor App:
 
@@ -125,6 +228,7 @@ Este projeto aplica várias metodologias do The Twelve-Factor App:
 
 
 ---
+
 ### Design Patterns (padrões de projeto)
 Neste projeto, podemos identificar vários Design Patterns (padrões de projeto) e padrões arquiteturais consolidados:
 
@@ -154,6 +258,7 @@ Neste projeto, podemos identificar vários Design Patterns (padrões de projeto)
    8. Observer / Event-Driven Pattern (Eventos de Domínio e Mensageria):
       - Uso de brokers de mensagens (RabbitMQ) e manipuladores de eventos para processamento assíncrono (ex: VideosConsumers, handlers de mídia).
 ---
+
 ### generico
 - config, variaveis de ambiente
   - local
@@ -174,48 +279,8 @@ Neste projeto, podemos identificar vários Design Patterns (padrões de projeto)
   - commands: pontos de entrada da aplicação.
 
 ---
-### principios de design de software
-- cqs: Command Query Separation
-  - um método deve ou alterar o estado (Command) ou retornar uma informação (Query), mas não fazer os dois ao mesmo tempo.
-  - levar em conta consequencias que podem acontecer dado a complexidade do que estou construindo
-  - src/core/video/infra/db/sequelize/video-sequelize.repository.ts (.insert)
-  - cqrs
-    -  leva essa separação para uma arquitetura, podendo ter modelos, handlers/use cases, bancos ou fluxos separados.
-    - src/core/video/application/create-video/create-video.use-case.ts
-    - src/core/video/application/get-video/get-video.use-case.ts
-    - src/nest-modules/videos-module/videos.controller.ts
-- ocp: Open Closed Principle (Princípio Aberto-Fechado)
-  - aberto para extensão, mas fechado para modificação.
-  - src/core/shared/domain/validators/validation.error.ts
-    - herança
-    - permite criar novos tipos de erros estendendo a base, sem modificar a classe base.
-  - src/core/video/domain/banner.vo.ts
-  - src/core/shared/domain/validators/validation.error.ts
-- solid, poo
-  - srp
-    - usecase: execute, validação input
-    - repository: mapper, helper
-    - .validate dominio
-  - open/closed principle (OCP):
-    - class-validator: validação da entidade
-    - IRepository, ISearchableRepository
-      - filter
-    - SearchParams
-    - objeto de valor imageMedia abstract
-      - banner, thumbnail
-  - liskov substitution principle (LSP):
-    - garantir que subclasses possam substituir as superclasses sem alterar a corretude do comportamento do sistema
-  - interface segregation
-    - IRepository e ISearchableRepository separados
-  - d: dependecy inversion
-    - usecase
-      - constructor
-        - repository
-    - repository
-      - constructor
-        - sequelize
 
---- 
+
 ### design patterns
 - unit of work (design pattern)
   - Unit of Work coordena tudo que precisa acontecer junto para uma operação de domínio ser concluída de forma consistente. 
@@ -235,8 +300,9 @@ Neste projeto, podemos identificar vários Design Patterns (padrões de projeto)
   - src/nest-modules/event-module/event.module.ts
 
 --- 
+
 ### upload, storage, gcp
-- google cloud storage
+- storage - google cloude storage - assets(imagens, videos)
 - como foi usado nesse projeto?
   - upload do video, trailer, imagens
   - Processo de Upload e Publicação de Vídeos
@@ -259,6 +325,7 @@ Neste projeto, podemos identificar vários Design Patterns (padrões de projeto)
   - src/core/video/application/use-cases/update-video
 
 ---
+
 ### eventos
 - contextualizando, como os eventos foram usados nesse projeto
   1. Um funcionário ou administrador faz o upload do arquivo de áudio ou vídeo no microserviço de gestão de conteúdo.
@@ -336,8 +403,10 @@ Neste projeto, podemos identificar vários Design Patterns (padrões de projeto)
   - handlers consumers do rabbitmq sao diferentes do do core
   
 ---
+
 ### mensageria
 - rabbitmq
+  - comunicação assincrona, processamento assincrono com rabbitmq
   - exchange, fila, routing key, produtor, consumidor
   - @golevelup/nestjs-rabbitmq
     - lib usada para integrar com rabbitmq
@@ -409,6 +478,7 @@ Neste projeto, podemos identificar vários Design Patterns (padrões de projeto)
     - login: admin
 
 ----
+
 ### autenticacao e autorizacao
 - seguranca
 - fluxo
@@ -468,6 +538,7 @@ Neste projeto, podemos identificar vários Design Patterns (padrões de projeto)
     - node crypto/generate-token.js
 
 ----
+
 ### persistence layer
 - camada de infraestrutura de persistência.
   - É responsável por armazenar, recuperar e gerenciar dados persistentes da aplicação, independentemente do tipo de tecnologia utilizada (bancos, arquivos, filas, caches, buscadores).
@@ -494,6 +565,7 @@ Neste projeto, podemos identificar vários Design Patterns (padrões de projeto)
 - orm
   - sequelize: design pattern - active record
     - mysql, sqlite
+  - ORM significa Object-Relational Mapping (“Mapeamento Objeto-Relacional”): é uma técnica que permite manipular bancos de dados relacionais usando objetos nas linguagens de programação, facilitando a conversão entre dados do banco e objetos do código.
 - mapper
   - toDomain
   - toModel
@@ -527,6 +599,7 @@ Neste projeto, podemos identificar vários Design Patterns (padrões de projeto)
       - comandos de exemplo na seção mais abaixo
 
 ----
+
 ### clean architecture
   - interface adapters
     - presenters
@@ -556,8 +629,18 @@ Neste projeto, podemos identificar vários Design Patterns (padrões de projeto)
     - essencial, acidental
     src/core/video/application/use-cases/upload-audio-video-medias/upload-audio-video-medias.use-case.ts
 
+- construir o nucleo primeiro e deixar o mais puro possivel
+    - manter livre de tecnologia
+    - mantivel ao longo do tempo e independente de tecnologia
+    - consigo trocar os frameworks com essa estrategia, ex: nestjs, express, banco
+    - uncle bob - framework é detalhe
+
 ---
+
 ### hexagonal - ports and adapters
+Arquitetura Hexagonal: É um padrão arquitetural (ou estilo) que organiza o sistema inteiro, isolando o núcleo da aplicação (regras de negócio) de agentes externos como bancos de dados, interfaces gráficas e APIs por meio de portas (ports) e adaptadores (adapters).
+Escopo: a Arquitetura Hexagonal define as fronteiras e a direção das dependências de toda a aplicação. 
+- atua em um nível de abstração
 - repository
   - port: ICategoryRepository, repository-interface.ts
   - adapter: CategorySequelizeRepository, CategoryInMemoryRepository
@@ -570,6 +653,12 @@ Neste projeto, podemos identificar vários Design Patterns (padrões de projeto)
 - storage
   - port: src/core/shared/application/storage.interface.ts
   - adapter: src/core/shared/infra/storage/google-cloud.storage.ts
+
+---
+
+### Padrões GoF (Gang of Four) 
+Padrões GoF (Gang of Four): Focam em microdecisões de design, resolvendo problemas de colaboração, criação ou estrutura entre classes e objetos individuais (divididos em Criacionais, Estruturais e Comportamentais)
+Escopo: O GoF resolve problemas pontuais de código e orientação a objetos; 
 
 ---
 
@@ -604,6 +693,7 @@ Neste projeto, podemos identificar vários Design Patterns (padrões de projeto)
 - prettier (formatação automatica baseada nas regras)
 
 ---
+
 ### observabilidade
 - Observabilidade → capacidade de entender o estado interno de um sistema a partir dos dados que ele produz.
   - Logs → registros de acontecimentos.
@@ -667,6 +757,7 @@ Neste projeto, podemos identificar vários Design Patterns (padrões de projeto)
         - docker compose -f docker/docker-compose.elk.yaml exec codeflix-kibana curl http://codeflix-elasticsearch:9200
 
 ---
+
 ### ci, cdel, cdep
 - devops
 - Integração contínua — Continuous Integration (CI)
@@ -735,6 +826,7 @@ Neste projeto, podemos identificar vários Design Patterns (padrões de projeto)
     - cdep
 
 ---
+
 ### testes
 - tdd(test driven development), triple aaa(arrange, act, assert), piramidade de testes
 - Test Data Builder(Gof - criacional)
@@ -763,6 +855,7 @@ Neste projeto, podemos identificar vários Design Patterns (padrões de projeto)
   - npm run test:e2e:runInBand
   - ![Exemplo de teste E2E – execução e verificação](docs/teste-e2e.png)
 ----
+
 ### typescript
 - @types
   - extender interface
@@ -832,6 +925,7 @@ Neste projeto, podemos identificar vários Design Patterns (padrões de projeto)
   - proteger requisicao
 
 ----
+
 ### docker
 - como está organizado a config do docker?
 - docker-compose.yml
@@ -863,6 +957,7 @@ Neste projeto, podemos identificar vários Design Patterns (padrões de projeto)
     - admin
   - mapeia o volume keycloak, talvez quando iniciar nao precisar criar o realm, client, user
 ----
+
 ### como rodar o projeto
 
 - como executar o projeto localmente
@@ -1012,11 +1107,13 @@ select * from SequelizeMeta;
 ```
 
 ----
+
 ### como rodar o projeto em producao
 - todo -> deploy
   - github action so faz ci, cdel
   - a imagem de producao nao precisa redirecionar o stdout, pois o processo principal eh o nest
 ---
+
 projeto pai:
 [Link para o projeto pai](https://github.com/iamfelipy/fc3-codeflix-netflix)
 ---
