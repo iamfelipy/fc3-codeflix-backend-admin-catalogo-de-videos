@@ -6,6 +6,8 @@ import { ModuleRef } from '@nestjs/core';
 import { ProcessAudioVideoMediasUseCase } from '@core/video/application/use-cases/process-audio-video-medias/process-audio-video-medias.use-case';
 import { RabbitmqConsumeErrorFilter } from '../rabbitmq-module/rabbitmq-consume-error/rabbitmq-consume-error.filter';
 
+// @UseFilters() aceita uma instância do filtro ou a classe. Aqui você passa a classe:
+// O Nest usa essa classe como token para localizar o provider e obter uma instância, permitindo injetar AmqpConnection no construtor.
 @UseFilters(RabbitmqConsumeErrorFilter)
 @Injectable()
 export class VideosConsumers {
@@ -45,6 +47,7 @@ export class VideosConsumers {
         // indica a origem dos dados a serem validados.
         type: 'body',
       });
+      // ModuleRef.resolve() permite buscar/criar providers em tempo de execução;
       const useCase = await this.moduleRef.resolve(
         ProcessAudioVideoMediasUseCase,
       );

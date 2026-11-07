@@ -33,6 +33,7 @@ export class RabbitmqConsumeErrorFilter implements ExceptionFilter {
       );
 
     if (hasRetriableError) {
+      // Nack sinaliza ao RabbitMQ que a mensagem não foi processada com sucesso. Você pode configurar se ela deve voltar para a fila (requeue) ou ser descartada/encaminhada para uma dead-letter queue.
       return new Nack(false);
     }
 
@@ -46,8 +47,11 @@ export class RabbitmqConsumeErrorFilter implements ExceptionFilter {
     );
 
     if (this.shouldRetry(message.properties.headers)) {
+      // Nesse fluxo, a mensagem atual é confirmada (ack) após retry() publicar a cópia na exchange direct.delayed. O await só espera a publicação.
+      // A nova mensagem mantém o conteúdo e recebe o atraso de 5 segundos e o contador atualizado.
       await this.retry(message);
     } else {
+      // /encaminha para a dead-letter queue
       return new Nack(false);
     }
   }
