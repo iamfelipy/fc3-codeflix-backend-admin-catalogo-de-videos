@@ -21,6 +21,7 @@ Execução:
   orientações finais (como rodar o projeto).
 
 ---
+
 ### apresentacao do projeto
 - Aplicação backend administrativa do catálogo de vídeos do sistema Codeflix (inspirado na Netflix).
   - Backend: processa regras de negócio e dados, fornecendo APIs e serviços para outros consumirem, sem interação direta com o usuário final.
@@ -32,6 +33,7 @@ Execução:
 - Principais tecnologias utilizadas: TypeScript, NestJS, MySQL/SQLite, Sequelize(ORM), RabbitMQ(mensageria) e Google Cloud Storage.
 
 ---
+
 ### documentacao, arquitetura, design
 
 <details>
@@ -556,10 +558,13 @@ gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener ->
 - princípios específicos  
   - cqs: Command Query Separation
     - métodos ou operações devem ser ou comandos (alteram o estado) ou queries (só consultam dados), nunca ambos.
-    - insert, find
+    - insert, findById
       - src/core/video/infra/db/sequelize/video-sequelize.repository.ts
   - ocp: Open Closed Principle (Princípio Aberto-Fechado)
     - componentes devem permitir (extensão) sem alterar seu código original (modificação).
+    - composicao
+    - heranca
+    - ...
   - solid, poo
     - srp
       - uma classe deve ter apenas um motivo para mudar — ou seja, uma única responsabilidade. 
@@ -612,85 +617,84 @@ gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener ->
           - constructor
             - sequelize
   - modularizacao
-    - organizar o sistema em partes com responsabilidade clara, alta coesão e baixo acoplamento.
-    - resultado de outros princípios
-    - Separação de concerns (separation of concerns(interesse))
-      - core vs nest-modules
-    - baixo acoplamento: 
-      - ex: use case depende de contrato, não de Sequelize
-    - alta coesão: 
-      - ex: modulo no core
+    -  organizar o sistema em módulos, agrupando artefatos relacionados e definindo limites e interfaces entre eles.
+      - coesao
+    - ex
+      - /core e /nest-modules
+      - /video
+      - /video-module
+  - inversao de controle
+    - Inversão de Controle (IoC): princípio em que um componente deixa de controlar diretamente parte do fluxo ou da criação de dependências; esse controle passa para outro componente ou framework.
+      - Nativo do NestJS, injetando serviços, repositórios e casos de uso via construtores e provedores (providers/useFactory).
+      - Injeção de Dependência (DI): técnica de IoC em que um objeto recebe suas dependências de fora, por exemplo, pelo construtor.
+        - design pattern
+      - Inversão de Dependência (DIP): princípio do SOLID: módulos de alto nível e de baixo nível devem depender de abstrações, não diretamente uns dos outros.
 
 --- 
 
-### Design Patterns (padrões de projeto)
-Neste projeto, podemos identificar vários Design Patterns (padrões de projeto) e padrões arquiteturais consolidados:
-
-   1. Repository Pattern (Padrão Repositório):
-      - Abstração da camada de persistência de dados (ex: VideoRepository, CategoryRepository, GenreRepository), desacoplando as regras de negócio do ORM (Sequelize) ou
-        armazenamento em memória.
-
-   2. Factory Pattern (Padrão Fábrica):
-      - Uso de métodos estáticos de criação (ex: Category.create(...), Video.fake()) e Builders (ex: CategoryFakeBuilder) para instanciar agregados e entidades complexas de
-        forma controlada.
-
-   3. Dependency Injection (Injeção de Dependência):
-      - Nativo do NestJS, injetando serviços, repositórios e casos de uso via construtores e provedores (providers/useFactory).
-
-   4. Decorator Pattern (Padrão Decorator):
-      - Uso extensivo de decorators do NestJS e class-validator (ex: @Controller, @Get, @Post, @UseGuards, @Inject, @Param, @Body, @IsUUID).
-
-   5. Unit of Work (Unidade de Trabalho):
-      - Gerenciamento de transações de banco de dados de forma atômica (ex: UnitOfWorkSequelize).
-
-   6. Presenter Pattern (Padrão Apresentador / Serialização):
-      - Transformação de objetos de domínio/saída de casos de uso em estruturas serializadas para a API (ex: CategoryPresenter, VideoCollectionPresenter).
-
-   7. Command / Use Case Pattern (Padrão Caso de Uso):
-      - Encapsulamento de cada operação de negócio em uma classe dedicada de Caso de Uso que implementa uma interface comum IUseCase (Clean Architecture / DDD).
-
-   8. Observer / Event-Driven Pattern (Eventos de Domínio e Mensageria):
-      - Uso de brokers de mensagens (RabbitMQ) e manipuladores de eventos para processamento assíncrono (ex: VideosConsumers, handlers de mídia).
-    
-- adapter
-  - Adaptador: componente que faz a conversão entre interfaces incompatíveis, permitindo que dois componentes se comuniquem. Muitas vezes ligam a aplicação a uma servicos externos, como RabbitMQ ou GCS, mas também podem adaptar componentes internos entre si.
-    - Conversão: transformação de algo de uma forma para outra.
-  - API - Application Programming Interface  
-    - Interface de Programação de Aplicações.
-    - API é uma interface específica: define como um programa pode usar outro programa, geralmente por operações, mensagens ou endpoints.
-    - Interface: contrato que define como um componente pode ser usado ou acessado.
-      - Interface é qualquer ponto de contato ou contrato entre componentes. 
-
-### design patterns
-- Design patterns são soluções nomeadas para problemas recorrentes de design.
-  - “Mecanismo” pode significar como algo funciona ou as partes que fazem isso funcionar.
-  - Mecanismo é a lógica geral de como as partes colaboram. Implementação concreta é o código específico que realiza essa lógica, com uma linguagem ou biblioteca.
-- unit of work (design pattern)
-  - Unit of Work coordena tudo que precisa acontecer junto para uma operação de domínio ser concluída de forma consistente. 
-  - video aggregate
-  - trasanction sequelize
-  - events 
+### livro Patterns of Enterprise Application Architecture, de Martin Fowler (2002).
+- Padrões de arquitetura de aplicações empresariais
+- Padrões arquiteturais orientam a estrutura maior do sistema e como suas partes se organizam.
+- repository
+  - separa o acesso e a persistência dos dados das regras de negócio, oferecendo uma interface para buscar e salvar entidades sem expor detalhes do banco ou ORM.
+    - abstrair, desacoplar
+    - src/core/video/domain/video.repository.ts
+    - src/core/shared/domain/repository/repository-interface.ts
+- unit of work
+  - Mantém uma lista dos objetos afetados por uma transação de negócio, coordena a gravação das alterações e resolve problemas de concorrência.” Martin Fowler — Unit of Work
   - src/core/shared/infra/db/sequelize/unit-of-work-sequelize.ts
-- mediator
-  - O Mediator serve para reduzir o acoplamento entre objetos: em vez de cada objeto conversar diretamente com vários outros, eles se comunicam por meio de um mediador que coordena as interações.
-  - src/core/shared/domain/events/domain-event-mediator.ts
-  - Vem do livro Design Patterns: Elements of Reusable Object-Oriented Software (1994), de Gamma, Helm, Johnson e Vlissides — conhecido como o livro da Gang of Four. O Mediator está entre os padrões comportamentais
-- adapter
-  - Ele serve para integrar interfaces incompatíveis, permitindo que classes com APIs diferentes trabalhem juntas.
-  - storage
-    - src/core/shared/infra/storage/google-cloud.storage.ts
-       - Ele implementa a interface IStorage e adapta o SDK do Google Cloud Storage para o formato esperado pela aplicação.
-- Observer
-  - O Observer é um padrão comportamental: um objeto se inscreve para receber notificações quando outro objeto publica mudanças ou eventos.
-  - EventEmitter2 permite registrar handlers para eventos e chamá-los quando esses eventos são emitidos — um mecanismo semelhante ao padrão Observer.
-- Observable
-  - No RxJS é um tipo que representa um fluxo de valores ao longo do tempo.
+    - No projeto, o Unit of Work gerencia a transação do banco: inicia, confirma ou desfaz as alterações, enquanto os repositórios fazem as gravações dentro dela. O IUnitOfWork define o contrato, e o UnitOfWorkSequelize o implementa usando o Sequelize. Assim, a aplicação depende da abstração, não diretamente do ORM. O Unit of Work também registra agregados envolvidos no fluxo de eventos. Seu método do() executa um callback dentro de uma transação. No fluxo com ApplicationService, ele coordena a execução do callback e chama o Unit of Work para iniciar ou encerrar a transação.
+    - start, do, commit, rollback
+  - conceitos
+    - Transação: conjunto de operações tratado como uma unidade.
+    - Negócio: atividade que o sistema realiza, como cadastrar um vídeo.
+    - Transação de negócio: conjunto de operações que realiza uma atividade do sistema.
+    - Atomicidade: garantir que as operações sejam aplicadas por completo ou que nenhuma seja aplicada.
+    - Coordena: organiza quando e como as alterações são gravadas no banco.
+    - Concorrência: situação em que operações simultâneas tentam alterar os mesmos dados, podendo gerar conflitos
+  - extra
+    - a implementação usa o nome Unit of Work, mas seu papel principal aqui é controlar a transação do banco e reunir agregados para eventos — não implementar por completo a descrição clássica do Fowler.
+    - O Unit of Work aparece em Patterns of Enterprise Application Architecture, de Martin Fowler (2002). Fowler o descreve como um padrão que acompanha as alterações feitas durante uma transação de negócio. Referência do Fowler
 
----
 
-### Padrões GoF (Gang of Four) 
-Padrões GoF (Gang of Four): Focam em microdecisões de design, resolvendo problemas de colaboração, criação ou estrutura entre classes e objetos individuais (divididos em Criacionais, Estruturais e Comportamentais)
-Escopo: O GoF resolve problemas pontuais de código e orientação a objetos; 
+--- 
+
+### livro Design Patterns: Elements of Reusable Object-Oriented Software, da Gang of Four (GoF)
+- design patterns são soluções recorrentes para problemas específicos.
+  - tratam de soluções em partes menores do software
+- Padrões GoF (Gang of Four):
+  - Gof-> Focam em microdecisões de design, resolvendo problemas de colaboração, criação ou estrutura entre classes e objetos individuais (divididos em Criacionais, Estruturais e Comportamentais)
+  - padrao criacional
+    - abstraem o processo de criação de objetos.
+    - Factory Pattern
+      - centraliza a criação de objetos, escondendo os detalhes de como são construídos.
+      - src/core/category/domain/category.aggregate.ts
+        - metodo estatico de criacao
+      - src/core/category/domain/category-fake.builder.ts
+        - builder
+        - testes
+  - padrao estrutural
+    -  tratam da composição de classes e objetos para formar estruturas maiores.
+    - adapter
+      - componente que faz a conversão entre interfaces incompatíveis, permitindo que dois componentes se comuniquem.
+      - src/core/shared/infra/storage/google-cloud.storage.ts
+        - Ele implementa a interface IStorage e adapta o SDK do Google Cloud Storage para o formato esperado pela aplicação.
+  - padrao comportamental
+    - tratam da interação e da distribuição de responsabilidades entre objetos.
+    - mediator
+      - define um objeto que encapsula como um grupo de objetos interage.
+      - envolve objetos se comunicando indiretamente
+      - o foco é coordenar interações
+      - serve para reduzir o acoplamento entre objetos
+      - src/core/shared/domain/events/domain-event-mediator.ts
+        - Então, o DomainEventMediator atua como mediador do despacho: o agregado não precisa conhecer os handlers. O EventEmitter2 é o mecanismo que mantém as inscrições e notifica esses handlers — comportamento associado ao Observer.
+        - appService, domainEventMediator, unit of work, repository, agregado, events, handlers
+        - nestjs usa eventEmitter2 pra registrar eventos e handlers de forma facil
+    - observer
+      - um objeto publica uma mudança e seus inscritos são notificados.
+      - EventEmitter2 permite registrar handlers para eventos e chamá-los quando esses eventos são emitidos.
+        - mecanismo
+      - é um padrão comportamental
 
 ---
 
@@ -715,6 +719,11 @@ Escopo: O GoF resolve problemas pontuais de código e orientação a objetos;
 - shared kernel
   - Shared Kernel é um conceito do Domain-Driven Design, descrito por Eric Evans em Domain-Driven Design. É uma parte do modelo e do código compartilhada entre equipes ou contextos, com mudanças coordenadas.
   - src/core/shared
+- appService
+  - src/core/shared/application/application.service.ts
+  - a ideia venha do padrão Service Layer, descrito por Martin Fowler em Patterns of Enterprise Application Architecture. Esse padrão coloca operações da aplicação numa camada que coordena as tarefas necessárias para atendê-las. Martin Fowler — Service Layer
+  - “O Unit of Work acompanha as alterações de uma operação de negócio e coordena sua persistência no banco. Neste projeto, o UnitOfWorkSequelize usa uma transação do Sequelize e também registra agregados para o despacho de eventos. Os repositórios fazem as gravações usando essa transação.
+  - No fluxo de upload, o ApplicationService inicia o Unit of Work, executa o callback e, ao final, confirma ou desfaz a transação. Depois do commit, coordena o despacho dos eventos de integração. Assim, o caso de uso não depende diretamente da API de transações do Sequelize.”
 
 --- 
 
@@ -830,6 +839,9 @@ Escopo: O GoF resolve problemas pontuais de código e orientação a objetos;
   - sequelize: design pattern - active record
     - mysql, sqlite
   - ORM significa Object-Relational Mapping (“Mapeamento Objeto-Relacional”): é uma técnica que permite manipular bancos de dados relacionais usando objetos nas linguagens de programação, facilitando a conversão entre dados do banco e objetos do código.
+  - padrao de persistencia
+    - Active Record: o objeto combina os dados com métodos para salvar, atualizar ou excluir a si mesmo.
+    - Data Mapper: um componente separado faz a conversão entre os objetos de domínio e as tabelas do banco.
 - mapper
   - toDomain
   - toModel
@@ -1150,6 +1162,8 @@ Este projeto aplica várias metodologias do The Twelve-Factor App:
   - ao carregar o eventEmitter2 do pacote nest, ele registra o servico de forma global no container de servicos
 - guard
   - proteger requisicao
+- Observable
+  - No RxJS é um tipo que representa um fluxo de valores ao longo do tempo.
 
 ----
 
