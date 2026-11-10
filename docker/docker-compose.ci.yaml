@@ -9,8 +9,9 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - '/etc/timezone:/etc/timezone:ro'
-      - '/etc/localtime:/etc/localtime:ro'
+      # estao comentadas pois no github actions esta dando erro
+      #- '/etc/timezone:/etc/timezone:ro'
+      #- '/etc/localtime:/etc/localtime:ro'
       - ../envs:/home/node/app/envs
     extra_hosts:
       - "host.docker.internal:host-gateway"
