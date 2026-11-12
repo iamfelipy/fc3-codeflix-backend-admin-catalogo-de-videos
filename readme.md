@@ -1,156 +1,153 @@
 # Microserviço de Administração do Catálogo de Vídeo do Sistema Codeflix
 
+### apresentacao do projeto
+- Aplicação backend administrativa do catálogo de vídeos do sistema Codeflix (inspirado na Netflix).
+  - <details>
+    <summary><strong>termos</strong> </summary>
+
+    <ul>
+      <li><strong>Backend:</strong> processa regras de negócio e dados, fornecendo APIs e serviços para outros sistemas.</li>
+      <li><strong>Administrativo:</strong> relacionado à administração e ao gerenciamento de atividades e recursos.</li>
+      <li><strong>Gerenciamento:</strong> organização e controle de recursos ou tarefas para alcançar um objetivo.</li>
+      <li><strong>Catálogo:</strong> conjunto organizado de itens que podem ser consultados ou escolhidos.</li>
+    </ul>
+  </details>
+- Construído durante o curso Full Cycle 3.
+
+- Principais tecnologias: TypeScript, NestJS, MySQL/SQLite, Sequelize(ORM), RabbitMQ(mensageria), Docker, Jest e Google Cloud Storage.
+
+---
+
 ### sumario
 - [apresentacao do projeto](#apresentacao-do-projeto)
-Documentação/Design: 
-  explique DDD, C4, event storming, hexagonal, princípios de design.
-Características do projeto: 
-  visão geral, tecnologias, arquitetura.
-Etapas de construção: 
-  descreva seu processo (modelagem, core, testes, integração etc.).
-
+- [event storming](#event-storming)
+- [c4](#c4)
+- [domain-driven design](#domain-driven-design)
 - [Estilos e padroes arquiteturais](#estilos-e-padroes-arquiteturais)
 - [Arquitetura orientada a eventos](#arquitetura-orientada-a-eventos)
 - [Mensageria - comunicacao assincrona e processamento assincrono](#mensageria---comunicacao-assincrona-e-processamento-assincrono) 
+- [Princípios de design](#principios-de-design)
+- [Patterns of Enterprise Application Architecture](#livro-patterns-of-enterprise-application-architecture-de-martin-fowler-2002)
+- [Design Patterns: Elements of Reusable Object-Oriented Software](#livro-design-patterns-elements-of-reusable-object-oriented-software-da-gang-of-four-gof)
 
-Implementação técnica: 
-  detalhar cada seção do sumário da imagem (nestjs, docker, testes, mensageria, eventos etc.).
+
 Boas práticas: 
   validações, tratamento de erros, observabilidade, CI/CD, configurações de qualidade.
 Execução: 
   orientações finais (como rodar o projeto).
 
----
-
-### apresentacao do projeto
-- Aplicação backend administrativa do catálogo de vídeos do sistema Codeflix (inspirado na Netflix).
-  - Backend: processa regras de negócio e dados, fornecendo APIs e serviços para outros consumirem, sem interação direta com o usuário final.
-  - administrativa: organização e ao gerenciamento de atividades, recursos ou pessoas.
-    - Gerenciamento: atividade de organizar e controlar recursos ou tarefas para alcançar um objetivo.
-  - Catálogo: conjunto organizado de itens, apresentado para que possam ser conhecidos, consultados ou escolhidos.
-- Construído durante o curso Full Cycle 3.
-
-- Principais tecnologias utilizadas: TypeScript, NestJS, MySQL/SQLite, Sequelize(ORM), RabbitMQ(mensageria) e Google Cloud Storage.
 
 ---
 
-### documentacao, arquitetura, design
+### event storming
 
+- Técnica de modelagem colaborativa para entender processos de negócio e domínio
+<details>
+  <summary>
+    diagrama event storming<br>
+    Domínio: streaming de vídeo<br>
+    <small>Imagem (clique para expandir)</small><br>
+  </summary>
+  <img src="docs/event-storming-contextos.png" alt="Contextos Event Storming" style="max-width:100%; margin-top:10px;">
+</details>  
+<a href="https://whimsical.com/felipy-s-workspace/event-storming-RYPkBfeTH251u5Fk4e7JQV@6HYTAunKLgTX1VPDZZjEEoTC6AqBfhF1vnb4Yo2fTv8r31o" target="_blank">Diagrama interativo no Whimsical</a><br>
+
+---
+
+### c4
+- Utilizado para descrever a arquitetura do sistema em diferentes níveis de detalhe visual.
 <details>
   <summary>
     <strong>Diagrama C4</strong> (níveis de container e contexto)<br/>
-    Utilizado para descrever a arquitetura do sistema em diferentes níveis de detalhe visual.<br>
-    <small>Imagem (clique para expandir)</small>
+    <small>Imagem (clique para expandir)</small><br>
   </summary>
   <img src="docs/c4-model-baixa-amplitude.png" alt="Diagrama C4 - Baixa Amplitude" style="max-width:100%; margin-top:10px;">
   <img src="docs/c4-model-ampla.png" alt="Diagrama C4 - Ampla" style="max-width:100%; margin-top:10px;">
 </details>
 <br>
 
-**Design Docs**  
-  Design docs são documentos que detalham a arquitetura, decisões técnicas, fluxos e estruturas do sistema. Eles servem para alinhar o time de desenvolvimento e são referência durante a implementação e manutenção do projeto.  
-
-### etapas de construção da aplicação backend
-- Montagem do ambiente de desenvolvimento (Docker e IDE)
-- modelar o core(regras de negocio, ...) antes de ir para o framework nestjs, usando ddd e clean archtecture
-- criar uma pasta shared(logica compartilhavel)
-- Criar uma aplicação TypeScript (core)
-  - Criar entidade de Categoria
-  - Criar testes (pirâmide de testes)
-    - unitario, integração
-  - Criar Casos de Uso e Repositório
-  - Nest.js - Criação de API Rest
-  - Criar testes e2e (end-to-end)
-  - Repetir para as outras entidades, cast member, genre, video
-- Integração com RabbitMQ e Encoder de vídeo
-- keycloak
-- logs
-  - rastrear comportamento
-- CI
-  - esteira no github actions
-  - docker file para produção
-      - imagem menor, otimizada
-      - vai ser usada no cd
 ---
 
-### DDD
-  - entities, aggregates
-    - category
-      - Categoria: um conjunto de coisas agrupadas porque compartilham uma característica geral em comum.
-      - Categoria = onde algo se encaixa pelo tipo geral.
-      - Categoria olha para a classe/espécie da coisa.
-      - Categoria agrupa pela natureza/tipo.
-      - filme, documentário, infantil
-    - cast-members
-      - "membro do elenco", uma pessoa (ator, atriz, diretor, etc.) que faz parte da produção de um filme, série ou peça.
-    - genre
-      - Gênero: uma categoria mais específica usada para agrupar coisas que compartilham características de estilo, estrutura ou padrão.
-      - Gênero = o estilo/padrão que algo segue dentro de uma categoria.
-      - Gênero agrupa pela forma/estilo/padrão.
-      - Filme → gênero: terror, comédia, ação, drama
+### domain-driven design
+
+**Domain-Driven Design (DDD)**
+  - é uma abordagem de desenvolvimento de software, baseada em um conjunto de princípios, que organiza o projeto em torno das regras e necessidades do negócio, colocando o modelo do domínio no centro. A ideia é entender bem o domínio e representar seus conceitos de forma coerente no código — por exemplo, em um sistema de catálogo de vídeos, conceitos como vídeo, categoria e publicação.
+  - Esse modelo é uma abstração seletiva do conhecimento do negócio, construída e refinada em colaboração entre especialistas do domínio e desenvolvedores. Assim, as decisões de desenvolvimento são guiadas pelo domínio, em vez de a tecnologia definir a estrutura do sistema.
+  - abordagem, principios, modelagem rica
+
+**divisoes do dominio**
+
+| Domínio | Classificação |
+|---|---|
+| Administração de vídeos | Auxiliar |
+| Catálogo de vídeos | Principal |
+| Gestão de planos e assinaturas | Auxiliar |
+| Pagamentos | Genérico |
+| Conversão de vídeos | Genérico |
+
+- **Domínio principal:** representa a área central do negócio, que diferencia o produto no mercado.
+- **Domínio auxiliar:** oferece funcionalidades necessárias para o negócio principal, mas não representa seu diferencial competitivo.
+- **Domínio genérico:** representa funcionalidades comuns a diferentes tipos de negócios, que podem ser resolvidas com soluções existentes no mercado.
+
+No contexto de DDD (Domain-Driven Design), essa classificação ajuda a decidir onde concentrar esforços de desenvolvimento e quais partes podem utilizar soluções prontas.
+
+
+**Alguns elementos comuns do DDD:**
+
+- Linguagem ubíqua: linguagem compartilhada entre desenvolvedores e especialistas do negócio, usando os mesmos termos e significados para representar o domínio do sistema.
+  - Ubíqua: algo que está presente em todos os lugares ou aparece em muitos contextos.
+- Regras de negócio no domínio: ficam próximas aos objetos e processos que elas governam, em vez de espalhadas pela aplicação.
+
+- DDD tático: blocos do modelo de domínio (The Building Blocks of a Model-Driven Design)
+  - São padrões usados para representar o domínio no código.
+    - Tático: voltado à execução prática de uma estratégia.
+      - Prática é aquilo que se faz ou aplica na realidade, em vez de ficar só na teoria.
+    - Bloco: parte que, junto de outras, forma algo maior.
+    - Modelo: representação simplificada de algo real.
+    - Domínio: área do problema ou negócio que o sistema atende.
+    - Padrão: solução recorrente para um problema comum.
+  - Entidades e agregados
+    - representam conceitos e regras do domínio.
+    - Category: agrupa conteúdos pela natureza ou tipo geral — por exemplo, filme, documentário ou infantil.
+    - Cast Member: pessoa que participa de uma produção, como ator, atriz ou diretor.
+    - Genre: agrupa conteúdos pelo estilo ou padrão — por exemplo, terror, comédia, ação ou drama.
       - Estilo é o modo particular de fazer, expressar ou apresentar algo, caracterizado por traços distintivos que diferenciam um autor, obra, período ou grupo.
-    - video
-      - video: significa registro ou exibição de imagens em movimento, geralmente acompanhado de som.
-  - object value
-    - uuid, search-params, search-result, cast-member-type, 
-    - rating
-        - classificação" é a categoria atribuída ao conteúdo, enquanto "faixa etária" é o intervalo ou limite de idades ao qual essa categoria se aplica.
-    - imageMedia
-      - banner, thumbnail-half, thumbnail
-    - audiovideomedia
-      - video principal, trailer
-  - repository
-    - category
-    - cast-member
-  - shared kernel
-    - src/core/shared
-  - eventos de dominio e integracao
-    - src/core/video/domain/domain-events/video-audio-media-replaced.event.ts
-  - encapsulamento
-    - src/core/cast-member/domain
-      - As regras de validação e o estado crítico das regras de negócio são mantidos dentro do domínio. Os objetos protegem seus invariantes através de validadores dedicados e classes base (Entity, ValueObject).
-        - Regra de negócio: condição ou critério que define como o negócio funciona.
-        - Invariante: condição que deve permanecer verdadeira em determinado estado do sistema.
-  - Imutabilidade (Imutability):
-    - Imutabilidade: um valor não pode ser alterado depois de criado.
-      - Como funciona: para representar um novo valor, cria-se outro objeto.
-      - Finalidade: evitar que uma alteração em um lugar afete inesperadamente outras partes do sistema.
-    - src/core/cast-member/domain/cast-member-type.vo.ts
-      - Forte utilização de Value Objects (Uuid, Rating, Banner, AudioVideoMedia, etc.). 
-  - Bounded context não é uma pasta. Também não é src/core/category nem “tudo que está em core” como se fosse um módulo isolado.
-    - É o limite do modelo e da linguagem. Neste repositório o contexto é um só: administração do catálogo de conteúdo. O microserviço inteiro (API + core + Nest) é esse contexto.
-    - O que você vê em src/core são módulos / agregados dentro do mesmo contexto
-    - Outro bounded context seria outro serviço, com outro vocabulário. No Codeflix
-      - Admin catálogo (este repo)
-      - Encoder / processamento de mídia
-      - Catálogo de exibição (frontend)
-      - Identidade
-  - validacao
-      - src/core/shared/domain/validators/validator-fields-interface.ts
-      - src/core/shared/domain/validators/class-validator-fields.ts
-        - empacota a lib class-validator.
-      - src/core/video/domain/video.validator.ts
-      - src/core/video/domain/video.aggregate.ts
+    - Video: representa o conteúdo audiovisual do sistema.
+      - significa registro ou exibição de imagens em movimento, geralmente acompanhado de som.
+    - Observação: um agregado é um conjunto de objetos do domínio tratado como uma unidade, com uma entidade principal que protege suas regras.
+  - Objetos de valor
+    - Representam valores do domínio sem identidade própria e, em geral, são imutáveis.
+    - Exemplos: Uuid, Rating, SearchParams, SearchResult, CastMemberType, ImageMedia — banner, thumbnail e thumbnail-half — e AudioVideoMedia — vídeo principal e trailer.
+    - Rating expressa uma classificação atribuída ao conteúdo; a faixa etária indica o intervalo ou limite de idade relacionado a essa classificação.
+  - Repositórios
+    - Oferecem operações para recuperar e persistir agregados, abstraindo os detalhes de armazenamento.
+    - Exemplos no projeto: repositórios de Category e CastMember.
+  - Eventos
+    - Eventos de domínio representam algo relevante que aconteceu dentro do domínio.
+    - Eventos de integração comunicam acontecimentos entre contextos ou serviços.
+    - Exemplo de arquivo: src/core/video/domain/domain-events/video-audio-media-replaced.event.ts. 
 
-<details>
-  <summary><strong>Event Storming</strong><br>
-    <em>Técnica de modelagem colaborativa para entender processos de negócio e domínio</em><br>
-    <strong>Domínio:</strong> <em>streaming de vídeo</em><br>
-    <a href="https://whimsical.com/felipy-s-workspace/event-storming-RYPkBfeTH251u5Fk4e7JQV@6HYTAunKLgTX1VPDZZjEEoTC6AqBfhF1vnb4Yo2fTv8r31o" target="_blank">Diagrama interativo no Whimsical</a><br>
-    <small>Imagem (clique para expandir)</small>
-  </summary>
-  <img src="docs/event-storming-contextos.png" alt="Contextos Event Storming" style="max-width:100%; margin-top:10px;">
-</details>  
-<br>
+- Princípios de modelagem e implementação
+  - Encapsulamento: as regras de validação e o estado crítico ficam protegidos dentro do domínio. Entidades e objetos de valor mantêm seus invariantes usando validadores e classes-base como Entity e ValueObject.
+    - Regra de negócio: condição ou critério que define como o negócio funciona.
+    - Invariante: condição que precisa continuar verdadeira em determinado estado do sistema.
+    - Exemplos: src/core/cast-member/domain e src/core/video/domain/video.aggregate.ts.
+  - Imutabilidade: um objeto de valor não é alterado depois de criado. Para representar outro valor, cria-se outro objeto. Isso ajuda a evitar alterações inesperadas em outros pontos do sistema.
+    - Exemplo: src/core/cast-member/domain/cast-member-type.vo.ts.
+    - Outros exemplos de objetos de valor no projeto: Uuid, Rating, Banner e AudioVideoMedia.
+  - Validação: verifica se os dados e estados respeitam os critérios definidos pelo domínio.
+    - src/core/shared/domain/validators/validator-fields-interface.ts
+    - src/core/shared/domain/validators/class-validator-fields.ts — adapta a biblioteca class-validator.
+    - src/core/video/domain/video.validator.ts
+    - src/core/video/domain/video.aggregate.ts
 
-DDD  
-DDD é uma abordagem de modelagem/arquitetura 
-detalhando como o domínio e as decisões de modelagem foram aplicados no projeto
-
-- utlizando conceitos de uma modelagem mais rica, facilita o entendimento da arquitetura em camadas do software de forma mais madura
-- ddd: domain driven design
-  - design tatico
-    - entidade, objeto de valor, repository
+- Organização do modelo
+  - Shared Kernel: parte do modelo compartilhada por diferentes módulos do contexto.
+    - Exemplo: src/core/shared.
+  - Bounded Context: limite dentro do qual o modelo e a linguagem têm um significado definido. Não é uma pasta específica, nem apenas src/core/category ou tudo que está em core.
+    - Neste repositório, o contexto é a administração do catálogo de conteúdo. A API, o core e a camada Nest fazem parte desse contexto.
+    - Os módulos em src/core são partes do modelo dentro desse contexto.
+    - Outros contextos possíveis no Codeflix: processamento de mídia/encoder, catálogo de exibição...
 
 ---
 
@@ -262,9 +259,10 @@ detalhando como o domínio e as decisões de modelagem foram aplicados no projet
 - A arquitetura orientada a eventos organiza a comunicação em torno de acontecimentos: um componente publica que algo ocorreu, e outros componentes interessados reagem. Isso desacopla os componentes, pois quem publica o evento não precisa conhecer diretamente quem vai tratá-lo.
   - Desacoplar significa reduzir a dependência entre partes de um sistema, para que uma possa mudar ou funcionar sem exigir mudanças na outra.
 - **contextualizando: uma das formas de utilização dos eventos neste projeto é o processamento assíncrono de mídias.**
-  - O frontend precisa conseguir iniciar a reprodução antes que o vídeo inteiro seja baixado. Por isso, após receber o MP4 enviado pelo administrador, o encoder o converte em segmentos MPEG-TS e gera uma playlist HLS, que permite transmitir o vídeo em partes.
+  - O frontend precisa conseguir iniciar a reprodução antes que o vídeo inteiro seja baixado. Por isso, após receber o MP4 enviado pelo administrador, o encoder prepara o conteúdo para streaming MPEG-DASH: divide a mídia em segmentos e gera um manifesto MPD, que descreve as representações e os segmentos disponíveis para o player.
     - O MP4 costuma ser usado como formato de entrada por ser comum e prático para quem envia vídeos, por exemplo, a partir de ferramentas de gravação e edição.
-  - Quando um administrador envia uma mídia MP4, o arquivo é armazenado no GCS. O caso de uso atualiza o agregado Video, que registra um evento de domínio; o repositório adiciona o agregado ao UnitOfWork. O ApplicationService usa o DomainEventMediator para despachar os eventos. Após o commit, o evento de domínio gera um evento de integração, que um handler publica no RabbitMQ. O serviço de encoding consome esse evento, processa a mídia — por exemplo, convertendo MP4 para MPEG — e publica o resultado. O consumidor recebe o resultado e atualiza o vídeo. Quando todas as mídias obrigatórias foram processadas, o agregado pode marcá-lo como publicado.
+    - MPEG-DASH é um padrão de streaming adaptativo: descreve como dividir e entregar o vídeo em segmentos via HTTP, permitindo ao player alternar entre qualidades.
+  - Quando um administrador envia uma mídia MP4, o arquivo é armazenado no GCS. O caso de uso atualiza o agregado Video, que registra um evento de domínio; o repositório adiciona o agregado ao UnitOfWork. O ApplicationService usa o DomainEventMediator para despachar os eventos. Após o commit, o evento de domínio gera um evento de integração, que um handler publica no RabbitMQ. O serviço de encoding consome esse evento, processa a mídia — por exemplo, convertendo MP4 para MPEG-DASH — e publica o resultado. O consumidor recebe o resultado e atualiza o vídeo. Quando todas as mídias obrigatórias foram processadas, o agregado pode marcá-lo como publicado.
 - **tipos de eventos no DDD**
   - evento de domínio (Domain Event):
     - representa um acontecimento relevante dentro do próprio bounded context (contexto delimitado).
@@ -422,7 +420,7 @@ Também implementei mecanismos de tratamento de falhas, com retry e Dead Letter 
 - Escalabilidade: possibilidade de executar os consumidores em processos separados da API HTTP.
 
 resumo do fluxo:  
-gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener -> producer -> mensagem -> rabbitmq -> consumer -> microservico-go -> mp4 -> codificar -> mpeg -> bucket -> producer -> rabbitmq -> consumer -> gestao de conteudo -> encoded_location 
+gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener -> producer -> mensagem -> rabbitmq -> consumer -> microservico-go -> mp4 -> codificar -> segmentos + manifesto MPD (MPEG-DASH) -> bucket -> producer -> rabbitmq -> consumer -> gestao de conteudo -> encoded_location 
 
 **Modelos de mensageria**
 - Message Queue: mensagens vão para uma fila e são distribuídas entre os consumidores dessa fila; cada mensagem é processada por um deles.
@@ -632,7 +630,7 @@ gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener ->
 
 --- 
 
-### livro Patterns of Enterprise Application Architecture, de Martin Fowler (2002).
+### livro: Patterns of Enterprise Application Architecture, de Martin Fowler (2002).
 - Padrões de arquitetura de aplicações empresariais
 - Padrões arquiteturais orientam a estrutura maior do sistema e como suas partes se organizam.
 - repository
@@ -659,11 +657,12 @@ gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener ->
 
 --- 
 
-### livro Design Patterns: Elements of Reusable Object-Oriented Software, da Gang of Four (GoF)
-- design patterns são soluções recorrentes para problemas específicos.
+### livro: Design Patterns: Elements of Reusable Object-Oriented Software, da Gang of Four (GoF)
+- Soluções reutilizáveis para problemas recorrentes de design no código.
+  - qual problema de implementação esse padrão resolve?
   - tratam de soluções em partes menores do software
+  - Focam em microdecisões de design
 - Padrões GoF (Gang of Four):
-  - Gof-> Focam em microdecisões de design, resolvendo problemas de colaboração, criação ou estrutura entre classes e objetos individuais (divididos em Criacionais, Estruturais e Comportamentais)
   - padrao criacional
     - abstraem o processo de criação de objetos.
     - Factory Pattern
@@ -726,6 +725,29 @@ gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener ->
   - No fluxo de upload, o ApplicationService inicia o Unit of Work, executa o callback e, ao final, confirma ou desfaz a transação. Depois do commit, coordena o despacho dos eventos de integração. Assim, o caso de uso não depende diretamente da API de transações do Sequelize.”
 
 --- 
+
+### etapas de construção da aplicação backend
+- Montagem do ambiente de desenvolvimento (Docker e IDE)
+- modelar o core(regras de negocio, ...) antes de ir para o framework nestjs, usando ddd e clean archtecture
+- criar uma pasta shared(logica compartilhavel)
+- Criar uma aplicação TypeScript (core)
+  - Criar entidade de Categoria
+  - Criar testes (pirâmide de testes)
+    - unitario, integração
+  - Criar Casos de Uso e Repositório
+  - Nest.js - Criação de API Rest
+  - Criar testes e2e (end-to-end)
+  - Repetir para as outras entidades, cast member, genre, video
+- Integração com RabbitMQ e Encoder de vídeo
+- keycloak
+- logs
+  - rastrear comportamento
+- CI
+  - esteira no github actions
+  - docker file para produção
+      - imagem menor, otimizada
+      - vai ser usada no cd
+---
 
 ### upload, storage, gcp
 - storage - google cloude storage - assets(imagens, videos)
