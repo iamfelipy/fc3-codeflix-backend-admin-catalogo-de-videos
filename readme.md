@@ -29,6 +29,9 @@
 - [Princípios de design](#principios-de-design)
 - [Patterns of Enterprise Application Architecture](#livro-patterns-of-enterprise-application-architecture-de-martin-fowler-2002)
 - [Design Patterns: Elements of Reusable Object-Oriented Software](#livro-design-patterns-elements-of-reusable-object-oriented-software-da-gang-of-four-gof)
+- [Persistence layer](#persistence-layer)
+- [Framework: NestJS](#framework-nestjs)
+- [Autenticação e autorização](#autenticacao-e-autorizacao)
 
 
 Boas práticas: 
@@ -74,6 +77,8 @@ Execução:
   - é uma abordagem de desenvolvimento de software, baseada em um conjunto de princípios, que organiza o projeto em torno das regras e necessidades do negócio, colocando o modelo do domínio no centro. A ideia é entender bem o domínio e representar seus conceitos de forma coerente no código — por exemplo, em um sistema de catálogo de vídeos, conceitos como vídeo, categoria e publicação.
   - Esse modelo é uma abstração seletiva do conhecimento do negócio, construída e refinada em colaboração entre especialistas do domínio e desenvolvedores. Assim, as decisões de desenvolvimento são guiadas pelo domínio, em vez de a tecnologia definir a estrutura do sistema.
   - abordagem, principios, modelagem rica
+  - Conceitos usados para representar as regras e os conceitos do negócio.
+    - como você representou as regras do negócio no código?
 
 **divisoes do dominio**
 
@@ -697,110 +702,308 @@ gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener ->
 
 ---
 
-### generico
-- config, variaveis de ambiente
-  - local
-    - usado pelos testes
-    - src/core/shared/infra/config.ts
-    - dotenv
-      - carregar variveis de ambiente
-      - normalmente o dotenv é usado apenas em desenvolvimento para carregar variáveis de ambiente locais, não em produção, onde variáveis já devem estar definidas no ambiente do servidor/container.
-  - nest, framework, infraestrutura
-    - usado pelas serviços do container de injeção de dependencia e tambem pelos testes e2e
-    - src/nest-modules/config-module/config.module.ts
-    - criei suportando configurações alem do .env, assim respeitando twelve-factory - chapter 3
-    - validação
-      - lib typescript joi
-- /core: contem as principais operações do dominio, com poucas influencia do nestjs
-- /cmd
-  - cmd = uma pasta para arquivos que iniciam diferentes partes/modos da aplicação.
-  - commands: pontos de entrada da aplicação.
-- shared kernel
-  - Shared Kernel é um conceito do Domain-Driven Design, descrito por Eric Evans em Domain-Driven Design. É uma parte do modelo e do código compartilhada entre equipes ou contextos, com mudanças coordenadas.
-  - src/core/shared
-- appService
-  - src/core/shared/application/application.service.ts
-  - a ideia venha do padrão Service Layer, descrito por Martin Fowler em Patterns of Enterprise Application Architecture. Esse padrão coloca operações da aplicação numa camada que coordena as tarefas necessárias para atendê-las. Martin Fowler — Service Layer
-  - “O Unit of Work acompanha as alterações de uma operação de negócio e coordena sua persistência no banco. Neste projeto, o UnitOfWorkSequelize usa uma transação do Sequelize e também registra agregados para o despacho de eventos. Os repositórios fazem as gravações usando essa transação.
-  - No fluxo de upload, o ApplicationService inicia o Unit of Work, executa o callback e, ao final, confirma ou desfaz a transação. Depois do commit, coordena o despacho dos eventos de integração. Assim, o caso de uso não depende diretamente da API de transações do Sequelize.”
+### persistence layer
+- camada de persistência.
+  - É responsável por armazenar, recuperar e gerenciar dados persistentes da aplicação, independentemente do tipo de tecnologia utilizada (bancos, arquivos, filas, caches, buscadores).
+  - tipos
+    - Database: Armazena dados estruturados ou semi-estruturados para consulta e manipulação (ex: MySQL, PostgreSQL, MongoDB).
+    - Storage: Guarda arquivos binários como imagens, vídeos e documentos (ex: Amazon S3, Google Cloud Storage).
+    - Cache: Memória temporária para acelerar leituras rápidas (ex: Redis, Memcached).
+    - Fila/Mensageria: Gerencia comunicação assíncrona entre sistemas (ex: RabbitMQ, Kafka).
+    - Buscador (Search Engine): Permite busca e indexação eficiente de grandes volumes de texto (ex: Elasticsearch).
+      - Busca: localizar informações usando critérios, como texto ou filtros.
+        - Critério: regra ou condição usada para decidir quais resultados correspondem à busca, como “título contém ação”.
+      - Indexação: organizar e registrar informações em um índice para tornar a busca mais rápida.
+        - Índice: estrutura organizada com referências aos dados, que ajuda a encontrá-los mais rápido.
+- database
+  - banco de dados relacional
+    - mysq
+      - dados estruturados
+      - index
+        - Um índice é como uma lista ordenada que ajuda o banco a encontrar registros sem verificar cada linha da tabela.
+        - o índice também pode acelerar consultas, mas não precisa ser usado explicitamente no código. O banco decide quando aproveitá-lo. 
+          - Neste projeto, o repositório filtra mídias por video_id, por exemplo ao excluir as mídias de um vídeo. Como video_id é a primeira coluna do índice composto (video_id, video_related_field), o banco pode usar esse índice nessa consulta.
+        - audio-video-media.model.ts (src/core/video/infra/db/sequelize/audio-video-media.model.ts:25): índice único composto em video_id e video_related_field.
+        - image-media.model.ts (src/core/video/infra/db/sequelize/image-media.model.ts:24)
+      - integridade referencial
+        - Integridade referencial é a garantia de que uma referência entre tabelas aponta para um registro existente — por exemplo, que o video_id de uma mídia corresponde a um vídeo cadastrado.
+        - No seu caso, isso é garantido pela chave estrangeira (ForeignKey)
+      - constrains
+    - tabelas
+      - videos
+      - categories
+      - genres
+      - cast_members
+      - image_medias
+      - audio_video_medias
+      - category_video — relaciona vídeos e categorias
+      - genre_video — relaciona vídeos e gêneros
+      - cast_member_video — relaciona vídeos e membros do elenco
+      - category_genre — relaciona categorias e gêneros
+    - cardinalidade
+      - Cardinalidade mostra quantos itens de um grupo podem se ligar a itens de outro grupo.
+        | Relação | Cardinalidade no projeto |
+        |---|---|
+        | Vídeo ↔ Categoria | N:N — um vídeo pode ter várias categorias, e uma categoria pode estar associada a vários vídeos. |
+        | Vídeo ↔ Gênero | N:N — um vídeo pode ter vários gêneros, e um gênero pode estar associado a vários vídeos. |
+        | Vídeo ↔ Membro do elenco | N:N — um vídeo pode ter várias pessoas no elenco, e uma pessoa pode participar de vários vídeos. |
+        | Gênero ↔ Categoria | N:N — um gênero pode estar relacionado a várias categorias, e uma categoria a vários gêneros. |
+        | Vídeo → Mídias de imagem | 1:N, com até uma mídia de cada tipo: banner, thumbnail e thumbnail-half. |
+        | Vídeo → Mídias de áudio/vídeo | 1:N, com até uma mídia principal e um trailer. |
 
---- 
+        Referências no código: 
+        VideoModel (src/core/video/infra/db/sequelize/video.model.ts)
+        Video aggregate (src/core/video/domain/video.aggregate.ts)
+        GenreModel (src/core/genre/infra/db/sequelize/genre-model.ts)
+        ImageMediaModel (src/core/video/infra/db/sequelize/image-media.model.ts)AudioVideoMediaModel (src/core/video/infra/db/sequelize/audio-video-media.model.ts).
+    - orm
+      - ORM significa Object-Relational Mapping (“Mapeamento Objeto-Relacional”): 
+        - é uma técnica que permite manipular bancos de dados relacionais usando objetos nas linguagens de programação, facilitando a conversão entre dados do banco e objetos do código.
+        - produtividade, portabilidade entre bancos
+      - sequelize
+      - models
+        - src/core/video/infra/db/sequelize/video.model.ts
+      - padrao de persistencia
+        - Active Record:  
+          - os modelos representam registros e oferecem operações de persistência.
+          - o objeto sabe persistir a si mesmo
+        - Data Mapper: 
+          - as entidades do domínio não precisam conter métodos de persistência.
+          - essa responsabilidade fica em um componente separado.
+    - repository 
+      - IRepository
+        - crud
+        - src/core/video/domain/video.repository.ts
+      - ISearchableRepository
+        - filter, sort, paginate
+        - src/core/video/infra/db/sequelize/video-sequelize.repository.ts
+    - mapper
+      - src/core/video/infra/db/sequelize/video-model.mapper.ts
+        - uma camada que converte dados entre os objetos do dominio e o banco, mantendo-os separados.
+          - manter o domínio independente do banco e do Sequelize.
+        - toDomain
+        - toModel
+        - livro é Patterns of Enterprise Application Architecture, de Martin Fowle
+    - transaction
+      - Transação é um conjunto de operações no banco tratado como uma única unidade.
+      - src/core/video/infra/db/sequelize/video-sequelize.repository.ts
+        - .update() muda muitas tabelas
+      - acid
+      - unit of work
+        - abstracao para gerenciar na camada de aplicacao
+        - start, rollback, commit
+    - migration
+      - migração é uma mudança versionada no banco de dados.
+        - A ideia das migrações é registrar cada mudança em um script versionado e aplicar esse mesmo script nos ambientes.
+        - evitar sql manual em diferentes ambientes
+        - Martin Fowler — Evolutionary Database Design
+      - umzug
+        - configuração
+          - src/core/shared/infra/db/sequelize/migrator.ts
+            - cli no core
+          - src/migrate.ts
+            - no nestjs usando a cli
+        - migrations
+          - src/core/*/infra/db/sequelize/migrations
+        - model vs migration
+          - model:  o ORM cria/altera o banco com base nos Models.
+            - usado pelos testes
+          - migration: você cria arquivos que descrevem cada alteração no 
+          banco.
+            - usadas em produção e desenvolvimento
+        - comando
+          ```bash
+              # migration umzug
+              - mostra as funcionalidades disponiveis do umzug
+                - dev
+                  - npm run migrate:ts:with-paths
+                - produção
+                  - npm run migrate:js
+              - ver funcionalidades disponiveis do create
+                npm run migrate:ts:with-paths create -- --help
 
-### etapas de construção da aplicação backend
-- Montagem do ambiente de desenvolvimento (Docker e IDE)
-- modelar o core(regras de negocio, ...) antes de ir para o framework nestjs, usando ddd e clean archtecture
-- criar uma pasta shared(logica compartilhavel)
-- Criar uma aplicação TypeScript (core)
-  - Criar entidade de Categoria
-  - Criar testes (pirâmide de testes)
-    - unitario, integração
-  - Criar Casos de Uso e Repositório
-  - Nest.js - Criação de API Rest
-  - Criar testes e2e (end-to-end)
-  - Repetir para as outras entidades, cast member, genre, video
-- Integração com RabbitMQ e Encoder de vídeo
-- keycloak
-- logs
-  - rastrear comportamento
-- CI
-  - esteira no github actions
-  - docker file para produção
-      - imagem menor, otimizada
-      - vai ser usada no cd
----
+              - cria migration
+                - dar um nome sugestivo, do que está sendo feito
+                - mover para a pasta do modulo correspondente
+                npm run migrate:ts:with-paths create -- --name create-categories-table.ts --folder ./src
 
-### upload, storage, gcp
-- storage - google cloude storage - assets(imagens, videos)
-- como foi usado nesse projeto?
-  - upload do video, trailer, imagens
-  - Processo de Upload e Publicação de Vídeos
-    1. Um funcionário ou administrador faz o upload do arquivo de áudio ou vídeo no microserviço de gestão de conteúdo.
-    2. O arquivo é armazenado em um bucket (armazenamento na nuvem).
-    3. O sistema dispara um evento indicando que o arquivo de áudio/vídeo foi modificado e publica esse evento no RabbitMQ.
-    4. O microserviço em Go responsável pelo encoding consome esse evento, faz o download do arquivo no GCP, realiza o processo de encoding e, ao finalizar, publica um novo evento no RabbitMQ.
-    5. O microserviço administrativo possui um consumidor do RabbitMQ que lê esse evento, e então atualiza o vídeo correspondente:
-      - Atualiza o status e o caminho do arquivo já encodado no value-object: vídeo ou trailer no agregado vídeo.
-    6. Se o vídeo atender a todos os critérios necessários (ex: ter os arquivos de vídeo/trailer processados), ele é atualizado para o status de "published" (publicado).
-  - arquivos uteis relacionados
-    - src/core/video/application/use-cases/process-audio-video-medias
-      - caso de uso usado pelo microserviço de encoded, ele usa para informar o resultado do encoded
-    - src/core/video/application/use-cases/upload-image-medias
-    - src/core/video/application/use-cases/upload-audio-video-medias
-    - src/nest-modules/shared-module/shared.module.ts
+              - mostra migrations pendentes
+                - npm run migrate:ts:with-paths pending
+              - aplica migrations pendentes
+                - npm run migrate:ts:with-paths up
+              - desfaz migrations
+                - npm run migrate:ts:with-paths down               # desfaz apenas a última migration
+                - npm run migrate:ts:with-paths down -- --step 2   # desfaz as 2 últimas migrations
+                - npm run migrate:ts:with-paths down -- --to 0   # desfaz todas as migrations, volta ao estado inicial
+            ```
+- storage
+  - google cloude storage - assets(imagens, videos)
+  - caso de uso nesse projeto:
+    - upload do video principal, trailer, imagens
+    - Processo de Upload e Publicação de Vídeos
+      1. Um funcionário ou administrador faz o upload do arquivo de áudio ou vídeo no microserviço de gestão de conteúdo.
+      2. O arquivo é armazenado em um bucket (armazenamento na nuvem).
+      3. O sistema dispara um evento indicando que o arquivo de áudio/vídeo foi modificado e publica esse evento no RabbitMQ.
+      4. O microserviço video-encoder, escrito em Go, consome o evento do RabbitMQ, baixa o arquivo original do Google Cloud Storage e realiza o encoding. Depois, salva o arquivo encodado no bucket e publica um novo evento no RabbitMQ com o caminho do arquivo processado. O microserviço video-admin consome esse evento e atualiza o vídeo correspondente com o novo caminho e o status do processamento.
+      5. O microserviço administrativo possui um consumidor do RabbitMQ que lê esse evento, e então atualiza o vídeo correspondente:
+        - Atualiza o status e o caminho do arquivo já encodado no value-object: vídeo ou trailer no agregado vídeo.
+      6. Se o vídeo atender a todos os critérios necessários (ex: ter os arquivos de vídeo/trailer processados), ele é atualizado para o status de "published" (publicado).
+    - arquivos uteis relacionados
+      - contrato
+        - src/core/shared/application/storage.interface.ts
+      - adaptador
+        - src/core/shared/infra/storage/google-cloud.storage.ts
+      - caso de uso: upload do video ou audio
+        - src/core/video/application/use-cases/upload-audio-video-medias
+      - caso de uso: lidar com o resultado do encoded
+        - src/core/video/application/use-cases/process-audio-video-medias
       - registra IStorage com o adapter GoogleCloudStorageSdk
-- para o sdk do gcs funcionar, precisei atualizar a data do container, alterando o volume no docker compose
-- o caso de uso de video cria sem upload  
-  - src/core/video/application/use-cases/update-video
+        - src/nest-modules/shared-module/shared.module.ts
+  - extra
+    - erro sdk google: token expirado
+      - precisei atualizar a data do container, alterando o volume no docker compose
+    - o caso de uso de video cria sem upload  
+      - src/core/video/application/use-cases/update-video
 
 ---
+
+### framework: nestjs
+- framework nestjs
+  -  nestjs é um framework para criar aplicações server-side eficientes e escaláveis com Node.js. Ele usa TypeScript e, por padrão.
+  - Ele fornece uma estrutura para organizar o código em módulos, controllers e services, além de recursos para criar APIs.
+  - Express é um framework web para Node.js. Ele recebe requisições HTTP e ajuda a definir como a aplicação responde a elas.
+  - detalhes
+    - versão da cli: @nestjs/cli@10.1.17
+    - comandos
+      - inicializa um novo projeto
+        - nest new nest
+          - select: npm
+      - novo modulo
+        - npx nest g module shared
+- api rest sobre o http
+  - API: interface para sistemas se comunicarem.
+  - REST: estilo de arquitetura para organizar essa comunicação.
+  - HTTP: protocolo usado para enviar as requisições e respostas.
+- recursos, funcionalidades nestjs
+  - controllers
+    - rest
+      - recursos
+        - categories
+        - genres
+        - cast members
+        - videos
+        - src/nest-modules
+        - níveis de maturidade REST costumam ser apresentados pelo Modelo de Richardson:
+          1. Nível 0 — um endpoint: usa HTTP como transporte, mas concentra as operações em um único endpoint, muitas vezes enviando comandos no corpo da requisição.
+          2. Nível 1 — recursos: organiza a API em URLs para recursos, como /videos e /categorias.
+          3. Nível 2 — métodos e códigos HTTP: usa métodos como GET, POST, PUT e DELETE, além de códigos de resposta adequados.
+          4. Nível 3 — hypermedia (HATEOAS): as respostas incluem links que indicam ações ou recursos relacionados disponíveis.
+      - teste manual com client rest
+        - api.http
+  - pipe
+    - ParseUUIDPipe
+      - src/nest-modules/videos-module/videos.controller.ts
+    - ValidationPipe configurado globalmente
+      - class-validator
+        - validação do dto, parametros
+      - class-transform 
+        - transformacao do body para o formato do dto do usecase
+      - src/nest-modules/videos-module/videos.controller.ts
+  - interceptor
+    - WrapperDataInterceptor
+      - envolver saida do category get com a propriedade data
+    - ClassSerializerInterceptor
+      - class-transform para transformar a data para toIsoString
+      - src/nest-modules/shared-module/collection.presenter.ts
+      - src/nest-modules/shared-module/pagination.presenter.ts
+      - src/nest-modules/genres-module/genres.presenter.ts
+  - filter
+    - capturar execeções do dominio
+      - not found id no usecase, repository update
+  - injeção de dependencia
+    - Injeção de dependência é quando uma classe recebe de fora os objetos ou serviços de que precisa, em vez de criá-los por conta própria.
+      - Por exemplo, um caso de uso precisa de um repositório. O NestJS pode fornecer esse repositório ao caso de uso. Isso facilita trocar implementações e testar cada parte separadamente.
+    - scope.request
+      - appService
+      - unit of work
+      - src/nest-modules/shared-module/shared.module.ts
+  - global pipes, interceptors, filters
+    - src/nest-modules/global-config.ts
+- libs compativeis
+  - class-transformer
+    - usado na serialização do output do controller
+      - wrapper de dados
+      - transformacao de dados
+  - class-validator
+    - usado no core e no controller para validar entradas
+- nest-modules/shared-module
+  - Pasta com recursos compartilhados da camada Nest: storage, presenters genéricos, filters, interceptor e helpers de teste.
+  - O SharedModule em si registra globalmente apenas o serviço de storage.
+- upload de arquivo
+  - decorator, interceptor, multer, express, content-type: multipart/data-form
+  - src/nest-modules/videos-module/videos.controller.ts
+- eventos
+  - framework
+    - events, handlers
+    - integrar os eventos do dominio com nest
+      - usa @nestjs/event-emitter para configurar e integrar o emissor de eventos ao NestJS. 
+        - Por baixo, ele usa eventemitter2
+    - nest tem decorator pra registrar evento e handler
+    - nest implementa o pattern observer com eventEmitter2
+    - ao carregar o eventEmitter2 do pacote nest, ele registra o servico de forma global no container de servicos
+  - aplicacao
+    - O DomainEventMediator recebe o eventEmitter2 do Nest injetado que é a instância fornecida por @nestjs/event-emitter.
+- Observable
+  - No RxJS é um tipo que representa um fluxo de valores ao longo do tempo.
+
+----
 
 ### autenticacao e autorizacao
-- seguranca
-- fluxo
-  - usuario -> autentica no keycloak -> pega token -> acessa aplicacao backend com token -> aplicacao backend valida o token
+- conceito
+  - identificação: Ação de informar qual usuário você é.
+  - Autenticação: Processo de verificar se a identidade informada por um usuário é legítima.
+  - Autorização: concessão ou verificação de direitos para acessar recursos ou executar ações.
+    - Keycloak emite o access token: concede ao cliente um token para acessar recursos conforme as configurações e permissões aplicáveis. Isso é autorização no contexto do OAuth.
+    - CheckIsAdminGuard verifica admin-catalog: decide se o usuário pode executar aquela ação. Isso é autorização de acesso à rota.
+  - Permissão é o direito concedido: por exemplo, poder editar vídeos.
+  - SSO: se o usuário entra uma vez no Keycloak e depois acessa outras aplicações sem fazer login novamente, isso é Single Sign-On. O Keycloak mantém uma sessão que pode ser usada por vários clientes.
 - keycloak
-  - sistema que gerencia autenticação e autorização.
-  - usado para testar o fluxo de autenticacao e autorizacao com a aplicacao backend, quem vai usar ele vai ser o frontend
-  - token jwt
-  - endpoints
-    - olhar api.http
-    - xc5
-      - chave publica
+  - uma solução de gerenciamento de identidade e acesso (Identity and Access Management, IAM). Ele centraliza o login dos usuários e ajuda aplicações e serviços a controlar o acesso a recursos protegidos
+    - O Keycloak ajuda a controlar esse acesso por meio de autenticação e autorização.
+    - acesso: inclui administrar permissões e decidir se um acesso será permitido.
+    - tem os clients, users, roles, rbac, OAuth + OIDC
+  - OAuth 2.0 (Autorização)
+    - OAuth 2.0 tem vários fluxos, e todos são formas de obter um access token — isto é, uma autorização para acessar recursos. Mas isso não significa que em todos o usuário veja uma tela para conceder permissões.
+  - OpenID Connect - OIDC (Autenticação)
+    - Adiciona uma camada de identidade e autenticação sobre o OAuth 2.0.
+    - É construído em cima do OAuth 2.0 e emite um ID token (geralmente no formato JWT) que confirma quem é o usuário. Também oferece um endpoint UserInfo para buscar dados do perfil.
+  - gerar token jwt
   - roles
     - admin-catalog
       - gestao de videos no micro-admin-videos
     - assinante
+  - usado para testar o fluxo de autenticacao e autorizacao com a aplicacao backend, quem vai usar ele vai ser o frontend
   - config
     - versionei o banco do keycloak, estrutura ja esta montada
     - realm custom, client, user, realm role, role associada ao user
+  - docker 
+    - docker/docker-compose.keycloak.yaml
+- fluxo OAuth — Resource Owner Password Credentials, Password Grant (keycloak - Direct Access Grant):
+  1. O cliente envia username e password ao endpoint de tokens do Keycloak.
+  2. O Keycloak autentica o usuário e retorna um access_token.
+  3. O cliente envia esse token ao backend no header Authorization: Bearer ....
+  4. O AuthGuard valida o token e coloca seu conteúdo em request.user.
+  5. O CheckIsAdminGuard verifica se o usuário tem a role admin-catalog.
+  6. Se as verificações passarem, o controller executa a operação e retorna a resposta.
+  - ![oi](docs/digrama-mermaid-autenticacao-autorizacao.png)
 - nest
   - guard
     - src/nest-modules/auth-module/auth.module.ts
     - autenticacao
-      - src/nest-modules/auth-module/auth.guard.ts
       - verificar os tokens jwt com a chave publica 
         - import { JwtModule } from '@nestjs/jwt';
       - UnauthorizedException, 401
+      - src/nest-modules/auth-module/auth.guard.ts
     - autorizacao
       - src/nest-modules/auth-module/check-is-admin.guard.ts
       - verificar se tem a permissao admin-catalog
@@ -809,14 +1012,24 @@ gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener ->
       - src/nest-modules/categories-module/categories.controller.ts
   - criptografia 
     - assinatura digital
-      - algoritmo criptografico 
-        - rs256
+        - rsa256
+          - Ele é um algoritmo de criptografia assimétrica projetado especificamente para criptografar dados e gerar assinaturas digitais, enquanto a criação de hashes depende de funções matemáticas unidirecionais como o SHA-256.
+          - Para assinar um documento com RSA, o sistema primeiro usa um algoritmo externo para gerar o hash da mensagem. Em seguida, o RSA aplica sua chave privada sobre esse resumo para criar uma assinatura que qualquer pessoa pode validar usando a chave pública.
+            - criptografia: esconder
+            - hash: validar a integridade do arquivo
         - chave publica e privada
-    - olhar .env
+    - config .env
       - JWT_PUBLIC_KEY
         - vem do keycloak
+          - endpoints
+            - olhar api.http
+            - xc5
+              - chave publica
       - JWT_PRIVATE_KEY
         - esta no keycloak
+  - testar autenticacao e autorizacao se caso eu nao usasse keycloak
+    - src/nest-modules/auth-module/auth.controller.ts
+    - src/nest-modules/auth-module/auth.service.ts
 - scripts
   - usar para 
     - teste e2e
@@ -834,85 +1047,106 @@ gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener ->
 
 ----
 
-### persistence layer
-- camada de infraestrutura de persistência.
-  - É responsável por armazenar, recuperar e gerenciar dados persistentes da aplicação, independentemente do tipo de tecnologia utilizada (bancos, arquivos, filas, caches, buscadores).
-  - Database: Armazena dados estruturados ou semi-estruturados para consulta e manipulação (ex: MySQL, PostgreSQL, MongoDB).
-  - Storage: Guarda arquivos binários como imagens, vídeos e documentos (ex: Amazon S3, Google Cloud Storage).
-  - Cache: Memória temporária para acelerar leituras rápidas (ex: Redis, Memcached).
-  - Fila/Mensageria: Gerencia comunicação assíncrona entre sistemas (ex: RabbitMQ, Kafka).
-  - Buscador (Search Engine): Permite busca e indexação eficiente de grandes volumes de texto (ex: Elasticsearch).
-- repository 
-  - search(filter, sort, paginate), crud
-  - testes
-  - inmemoryRepository
-- cardinalidade
-  - oneToMany
-    - video 
-      - video, trailer
-      - banner
-  - manyToMany
-    - genres with categories
-    - video
-      - castmember
-      - genres
-      - categories
-- orm
-  - sequelize: design pattern - active record
-    - mysql, sqlite
-  - ORM significa Object-Relational Mapping (“Mapeamento Objeto-Relacional”): é uma técnica que permite manipular bancos de dados relacionais usando objetos nas linguagens de programação, facilitando a conversão entre dados do banco e objetos do código.
-  - padrao de persistencia
-    - Active Record: o objeto combina os dados com métodos para salvar, atualizar ou excluir a si mesmo.
-    - Data Mapper: um componente separado faz a conversão entre os objetos de domínio e as tabelas do banco.
-- mapper
-  - toDomain
-  - toModel
-- unit of work
-  - start, rollback, commit
-- transaction
-  - acid
-  - src/nest-modules/videos-module/videos.providers.ts
-  - src/nest-modules/genres-module/genres.providers.ts
-- migration
-  - umzug
-    - configuração
-      - src/core/shared/infra/db/sequelize/migrator.ts
-        - cli no core
-      - src/migrate.ts
-        - no nestjs usando a cli
-    - migrations
-      - src/core/*/infra/db/sequelize/migrations
-    - model vs migration
-      - model:  o ORM cria/altera o banco com base nos Models.
-        - usado pelos testes
-      - migration: você cria arquivos que descrevem cada alteração no 
-      banco.
-        - usadas em produção e desenvolvimento
-    - comando
-      - mostra as funcionalidades disponiveis do umzug
-        - dev
-          - npm run migrate:ts:with-paths
-        - produção
-          - npm run migrate:js
-      - comandos de exemplo na seção mais abaixo
+### capturar e tratar exceções
+- conceitos
+  - Erro (Error / Mistake)
+    - Definição: É a ação humana incorreta cometida ao pensar, projetar ou escrever o sistema.
+      - Na prática: É a origem mental ou de digitação antes mesmo de o código rodar (ex: esquecer uma regra de negócio ou digitar o sinal errado).
+  - Defeito (Fault / Bug)
+    - Definição: É o estado concreto e imperfeito gravado dentro do código ou da estrutura do sistema como resultado de um erro humano.
+      - Na prática: É o problema guardado em repouso no arquivo, esperando aquela parte do programa ser executada (ex: uma fórmula errada ou código morto salvo no projeto).
+  - Falha (Failure)
+    - Definição: É o evento visível em tempo de execução quando o sistema deixa de cumprir o que deveria para o usuário final.
+      - Na prática: É o colapso ou comportamento errado acontecendo na ponta quando o defeito é ativado (ex: o aplicativo travar ou cobrar o valor errado na fatura).
+  - Exceção (Exception)
+    - Definição: É um mecanismo de alerta em tempo de execução que interrompe o fluxo normal do programa ao detectar uma condição inesperada, exigindo tratamento imediato (`try-catch`).
+      - Na prática: É o freio de emergência do código para impedir que uma anomalia vire uma falha grave sem controle (ex: `EntityValidationError` disparada via `throw`).
+  - Padrão Notification (Notification Pattern)
+    - Definição: É um padrão de design de software usado para coletar e acumular múltiplos erros de validação em um único objeto durante um processo, sem interromper a execução a cada problema encontrado.
+      - Na prática: Substitui o lançamento repetido de exceções por uma lista única de pendências entregue de uma só vez ao final da verificação.
+- exceptions
+  - core
+    - src/core/shared/domain/errors/not-found.error.ts
+    - src/core/shared/domain/errors/invalid-argument.error.ts
+    - src/core/shared/domain/validators/validation.error.ts
+      - EntityValidationError
+      - SearchValidationError
+      - LoadEntityError
+    - src/core/cast-member/domain/cast-member-type.vo.ts
+  - nest framework
+    - notFound
+    - forbideen
+    - notAutheticated
+    - filters
+      - capturar exceptions 
+- mecanismos, patterns de tratamento de erros
+  - throw
+    - throw é uma instrução da linguagem para lançar uma exceção.
+  - either
+    - Either é um tipo que representa um valor de uma entre duas alternativas possíveis, geralmente um erro (Left) ou um resultado bem-sucedido (Right).
+    - evitar lancar excecao, interromper o fluxo com throw
+    - src/core/cast-member/application/validations/cast-members-ids-exists-in-database.
+    validator.ts
+    - src/core/cast-member/domain/cast-member-type.vo.ts
+    - src/core/cast-member/domain/cast-member.repository.ts
+    - src/core/genre/application/validations/genres-ids-exists-in-database.validator.ts
+    - src/core/video/application/use-cases/create-video/create-video.use-case.ts
+    - src/core/shared/domain/validators/media-file.validator.ts
+    - src/core/video/domain/banner.vo.ts
+  - notification
+    - acumular erros na entidade e no final fazer algo no usecase
+    - acumular vários problemas de validação sem interromper imediatamente o processamento.
+    - src/core/cast-member/application/use-cases/create-cast-member/create-cast-member.use-case.ts
+    - src/core/shared/domain/validators/notification.ts
 
-----
+---
 
-### validações, tratamento de erros
-  - validações
-    - separação das validações de dominio(regras de dominio) vs validações de sintaxe
-    - class-validator
-      - categoryRules
-      - CastMemberRules
-    - joy validator
-      - configModule - variaveis de ambiente
-    - nest - pipe
-  - tratamento de erros, lançamento de exceções
-    - either - tratar de forma explicita, alternativa ao throw
-    - erros na entidade com notification pattern(acumular erros e no final fazer algo no usecase)
-    - nest - filters
-    - exceptions especificas inves de new Error generic
+### validações
+- validações
+  - separação das validações de dominio(regras de dominio) vs validações de sintaxe
+    - controller dto
+      - src/nest-modules/genres-module/genres.controller.ts
+    - dto do usecase valida a sintaxe
+      - src/core/genre/application/use-cases/create-genre/create-genre.input.ts
+      - src/core/genre/application/use-cases/create-genre/create-genre.use-case.ts
+    - entidade valida regra de negocio
+      - src/core/genre/domain/genre.aggregate.ts
+      - src/core/genre/domain/genre.validator.ts
+  - validacoes em diferentes camadas
+  - class-validator
+    - categoryRules
+    - CastMemberRules
+  - joy validator
+    - configModule - variaveis de ambiente
+  - nest
+    - pipe
   
+---
+
+### Práticas e padrões operacionais
+  - Orientam como construir, configurar, executar e manter a aplicação.
+  - como você garante qualidade, execução consistente e manutenção?
+  - conceitos
+    - Prática: jeito de fazer algo.
+    - Padrão: jeito combinado ou recomendado para fazer algo de forma consistente.
+      - Consistente quer dizer feito de maneira uniforme, seguindo o mesmo padrão ao longo do tempo.
+    - Operacional: relacionado a colocar algo em funcionamento e mantê-lo funcionando.
+    - Construir: criar ou desenvolver a aplicação.
+    - Configurar: ajustar opções para que ela funcione em determinado ambiente.
+    - Executar: iniciar e usar a aplicação.
+
+### The Twelve-Factor App
+Este projeto aplica várias metodologias do The Twelve-Factor App:
+
+   1. III. Config (Configurações no ambiente): Uso do ConfigModule do NestJS e variáveis de ambiente (.env) para gerenciar parâmetros de configuração sem hardcoding.
+   2. II. Dependencies (Dependências explícitas): Gerenciamento de dependências isoladas e declaradas no package.json e package-lock.json.
+   3. IV. Backing services (Serviços de suporte): Tratamento de bancos de dados (MySQL/SQLite via Sequelize) e mensageria (RabbitMQ) como recursos acoplados/externos
+      configuráveis.
+   4. V. Build, release, run (Estágios separados): Separação estrita entre build (npm run build, gerando a pasta dist) e execução (node dist/main).
+   5. VII. Port binding (Exportação de serviços): A aplicação expõe sua API REST via ligação de porta HTTP gerenciada pelo NestJS.
+   6. X. Dev/prod parity (Paridade entre ambientes): Uso de Docker / Docker Compose e containerização para manter consistência entre desenvolvimento, testes e produção.
+   7. XII. Admin processes (Processos administrativos): Scripts dedicados para tarefas de migração de banco de dados (migrate.ts, npm run migration:run).
+
 ---
 
 ### configurações de qualidade
@@ -928,22 +1162,59 @@ gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener ->
 - eslint (regras de código)
 - prettier (formatação automatica baseada nas regras)
 
-
 ---
 
-### The Twelve-Factor App
-Este projeto aplica várias metodologias do The Twelve-Factor App:
+### testes
+- tdd(test driven development)
+- triple aaa(arrange, act, assert)
+- piramidade de testes
+- sqlite
+  - testes
+- InMemoryRepository
+  - usado nos testes de unidade
+  - src/core/video/infra/db/in-memory/video-in-memory.repository.spec.ts
+- Test Data Builder(Gof - criacional)
+  - CategoryFakeBuilder
+- fluent pattern
+  - ValidatorRules
+- helpers
+  - src/core/shared/infra/testing/helpers.ts
+    - teste de unidade e integração
+    - config para sequelize
+  - src/nest-modules/shared-module/testing/helpers.ts
+   - teste de integração e e2e
+   - config sequelize, aplicacao nest
+  - src/nest-modules/shared-module/testing/supertest-extend.ts
+   - teste e2e
+   - atalho para autenticar rotas protegidas
+- fixtures (configuração para teste, arranges)
+  - teste de integração, e2e
+- inmemory
+- tecnologia
+  - jest
+    - arquivo de configuracao diferente para unit, integration e e2e
+    - jest-setup.ts -> arquivo codigo na inicializacao
+- teste de unidade e integracao
+  - npm run test
+  - ![Exemplo de pirâmide de testes – unidade e integração](docs/teste-unidade-integracao.png)
+- teste e2e
+  - npm run test:e2e:runInBand
+  - ![Exemplo de teste E2E – execução e verificação](docs/teste-e2e.png)
+----
 
-   1. III. Config (Configurações no ambiente): Uso do ConfigModule do NestJS e variáveis de ambiente (.env) para gerenciar parâmetros de configuração sem hardcoding.
-   2. II. Dependencies (Dependências explícitas): Gerenciamento de dependências isoladas e declaradas no package.json e package-lock.json.
-   3. IV. Backing services (Serviços de suporte): Tratamento de bancos de dados (MySQL/SQLite via Sequelize) e mensageria (RabbitMQ) como recursos acoplados/externos
-      configuráveis.
-   4. V. Build, release, run (Estágios separados): Separação estrita entre build (npm run build, gerando a pasta dist) e execução (node dist/main).
-   5. VII. Port binding (Exportação de serviços): A aplicação expõe sua API REST via ligação de porta HTTP gerenciada pelo NestJS.
-   6. X. Dev/prod parity (Paridade entre ambientes): Uso de Docker / Docker Compose e containerização para manter consistência entre desenvolvimento, testes e produção.
-   7. XII. Admin processes (Processos administrativos): Scripts dedicados para tarefas de migração de banco de dados (migrate.ts, npm run migration:run).
-
-
+### config, variaveis de ambiente
+  - local
+    - usado pelos testes
+    - src/core/shared/infra/config.ts
+    - dotenv
+      - carregar variveis de ambiente
+      - normalmente o dotenv é usado apenas em desenvolvimento para carregar variáveis de ambiente locais, não em produção, onde variáveis já devem estar definidas no ambiente do servidor/container.
+  - nest, framework, infraestrutura
+    - usado pelas serviços do container de injeção de dependencia e tambem pelos testes e2e
+    - src/nest-modules/config-module/config.module.ts
+    - criei suportando configurações alem do .env, assim respeitando twelve-factory - chapter 3
+    - validação
+      - lib typescript joi
 ---
 
 ### observabilidade
@@ -1009,6 +1280,38 @@ Este projeto aplica várias metodologias do The Twelve-Factor App:
         - docker compose -f docker/docker-compose.elk.yaml exec codeflix-kibana curl http://codeflix-elasticsearch:9200
 
 ---
+
+### docker
+- como está organizado a config do docker?
+- docker-compose.yml
+  - usa tmpfs
+  - tmpfs
+    - util para teste
+    - carrega pasta do mysql na memoria ram
+- docker-compose.dev.yml
+  - util para desenvolvimento
+  - usa volumes inves de tmpfs, quando reiniciar o container não perde a pasta
+  - foi usado pq devcontainer não esta reconhecendo !reset do tmpfs do docker-compose.override.yaml, se reconhece-se era só descomentar .example do override para poder mudar de ambiente.
+  - O padrão é usar o docker-compose.yml. O docker-compose.dev.yml só é usado se você especificar explicitamente com a flag -f ou configurar no devcontainer.json.
+- docker-compose.overvire.yaml
+  - usaria isso com docker-compose.yml se o devcontainer reconhece-se !reset
+- devcontainer
+  - devcontainer.json.example
+    - por padrão está configurando para usar docker-compose.yml
+- rabbitmq
+  - instalacao personalizada com plugin
+    - plugin rabbitmq_delayed_message
+    - docker/.docker/rabbitmq/Dockerfile
+- keycloak
+  - docker compose -f ./docker/docker-compose.keycloak.yaml up
+    - sudo chmod -R 777 docker/.docker/keycloak_data
+  - extra_hosts
+    - mapeamentos de nomes de host para endereços IP
+  - localhost:8080
+    - admin
+    - admin
+  - mapeia o volume keycloak, talvez quando iniciar nao precisar criar o realm, client, user
+----
 
 ### ci, cdel, cdep
 - devops
@@ -1079,147 +1382,46 @@ Este projeto aplica várias metodologias do The Twelve-Factor App:
 
 ---
 
-### testes
-- tdd(test driven development), triple aaa(arrange, act, assert), piramidade de testes
-- Test Data Builder(Gof - criacional)
-  - CategoryFakeBuilder
-- fluent pattern
-  - ValidatorRules
-- helpers
-  - src/core/shared/infra/testing/helpers.ts
-    - teste de unidade e integração
-  - src/nest-modules/shared-module/testing/helpers.ts
-   - teste de integração e e2e
-  - src/nest-modules/shared-module/testing/supertest-extend.ts
-   - teste e2e
-   - atalho para autenticar rotas protegidas
-- fixtures (configuração para teste, arranges)
-  - teste de integração, e2e
-- inmemory
-- tecnologia
-  - jest
-    - arquivo de configuracao diferente para unit, integration e e2e
-    - jest-setup.ts -> arquivo codigo na inicializacao
-- teste de unidade e integracao
-  - npm run test
-  - ![Exemplo de pirâmide de testes – unidade e integração](docs/teste-unidade-integracao.png)
-- teste e2e
-  - npm run test:e2e:runInBand
-  - ![Exemplo de teste E2E – execução e verificação](docs/teste-e2e.png)
-----
+### generico
+- /core: contem as principais operações do dominio, com poucas influencia do nestjs
+- /cmd
+  - cmd = uma pasta para arquivos que iniciam diferentes partes/modos da aplicação.
+    - commands: pontos de entrada da aplicação.
+  - servidor http
+  - consumidor rabbitmq
+- shared kernel
+  - Shared Kernel é um conceito do Domain-Driven Design, descrito por Eric Evans em Domain-Driven Design. É uma parte do modelo e do código compartilhada entre equipes ou contextos, com mudanças coordenadas.
+  - src/core/shared
+- appService
+  - src/core/shared/application/application.service.ts
+  - a ideia venha do padrão Service Layer, descrito por Martin Fowler em Patterns of Enterprise Application Architecture. Esse padrão coloca operações da aplicação numa camada que coordena as tarefas necessárias para atendê-las. Martin Fowler — Service Layer
+  - “O Unit of Work acompanha as alterações de uma operação de negócio e coordena sua persistência no banco. Neste projeto, o UnitOfWorkSequelize usa uma transação do Sequelize e também registra agregados para o despacho de eventos. Os repositórios fazem as gravações usando essa transação.
+  - No fluxo de upload, o ApplicationService inicia o Unit of Work, executa o callback e, ao final, confirma ou desfaz a transação. Depois do commit, coordena o despacho dos eventos de integração. Assim, o caso de uso não depende diretamente da API de transações do Sequelize.”
 
-### paradigmas de programacao
-- estilos ou modelos de pensamento usados para estruturar e organizar programas
-- poo
-  - encapsulamento, herança, composição, interfaces e imutabilidade.
-- funcional
-  - src/core/cast-member/domain/cast-member-fake.builder.ts
+--- 
 
-----
-
-### typescript
-- @types
-  - extender interface
-----
-
-### nestjs
-
-- versão da cli: @nestjs/cli@10.1.17
-
-- inicializa um novo projeto
-  - nest new nest
-    - select: npm
-- novo modulo
-  - npx nest g module shared
-- controllers
-  - api rest
-    - recursos
-      - categories
-      - genres
-      - cast members
-      - videos
-      - src/nest-modules
-    - teste manual com client rest
-      - api.http
-  - class-transformer
-    - usado na serialização do output do controller
-  - class-validator
-    - usado no core e no controller para validar entradas
-- pipe
-  - validação com class-validator
-- interceptor
-  - class-transform para transformar a data para toIsoString
-  - envolver saida do category get com a propriedade data
-- filter
-  - tratar execeções do dominio
-    - o campo name não pode ter mais de 255 caracters, criar entidade e notification
-    - not found id no usecase, repository update
-- helper
-  - test
-    - startApp - inicia modulo, banco para o teste e2e
-- variaveis de ambiente
-  - src/nest-modules/config-module/config.module.ts
-- nest-modules/shared-module
-  - agrupar logica e serviços reutilizaveis
-  - global
-  - serviços
-    - storage
-    - domainEventMediator
-    - appService
-  - presenter
-    - paginacao
-    - collection
-  - filters, interceptors, testing
-- injeção de dependencia
-  - scope.request
-    - appService
-    - unit of work
-    - src/nest-modules/shared-module/shared.module.ts
-- upload de arquivos com multer, express, interceptor, multipart/data-form
-  - src/nest-modules/videos-module/videos.controller.ts
-- eventos
-  - integrar os eventos do dominio com nest
-  - nest tem decorator pra registrar evento e handler
-  - nest implementa o pattern observer com eventEmitter2
-  - ao carregar o eventEmitter2 do pacote nest, ele registra o servico de forma global no container de servicos
-- guard
-  - proteger requisicao
-- Observable
-  - No RxJS é um tipo que representa um fluxo de valores ao longo do tempo.
-
-----
-
-### docker
-- como está organizado a config do docker?
-- docker-compose.yml
-  - usa tmpfs
-  - tmpfs
-    - util para teste
-    - carrega pasta do mysql na memoria ram
-- docker-compose.dev.yml
-  - util para desenvolvimento
-  - usa volumes inves de tmpfs, quando reiniciar o container não perde a pasta
-  - foi usado pq devcontainer não esta reconhecendo !reset do tmpfs do docker-compose.override.yaml, se reconhece-se era só descomentar .example do override para poder mudar de ambiente.
-  - O padrão é usar o docker-compose.yml. O docker-compose.dev.yml só é usado se você especificar explicitamente com a flag -f ou configurar no devcontainer.json.
-- docker-compose.overvire.yaml
-  - usaria isso com docker-compose.yml se o devcontainer reconhece-se !reset
-- devcontainer
-  - devcontainer.json.example
-    - por padrão está configurando para usar docker-compose.yml
-- rabbitmq
-  - instalacao personalizada com plugin
-    - plugin rabbitmq_delayed_message
-    - docker/.docker/rabbitmq/Dockerfile
+### etapas de construção da aplicação
+- Montagem do ambiente de desenvolvimento (Docker e IDE)
+- modelar o core(regras de negocio, ...) antes de ir para o framework nestjs, usando ddd e clean archtecture
+- criar uma pasta shared(logica compartilhavel)
+- Criar uma aplicação TypeScript (core)
+  - Criar entidade de Categoria
+  - Criar testes (pirâmide de testes)
+    - unitario, integração
+  - Criar Casos de Uso e Repositório
+  - Nest.js - Criação de API Rest
+  - Criar testes e2e (end-to-end)
+  - Repetir para as outras entidades, cast member, genre, video
+- Integração com RabbitMQ e Encoder de vídeo
 - keycloak
-  - docker compose -f ./docker/docker-compose.keycloak.yaml up
-    - sudo chmod -R 777 docker/.docker/keycloak_data
-  - extra_hosts
-    - mapeamentos de nomes de host para endereços IP
-  - localhost:8080
-    - admin
-    - admin
-  - mapeia o volume keycloak, talvez quando iniciar nao precisar criar o realm, client, user
-----
+- logs
+  - rastrear comportamento
+- CI
+  - esteira no github actions
+  - docker file para produção
+      - imagem menor, otimizada
+      - vai ser usada no cd
+---
 
 ### como rodar o projeto
 
@@ -1325,29 +1527,6 @@ npm run test:cov
 # analise estatica do typescript sem gerar build
  npm run tsc:check
 
-# migration umzug
-- mostra as funcionalidades disponiveis do umzug
-  - dev
-    - npm run migrate:ts:with-paths
-  - produção
-    - npm run migrate:js
-- ver funcionalidades disponiveis do create
-  npm run migrate:ts:with-paths create -- --help
-
-- cria migration
-  - dar um nome sugestivo, do que está sendo feito
-  - mover para a pasta do modulo correspondente
-  npm run migrate:ts:with-paths create -- --name create-categories-table.ts --folder ./src
-
-- mostra migrations pendentes
-  - npm run migrate:ts:with-paths pending
-- aplica migrations pendentes
-  - npm run migrate:ts:with-paths up
-- desfaz migrations
-  - npm run migrate:ts:with-paths down               # desfaz apenas a última migration
-  - npm run migrate:ts:with-paths down -- --step 2   # desfaz as 2 últimas migrations
-  - npm run migrate:ts:with-paths down -- --to 0   # desfaz todas as migrations, volta ao estado inicial
-
 # container mysql, comandos uteis
 mysql -uroot -proot
 show databases;
@@ -1359,8 +1538,29 @@ drop table categories;
 describe categories;
 select * from SequelizeMeta;
 
+# obs: alguns comandos estao nas secoes relacionadas
 ```
 
+----
+
+### paradigmas de programacao
+- estilos ou modelos de pensamento usados para estruturar e organizar programas
+- poo
+  - encapsulamento, herança, composição, interfaces e imutabilidade.
+- funcional
+  - src/core/cast-member/domain/cast-member-fake.builder.ts
+
+----
+
+### typescript
+- @types
+  - extender interface
+- decorators
+  1. Funções: decorators são funções executadas sobre classes, métodos, propriedades ou parâmetros.
+  2. Metadados: decorators podem registrar informações sobre esses elementos; o Nest as consulta depois.
+  3. Reflect Metadata: mecanismo usado pelo Nest para armazenar e ler metadados em tempo de execução.
+  4. Compilação do TypeScript: opções como experimentalDecorators e emitDecoratorMetadata permitem gerar e disponibilizar esses metadados.
+  5. Injeção de dependência: o Nest usa metadados e decorators como @Injectable() para descobrir e conectar dependências.
 ----
 
 ### como rodar o projeto em producao

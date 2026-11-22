@@ -213,7 +213,7 @@ GET http://localhost:3000/fake-event
 GET http://localhost:3000/rabbitmq-fake
 
 ###
-
+### fluxo Resource Owner Password Credentials (autenticação via username e password)
 ### Estou usando host.docker.internal, porque no momento o dev container com rest client está fazendo requisição de dentro do container, 
 ### então por localhost:8080 não funciona, mas se estiver usando o rest client fora do container, pode usar localhost:8080
 POST http://host.docker.internal:8080/realms/codeflix/protocol/openid-connect/token
@@ -234,7 +234,7 @@ GET http://host.docker.internal:8080/realms/codeflix/protocol/openid-connect/cer
 
 @jwtToken = eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFkbWluQHVzZXIuY29tIiwibmFtZSI6InRlc3QiLCJpYXQiOjE3OTA2MjQxNjYsInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJhZG1pbi1jYXRhbG9nIl19fQ.UmMd5GdkF4JP3JnLiFmH-AVRJTJjYodZrFbyGwrb52P4EskUj7ulwspgrOEOhITlkIbXYmfGBN2gGf4JZ83Bf8TkK5I08Eq8HDQTGH-PeC5cO1gLG8IVJwtq4AyamCz4vlfiYNIlSmrewsoXlW6R3nMh19W_6SBaiMp6KVUzUMbcip5Fqsxim8Ci61kg1UXWAAZlbyH1LIvtOCE4oui8NLqjDgGR0XI3LiPGP67svoKiEdskeSc1g5SYtwH1pBVw1CX7ijrr5Me1D_DO8CbGJUfugmoS34FYqJCxDk9nkR85TgWvkNkeryqYnGfOCCbrYUQYNBSrdD0zu3AmIWtoKQ
 
-###
+### utilizei esses dois endpoints para teste caso nao usasse o keycloak para autenticação
 POST http://localhost:3000/auth
 Content-Type: application/json
 
