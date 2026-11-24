@@ -32,13 +32,8 @@
 - [Persistence layer](#persistence-layer)
 - [Framework: NestJS](#framework-nestjs)
 - [Autenticação e autorização](#autenticacao-e-autorizacao)
-
-
-Boas práticas: 
-  validações, tratamento de erros, observabilidade, CI/CD, configurações de qualidade.
-Execução: 
-  orientações finais (como rodar o projeto).
-
+- [Lançar, capturar e tratar exceções](#lancar-capturar-e-tratar-excecoes)
+- [Validações](#validações)
 
 ---
 
@@ -1047,80 +1042,86 @@ gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener ->
 
 ----
 
-### capturar e tratar exceções
+### lancar, capturar e tratar excecoes
 - conceitos
-  - Erro (Error / Mistake)
-    - Definição: É a ação humana incorreta cometida ao pensar, projetar ou escrever o sistema.
-      - Na prática: É a origem mental ou de digitação antes mesmo de o código rodar (ex: esquecer uma regra de negócio ou digitar o sinal errado).
-  - Defeito (Fault / Bug)
-    - Definição: É o estado concreto e imperfeito gravado dentro do código ou da estrutura do sistema como resultado de um erro humano.
-      - Na prática: É o problema guardado em repouso no arquivo, esperando aquela parte do programa ser executada (ex: uma fórmula errada ou código morto salvo no projeto).
-  - Falha (Failure)
-    - Definição: É o evento visível em tempo de execução quando o sistema deixa de cumprir o que deveria para o usuário final.
-      - Na prática: É o colapso ou comportamento errado acontecendo na ponta quando o defeito é ativado (ex: o aplicativo travar ou cobrar o valor errado na fatura).
-  - Exceção (Exception)
-    - Definição: É um mecanismo de alerta em tempo de execução que interrompe o fluxo normal do programa ao detectar uma condição inesperada, exigindo tratamento imediato (`try-catch`).
-      - Na prática: É o freio de emergência do código para impedir que uma anomalia vire uma falha grave sem controle (ex: `EntityValidationError` disparada via `throw`).
-  - Padrão Notification (Notification Pattern)
-    - Definição: É um padrão de design de software usado para coletar e acumular múltiplos erros de validação em um único objeto durante um processo, sem interromper a execução a cada problema encontrado.
-      - Na prática: Substitui o lançamento repetido de exceções por uma lista única de pendências entregue de uma só vez ao final da verificação.
+  - Defeito (defect): imperfeição em um artefato do software (código, projeto ou requisito) que pode provocar um comportamento incorreto.
+    - Exemplo: a validação da idade não verifica se o valor é negativo.
+  - Erro (error): ação humana equivocada ou estado interno incorreto produzido por essa ação.
+    - Exemplo: o desenvolvedor implementa uma condição de validação incorreta.
+  - Falha (failure): comportamento observável do sistema que não corresponde ao comportamento esperado.
+    - Exemplo: a aplicação aceita e grava uma idade negativa no banco.
+  - Exceção (exception): mecanismo da linguagem ou do programa para representar e sinalizar uma situação excepcional durante a execução.
+    - Exemplo: a validação lança ValidationError quando recebe uma idade negativa.
+    - exceção não é necessariamente consequência de uma falha. Ela também pode ser utilizada corretamente para impedir que uma falha aconteça.
+  - Notification Pattern: É um padrão de design de software usado para coletar e acumular múltiplos erros de validação em um único objeto durante um processo, sem interromper a execução a cada problema encontrado.
+    - Na prática: Substitui o lançamento repetido de exceções por uma lista única de pendências entregue de uma só vez ao final da verificação.
 - exceptions
   - core
     - src/core/shared/domain/errors/not-found.error.ts
-    - src/core/shared/domain/errors/invalid-argument.error.ts
     - src/core/shared/domain/validators/validation.error.ts
       - EntityValidationError
       - SearchValidationError
       - LoadEntityError
     - src/core/cast-member/domain/cast-member-type.vo.ts
   - nest framework
-    - notFound
-    - forbideen
-    - notAutheticated
-    - filters
-      - capturar exceptions 
+    - BadRequestException | 400 | Requisição ou dados inválidos |
+    - UnauthorizedException | 401 | Usuário não autenticado ou token inválido |
+      - src/nest-modules/auth-module/auth.guard.ts
+    - ForbiddenException | 403 | Usuário autenticado, mas sem permissão |
+      - src/nest-modules/auth-module/check-is-admin.guard.ts
+    - NotFoundException | 404 | Recurso não encontrado |  
+      - src/nest-modules/shared-module/filters/not-found-error.filter.ts
+    - ConflictException | 409 | Conflito, como tentar cadastrar algo duplicado |
+    - UnprocessableEntityException | 422 | Dados entendidos, mas rejeitados por validação ou regra |
+      - src/nest-modules/shared-module/filters/entity-validation-error.filter.ts
+    - filter
+      - capturar/tratar exceptions 
+      - src/nest-modules/global-config.ts
 - mecanismos, patterns de tratamento de erros
-  - throw
-    - throw é uma instrução da linguagem para lançar uma exceção.
+  - throw sinaliza o problema interrompendo o fluxo atual.
+  - try/catch captura a exceção para tratá-la, convertê-la ou relançá-la.
   - either
     - Either é um tipo que representa um valor de uma entre duas alternativas possíveis, geralmente um erro (Left) ou um resultado bem-sucedido (Right).
-    - evitar lancar excecao, interromper o fluxo com throw
-    - src/core/cast-member/application/validations/cast-members-ids-exists-in-database.
-    validator.ts
-    - src/core/cast-member/domain/cast-member-type.vo.ts
-    - src/core/cast-member/domain/cast-member.repository.ts
-    - src/core/genre/application/validations/genres-ids-exists-in-database.validator.ts
-    - src/core/video/application/use-cases/create-video/create-video.use-case.ts
-    - src/core/shared/domain/validators/media-file.validator.ts
-    - src/core/video/domain/banner.vo.ts
+      - evitar lancar excecao, interromper o fluxo com throw
+    - exemplos
+      - src/core/cast-member/application/validations/cast-members-ids-exists-in-database.
+      validator.ts
+      - src/core/cast-member/domain/cast-member-type.vo.ts
+      - src/core/cast-member/domain/cast-member.repository.ts
+      - src/core/genre/application/validations/genres-ids-exists-in-database.validator.ts
+      - src/core/video/application/use-cases/create-video/create-video.use-case.ts
+      - src/core/shared/domain/validators/media-file.validator.ts
+      - src/core/video/domain/banner.vo.ts
   - notification
     - acumular erros na entidade e no final fazer algo no usecase
     - acumular vários problemas de validação sem interromper imediatamente o processamento.
-    - src/core/cast-member/application/use-cases/create-cast-member/create-cast-member.use-case.ts
-    - src/core/shared/domain/validators/notification.ts
+    - exemplos
+      - src/core/cast-member/application/use-cases/create-cast-member/create-cast-member.use-case.ts
+      - src/core/shared/domain/validators/notification.ts
 
 ---
 
 ### validações
 - validações
   - separação das validações de dominio(regras de dominio) vs validações de sintaxe
-    - controller dto
-      - src/nest-modules/genres-module/genres.controller.ts
-    - dto do usecase valida a sintaxe
-      - src/core/genre/application/use-cases/create-genre/create-genre.input.ts
-      - src/core/genre/application/use-cases/create-genre/create-genre.use-case.ts
+  - validacoes em diferentes camadas
     - entidade valida regra de negocio
       - src/core/genre/domain/genre.aggregate.ts
       - src/core/genre/domain/genre.validator.ts
-  - validacoes em diferentes camadas
+    - dto do usecase valida a sintaxe
+      - src/core/genre/application/use-cases/create-genre/create-genre.input.ts
+      - src/core/genre/application/use-cases/create-genre/create-genre.use-case.ts
+    - controller dto
+      - src/nest-modules/genres-module/genres.controller.ts
+      - pipeGlobal
+    - mapper, hidratacao
+      - src/core/cast-member/infra/db/sequelize/cast-member-sequelize.ts
   - class-validator
     - categoryRules
     - CastMemberRules
   - joy validator
     - configModule - variaveis de ambiente
-  - nest
-    - pipe
-  
+    - src/nest-modules/config-module/config.module.ts
 ---
 
 ### Práticas e padrões operacionais
@@ -1134,6 +1135,13 @@ gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener ->
     - Construir: criar ou desenvolver a aplicação.
     - Configurar: ajustar opções para que ela funcione em determinado ambiente.
     - Executar: iniciar e usar a aplicação.
+  
+
+
+Boas práticas: 
+  validações, tratamento de erros, observabilidade, CI/CD, configurações de qualidade.
+Execução: 
+  orientações finais (como rodar o projeto).
 
 ### The Twelve-Factor App
 Este projeto aplica várias metodologias do The Twelve-Factor App:
