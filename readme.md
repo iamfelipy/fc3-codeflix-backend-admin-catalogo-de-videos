@@ -19,21 +19,29 @@
 ---
 
 ### sumario
-- [apresentacao do projeto](#apresentacao-do-projeto)
-- [event storming](#event-storming)
-- [c4](#c4)
-- [domain-driven design](#domain-driven-design)
-- [Estilos e padroes arquiteturais](#estilos-e-padroes-arquiteturais)
-- [Arquitetura orientada a eventos](#arquitetura-orientada-a-eventos)
-- [Mensageria - comunicacao assincrona e processamento assincrono](#mensageria---comunicacao-assincrona-e-processamento-assincrono) 
-- [Princípios de design](#principios-de-design)
-- [Patterns of Enterprise Application Architecture](#livro-patterns-of-enterprise-application-architecture-de-martin-fowler-2002)
-- [Design Patterns: Elements of Reusable Object-Oriented Software](#livro-design-patterns-elements-of-reusable-object-oriented-software-da-gang-of-four-gof)
+- Problema e domínio
+  - [apresentacao do projeto](#apresentacao-do-projeto)
+  - [event storming](#event-storming)
+- decisões arquiteturais
+  - [c4](#c4)
+  - [domain-driven design](#domain-driven-design)
+  - [Estilos e padroes arquiteturais](#estilos-e-padroes-arquiteturais)
+  - [Arquitetura orientada a eventos](#arquitetura-orientada-a-eventos)
+  - [Mensageria - comunicacao assincrona e processamento assincrono](#mensageria---comunicacao-assincrona-e-processamento-assincrono) 
+- design do código
+  - [Princípios de design](#principios-de-design)
+  - [Patterns of Enterprise Application Architecture](#livro-patterns-of-enterprise-application-architecture-de-martin-fowler-2002)
+  - [Design Patterns: Elements of Reusable Object-Oriented Software](#livro-design-patterns-elements-of-reusable-object-oriented-software-da-gang-of-four-gof)
 - [Persistence layer](#persistence-layer)
 - [Framework: NestJS](#framework-nestjs)
-- [Autenticação e autorização](#autenticacao-e-autorizacao)
-- [Lançar, capturar e tratar exceções](#lancar-capturar-e-tratar-excecoes)
-- [Validações](#validações)
+- qualidade e segurança
+  - [Autenticação e autorização](#autenticacao-e-autorizacao)
+  - [Lançar, capturar e tratar exceções](#lancar-capturar-e-tratar-excecoes)
+  - [Validações](#validações)
+  - [Configurações de qualidade](#configuracoes-de-qualidade)
+  - [Testes](#testes)
+- práticas e padrões operacionais
+  - [Configuração: variáveis de ambiente e `.env`](#configuracao-variaveis-de-ambiente-e-env)
 
 ---
 
@@ -962,11 +970,13 @@ gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener ->
     - CheckIsAdminGuard verifica admin-catalog: decide se o usuário pode executar aquela ação. Isso é autorização de acesso à rota.
   - Permissão é o direito concedido: por exemplo, poder editar vídeos.
   - SSO: se o usuário entra uma vez no Keycloak e depois acessa outras aplicações sem fazer login novamente, isso é Single Sign-On. O Keycloak mantém uma sessão que pode ser usada por vários clientes.
+  - seguranca
 - keycloak
   - uma solução de gerenciamento de identidade e acesso (Identity and Access Management, IAM). Ele centraliza o login dos usuários e ajuda aplicações e serviços a controlar o acesso a recursos protegidos
     - O Keycloak ajuda a controlar esse acesso por meio de autenticação e autorização.
     - acesso: inclui administrar permissões e decidir se um acesso será permitido.
     - tem os clients, users, roles, rbac, OAuth + OIDC
+  - usado para testar o fluxo de autenticacao e autorizacao com a aplicacao backend, quem vai usar ele vai ser o frontend
   - OAuth 2.0 (Autorização)
     - OAuth 2.0 tem vários fluxos, e todos são formas de obter um access token — isto é, uma autorização para acessar recursos. Mas isso não significa que em todos o usuário veja uma tela para conceder permissões.
   - OpenID Connect - OIDC (Autenticação)
@@ -977,12 +987,12 @@ gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener ->
     - admin-catalog
       - gestao de videos no micro-admin-videos
     - assinante
-  - usado para testar o fluxo de autenticacao e autorizacao com a aplicacao backend, quem vai usar ele vai ser o frontend
   - config
     - versionei o banco do keycloak, estrutura ja esta montada
     - realm custom, client, user, realm role, role associada ao user
   - docker 
-    - docker/docker-compose.keycloak.yaml
+    - docker compose -f ./docker/docker-compose.keycloak.yaml up
+      - sudo chmod -R 777 docker/.docker/keycloak_data
 - fluxo OAuth — Resource Owner Password Credentials, Password Grant (keycloak - Direct Access Grant):
   1. O cliente envia username e password ao endpoint de tokens do Keycloak.
   2. O Keycloak autentica o usuário e retorna um access_token.
@@ -1124,105 +1134,135 @@ gestao de conteudo -> usecase -> agregado -> evento -> dispatcher -> listener ->
     - src/nest-modules/config-module/config.module.ts
 ---
 
-### Práticas e padrões operacionais
-  - Orientam como construir, configurar, executar e manter a aplicação.
-  - como você garante qualidade, execução consistente e manutenção?
-  - conceitos
-    - Prática: jeito de fazer algo.
-    - Padrão: jeito combinado ou recomendado para fazer algo de forma consistente.
-      - Consistente quer dizer feito de maneira uniforme, seguindo o mesmo padrão ao longo do tempo.
-    - Operacional: relacionado a colocar algo em funcionamento e mantê-lo funcionando.
-    - Construir: criar ou desenvolver a aplicação.
-    - Configurar: ajustar opções para que ela funcione em determinado ambiente.
-    - Executar: iniciar e usar a aplicação.
-  
-
-
-Boas práticas: 
-  validações, tratamento de erros, observabilidade, CI/CD, configurações de qualidade.
-Execução: 
-  orientações finais (como rodar o projeto).
-
-### The Twelve-Factor App
-Este projeto aplica várias metodologias do The Twelve-Factor App:
-
-   1. III. Config (Configurações no ambiente): Uso do ConfigModule do NestJS e variáveis de ambiente (.env) para gerenciar parâmetros de configuração sem hardcoding.
-   2. II. Dependencies (Dependências explícitas): Gerenciamento de dependências isoladas e declaradas no package.json e package-lock.json.
-   3. IV. Backing services (Serviços de suporte): Tratamento de bancos de dados (MySQL/SQLite via Sequelize) e mensageria (RabbitMQ) como recursos acoplados/externos
-      configuráveis.
-   4. V. Build, release, run (Estágios separados): Separação estrita entre build (npm run build, gerando a pasta dist) e execução (node dist/main).
-   5. VII. Port binding (Exportação de serviços): A aplicação expõe sua API REST via ligação de porta HTTP gerenciada pelo NestJS.
-   6. X. Dev/prod parity (Paridade entre ambientes): Uso de Docker / Docker Compose e containerização para manter consistência entre desenvolvimento, testes e produção.
-   7. XII. Admin processes (Processos administrativos): Scripts dedicados para tarefas de migração de banco de dados (migrate.ts, npm run migration:run).
-
----
-
-### configurações de qualidade
+### configuracoes de qualidade
 - Configuração de Qualidade (QA)
-  - ferramentas de qualidade para garantir a integridade do código, assegurando cobertura de testes e tipagem correta.
+  - Configurações de qualidade são os ajustes e as regras das ferramentas que verificam se o código atende aos critérios do projeto, como tipagem correta, testes e formatação consistente.
+    - como você garante qualidade, integridade do codigo, execução consistente e manutenção?
+  - conceito
+    - configuracao
+      - Configuração é o ajuste ou a definição de como algo deve funcionar.
+      - Nesse título, são as definições das ferramentas: por exemplo, configurar o Jest para exigir pelo menos 80% de cobertura de testes.
+    - qualidade
+      - “grau de perfeição, precisão ou conformidade a certo padrão”.
+      - qualidade é o grau em que o código atende aos critérios esperados pelo projeto — como tipagem correta, testes passando, regras do ESLint respeitadas e formatação consistente.
+        - No seu exemplo, o padrão é definido por critérios como tipagem correta, testes e regras de código. “Qualidade” é o quanto o código atende a esses critérios.
 - typescript (tipagem)
   - Criado um script NPM chamado tsc:check que execute o compilador do TypeScript apenas para verificação (sem gerar build), garantindo que não existam erros de tipagem no projeto.
-- jest (teste)
-  - cobertura de testes
-    - Configurado o Jest para que a execução falhe caso a cobertura de código (code coverage) seja inferior a 80%.
-    - foi usado apenas para o teste de integração e unidade
-    - npm run test:cov
 - eslint (regras de código)
 - prettier (formatação automatica baseada nas regras)
-
+- cobertura de testes
+  - Configurado o Jest para que a execução falhe caso a cobertura de código (code coverage) seja inferior a 80%.
+  - foi usado apenas para o teste de integração e unidade
+  - npm run test:cov
 ---
 
 ### testes
-- tdd(test driven development)
-- triple aaa(arrange, act, assert)
-- piramidade de testes
-- sqlite
-  - testes
-- InMemoryRepository
-  - usado nos testes de unidade
-  - src/core/video/infra/db/in-memory/video-in-memory.repository.spec.ts
-- Test Data Builder(Gof - criacional)
-  - CategoryFakeBuilder
-- fluent pattern
-  - ValidatorRules
-- helpers
-  - src/core/shared/infra/testing/helpers.ts
-    - teste de unidade e integração
-    - config para sequelize
-  - src/nest-modules/shared-module/testing/helpers.ts
-   - teste de integração e e2e
-   - config sequelize, aplicacao nest
-  - src/nest-modules/shared-module/testing/supertest-extend.ts
-   - teste e2e
-   - atalho para autenticar rotas protegidas
-- fixtures (configuração para teste, arranges)
-  - teste de integração, e2e
-- inmemory
-- tecnologia
-  - jest
-    - arquivo de configuracao diferente para unit, integration e e2e
-    - jest-setup.ts -> arquivo codigo na inicializacao
-- teste de unidade e integracao
-  - npm run test
-  - ![Exemplo de pirâmide de testes – unidade e integração](docs/teste-unidade-integracao.png)
-- teste e2e
-  - npm run test:e2e:runInBand
-  - ![Exemplo de teste E2E – execução e verificação](docs/teste-e2e.png)
+  - Esta seção apresenta os testes, eles sao usados para verificar o comportamento da aplicação, encontrar problemas e aumentar a confiança nas alterações do código.
+  - piramidade de testes
+    - A pirâmide de testes representa uma estratégia de testes em camadas:
+      - Base — testes unitários: muitos; verificam partes pequenas e isoladas do código.
+      - Meio — testes de integração: verificam se partes, como serviço e banco, funcionam juntas.
+      - Topo — testes end-to-end (E2E): poucos; simulam o uso da aplicação de ponta a ponta.
+      - A ideia é ter mais testes rápidos e isolados e menos testes amplos, que tendem a ser mais lentos e custosos.
+    - A pirâmide de testes ficou conhecida por meio do livro Succeeding with Agile: Software Development Using Scrum, de Mike Cohn, publicado em 2009.
+    - unidade, integracao, e2e 
+      - unitário
+        - src/core/cast-member/application/use-cases/create-cast-member/__tests__/create-cast-member.use-case.spec.ts
+      - integração
+        - src/core/cast-member/application/use-cases/create-cast-member/__tests__/create-cast-member.use-case.int-spec.ts
+      - e2e
+        - test/cast-members
+    - Estratégias e práticas de teste
+  - tdd(test driven development)
+    - (Test-Driven Development, desenvolvimento orientado a testes), é uma prática em que se escreve um teste antes do código, implementa-se o necessário para fazê-lo passar e depois se melhora o código. O ciclo é: vermelho → verde → refatorar.
+     - TDD é uma prática de desenvolvimento
+      - Prática: é uma maneira de trabalhar aplicada durante o desenvolvimento.
+  - triple aaa(arrange, act, assert)
+    - AAA é uma forma de organizar um teste em três etapas:
+      - Arrange (preparar): configura os dados e dependências.
+      - Act (agir): executa a função testada.
+      - Assert (verificar): confere o resultado.
+    - Exemplo: preparar uma idade, chamar a validação e verificar se ela rejeita um valor negativo.
+    - Organização dos testes
+  - padrões e recursos de apoio a testes
+    - InMemoryRepository
+      - reduzir a quantidade de mocks inline
+      - acelerar a velocidade
+      - usado nos testes de unidade
+      - src/core/video/infra/db/in-memory/video-in-memory.repository.spec.ts
+      - src/core/shared/infra/db/in-memory/in-memory.repository.ts
+    - mocks
+      - objeto falso
+    - spy
+    - Test Data Builder(Gof - criacional)
+      - Test Data Builder é uma técnica para criar dados de teste por meio de um objeto construtor. Ele fornece valores padrão e permite alterar apenas os campos importantes para cada teste.
+        - esconder detalhes de criacao do agregado no teste
+      - CategoryFakeBuilder
+      - fluent pattern
+        - CategoryFakeBuilder
+        - ValidatorRules
+    - fixtures (configuração para teste, arranges)
+      - fixture é o conjunto de dados e configurações preparados para um teste. Pode ser reutilizada em vários testes.
+        - Arrange é a etapa do teste em que você prepara os dados e as dependências. Uma fixture é um dado ou conjunto de configurações que pode ser usado nessa preparação.
+          - Ou seja, a fixture pode ser usada durante o Arrange, mas Arrange é a etapa inteira.
+      - src/nest-modules/genres-module/testing/genre-fixture.ts
+      - teste de integração, e2e
+    - helpers
+      - src/core/shared/infra/testing/helpers.ts
+        - teste de unidade e integração
+        - config para sequelize
+      - src/nest-modules/shared-module/testing/helpers.ts
+        - teste de integração e e2e
+        - config sequelize, aplicacao nest
+      - src/nest-modules/shared-module/testing/supertest-extend.ts
+        - atalho para autenticar rotas protegidas
+        - teste e2e
+  - tecnologia
+    - jest
+      - arquivo de configuracao diferente para unit, integration e e2e
+      - jest-setup.ts -> arquivo codigo na inicializacao
+    - sqlite
+      - acelerar os testes de unidade e integracao
+      - em memoria
+  - como executar
+    - teste de unidade e integracao
+      - npm run test
+      - ![Exemplo de pirâmide de testes – unidade e integração](docs/teste-unidade-integracao.png)
+    - teste e2e
+      - npm run test:e2e:runInBand
+      - ![Exemplo de teste E2E – execução e verificação](docs/teste-e2e.png)
+
 ----
 
-### config, variaveis de ambiente
-  - local
-    - usado pelos testes
-    - src/core/shared/infra/config.ts
-    - dotenv
-      - carregar variveis de ambiente
-      - normalmente o dotenv é usado apenas em desenvolvimento para carregar variáveis de ambiente locais, não em produção, onde variáveis já devem estar definidas no ambiente do servidor/container.
-  - nest, framework, infraestrutura
-    - usado pelas serviços do container de injeção de dependencia e tambem pelos testes e2e
-    - src/nest-modules/config-module/config.module.ts
-    - criei suportando configurações alem do .env, assim respeitando twelve-factory - chapter 3
-    - validação
-      - lib typescript joi
+### configuracao: variaveis de ambiente e env
+- conceitos
+  - configuração: valores que determinam como a aplicação funciona.
+    - configuração: é o arranjo de elementos ou ajustes que define a forma ou o funcionamento de algo. 
+  - uma forma de fornecer esses valores à aplicação.
+    - Arquivo de configuração: por exemplo, config.json ou config.yaml.
+    - Argumentos na inicialização: por exemplo, npm start -- --port=3000.
+    - Serviço externo de configuração ou segredos: a aplicação busca os valores ao iniciar.
+    - Variáveis de ambiente: são pares de nome e valor fornecidos ao processo da aplicação. Em Node.js, ficam disponíveis em process.env; no NestJS, o ConfigService permite lê-las. 
+      - .env
+        - Um arquivo .env é uma forma comum de carregá-las durante o desenvolvimento
+        - um arquivo que lista variáveis de ambiente, geralmente usado no desenvolvimento local.
+  - Separar configurações do código permite usar o mesmo código em diferentes ambientes, trocar valores como a URL do banco e reduzir o risco de expor credenciais no repositório.
+- config no projeto
+  - desenvolvimento
+    - arquivos de configuracao
+      - envs/.env
+    - core
+      - src/core/shared/infra/config.ts
+        - usado pelos testes
+        - dotenv
+          - carregar variveis de ambiente
+          - normalmente o dotenv é usado apenas em desenvolvimento para carregar variáveis de ambiente locais, não em produção, onde variáveis já devem estar definidas no ambiente do servidor/container.
+    - nest, framework, infraestrutura
+      - src/nest-modules/config-module/config.module.ts
+        - usado pelas serviços do container de injeção de dependencia e tambem pelos testes e2e
+        - criei suportando configurações alem do .env, assim respeitando twelve-factory - chapter 3
+      - validação
+        - lib joi
 ---
 
 ### observabilidade
@@ -1390,6 +1430,21 @@ Este projeto aplica várias metodologias do The Twelve-Factor App:
 
 ---
 
+### The Twelve-Factor App
+- The Twelve-Factor App é um conjunto de 12 princípios para desenvolver e operar aplicações web como serviços. Eles orientam, por exemplo, como organizar o código, gerenciar configurações e dependências, registrar logs e preparar a aplicação para implantação e escala.
+  - Este projeto aplica várias metodologias do The Twelve-Factor App:
+   1. III. Config (Configurações no ambiente): Uso do ConfigModule do NestJS e variáveis de ambiente (.env) para gerenciar parâmetros de configuração sem hardcoding.
+   2. II. Dependencies (Dependências explícitas): Gerenciamento de dependências isoladas e declaradas no package.json e package-lock.json.
+   3. IV. Backing services (Serviços de suporte): Tratamento de bancos de dados (MySQL/SQLite via Sequelize) e mensageria (RabbitMQ) como recursos acoplados/externos
+      configuráveis.
+   4. V. Build, release, run (Estágios separados): Separação estrita entre build (npm run build, gerando a pasta dist) e execução (node dist/main).
+   5. VII. Port binding (Exportação de serviços): A aplicação expõe sua API REST via ligação de porta HTTP gerenciada pelo NestJS.
+   6. X. Dev/prod parity (Paridade entre ambientes): Uso de Docker / Docker Compose e containerização para manter consistência entre desenvolvimento, testes e produção.
+    - Paridade significa igualdade ou equivalência. No princípio dev/prod parity, significa manter os ambientes de desenvolvimento e produção o mais parecidos possível.
+   7. XII. Admin processes (Processos administrativos): Scripts dedicados para tarefas de migração de banco de dados (migrate.ts, npm run migration:run).
+
+---
+
 ### generico
 - /core: contem as principais operações do dominio, com poucas influencia do nestjs
 - /cmd
@@ -1506,9 +1561,6 @@ Este projeto aplica várias metodologias do The Twelve-Factor App:
         - ler a secao de dela
 - rabbitmq
   - olhar a secao ¨mensageria - comunicacao assincrona e processamento assincrono¨
-- keycloak
-  - docker compose -f ./docker/docker-compose.keycloak.yaml up
-    - sudo chmod -R 777 docker/.docker/keycloak_data
 - extra
   - env
     - usou .env com mysql e DB_AUTO_LOAD_MODELS=false e sem sequelize.sync, evita conflito entre migrations e com o array de models carregados na inicialização nest
